@@ -17,6 +17,13 @@ function generateInviteCode() {
   return Math.random().toString(36).toUpperCase().slice(2, 8);
 }
 
+function defaultDueDate(): string {
+  // 40 weeks (280 days) from today — sane default the user can edit.
+  const d = new Date();
+  d.setDate(d.getDate() + 280);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function LoginScreen() {
   const { setHousehold, setCurrentUser, setPartnerUser } = useHouseholdStore();
 
@@ -28,7 +35,7 @@ export default function LoginScreen() {
   const [joinCode,  setJoinCode]  = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [stage,     setStage]     = useState<Stage>('pregnant');
-  const [dueDate,   setDueDate]   = useState('');
+  const [dueDate,   setDueDate]   = useState(defaultDueDate());
   const [babyName,  setBabyName]  = useState('');
   const [babyGender,setBabyGender]= useState<BabyGender>('unknown');
   const [loading,   setLoading]   = useState(false);
@@ -72,16 +79,32 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (isJoining) {
-        const { data: hh, error: hhErr } = await supabase
-          .from('households').select('*').eq('invite_code', joinCode.trim().toUpperCase()).single();
-        if (hhErr || !hh) { setError('Invite code not found.'); return; }
+        // Pre-membership reads of `households` are blocked by RLS — we have to
+        // go through the security-definer RPC to look up the household by code
+        // and enforce the 2-user cap. After the RPC succeeds, the users insert
+        // is policy-allowed and we can re-read the row normally.
+        const { data: hhId, error: rpcErr } = await supabase.rpc('join_household_by_code', {
+          code: joinCode.trim(),
+        });
+        if (rpcErr || !hhId) {
+          const msg = rpcErr?.message ?? '';
+          setError(
+            msg.includes('household_full')      ? 'Household already has two members.'
+          : msg.includes('invalid_invite_code') ? 'Invite code not found.'
+          : msg.includes('not_authenticated')   ? 'Please sign in again.'
+                                                : 'Could not join household.'
+          );
+          return;
+        }
+        const householdId = hhId as string;
         const { data: user, error: uErr } = await supabase.from('users').insert({
-          id: userId, household_id: hh.id, role,
+          id: userId, household_id: householdId, role,
         }).select().single();
         if (uErr) throw uErr;
+        const { data: hh } = await supabase.from('households').select('*').eq('id', householdId).single();
+        if (hh) setHousehold(hh);
         setCurrentUser(user);
-        setHousehold(hh);
-        const { data: partner } = await supabase.from('users').select('*').eq('household_id', hh.id).neq('id', userId).maybeSingle();
+        const { data: partner } = await supabase.from('users').select('*').eq('household_id', householdId).neq('id', userId).maybeSingle();
         if (partner) setPartnerUser(partner);
       } else {
         const invite_code = generateInviteCode();

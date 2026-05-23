@@ -12,7 +12,7 @@ import { Badge } from '../../components/ui/Badge';
 import { colors, fonts, radii, spacing, priorityColors } from '../../constants/theme';
 import type { Appointment, Priority, Todo } from '../../types';
 
-type PlanTab = 'todos' | 'appointments';
+type PlanTab = 'todos' | 'appointments' | 'calendar';
 
 const PRIORITY_BADGE: Record<Priority, 'error'|'warning'|'success'> = {
   high:'error', medium:'warning', low:'success',
@@ -107,10 +107,10 @@ export default function PlanScreen() {
     <View style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Plan</Text>
+        <Text style={styles.headerTitle}>To Do</Text>
         <TouchableOpacity
           style={styles.addBtn}
-          onPress={() => router.push(activeTab === 'todos' ? '/(modals)/add-todo' : '/(modals)/add-appointment')}
+          onPress={() => router.push(activeTab === 'appointments' ? '/(modals)/add-appointment' : '/(modals)/add-todo')}
           activeOpacity={0.8}
         >
           <Text style={styles.addBtnText}>+ Add</Text>
@@ -119,7 +119,7 @@ export default function PlanScreen() {
 
       {/* Segment control */}
       <View style={styles.segmentBar}>
-        {(['todos', 'appointments'] as PlanTab[]).map(tab => (
+        {(['todos', 'appointments', 'calendar'] as PlanTab[]).map(tab => (
           <TouchableOpacity
             key={tab}
             style={[styles.segment, activeTab === tab && styles.segmentActive]}
@@ -127,7 +127,9 @@ export default function PlanScreen() {
             activeOpacity={0.7}
           >
             <Text style={[styles.segmentLabel, activeTab === tab && styles.segmentLabelActive]}>
-              {tab === 'todos' ? `✅  Todos${activeTodos.length > 0 ? ` (${activeTodos.length})` : ''}` : `📅  Appointments`}
+              {tab === 'todos'        ? `✅  Todos${activeTodos.length > 0 ? ` (${activeTodos.length})` : ''}` :
+               tab === 'appointments' ? `📅  Appts` :
+                                        `🗓  Calendar`}
             </Text>
           </TouchableOpacity>
         ))}
@@ -300,10 +302,169 @@ export default function PlanScreen() {
             )}
           </>
         )}
+
+        {/* ── CALENDAR ── */}
+        {activeTab === 'calendar' && (
+          <CalendarPane
+            todos={todos}
+            appointments={appointments}
+            onToggleTodo={toggleTodo}
+          />
+        )}
       </ScrollView>
     </View>
   );
 }
+
+// ───────────────────────────────────────────────────────────────────────────
+// Calendar pane — 14-day horizontal strip + selected day's items
+// Combines todos (with due_date) and appointments by date.
+// ───────────────────────────────────────────────────────────────────────────
+
+function toDateKey(d: Date) {
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function CalendarPane({
+  todos, appointments, onToggleTodo,
+}: {
+  todos:        Todo[];
+  appointments: Appointment[];
+  onToggleTodo: (t: Todo) => void;
+}) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const [selectedKey, setSelectedKey] = useState(toDateKey(today));
+
+  // Build 14-day window
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    return d;
+  });
+
+  // Group items by date key
+  const todosByDate: Record<string, Todo[]> = {};
+  for (const t of todos) {
+    if (!t.due_date || t.is_done) continue;
+    const key = t.due_date.slice(0, 10);
+    (todosByDate[key] ??= []).push(t);
+  }
+  const apptsByDate: Record<string, Appointment[]> = {};
+  for (const a of appointments) {
+    const key = a.appointment_date.slice(0, 10);
+    (apptsByDate[key] ??= []).push(a);
+  }
+
+  const selectedTodos = todosByDate[selectedKey] ?? [];
+  const selectedAppts = apptsByDate[selectedKey] ?? [];
+  const isEmpty = selectedTodos.length === 0 && selectedAppts.length === 0;
+
+  const selectedDate = new Date(selectedKey);
+  const selectedLabel = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  return (
+    <>
+      {/* Day strip */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={calStyles.strip}>
+        {days.map(d => {
+          const key       = toDateKey(d);
+          const isSelected = key === selectedKey;
+          const isToday    = key === toDateKey(today);
+          const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
+          return (
+            <TouchableOpacity
+              key={key}
+              style={[calStyles.day, isSelected && calStyles.daySelected]}
+              onPress={() => setSelectedKey(key)}
+              activeOpacity={0.7}
+            >
+              <Text style={[calStyles.dayWeek, isSelected && calStyles.dayWeekSelected]}>
+                {d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3).toUpperCase()}
+              </Text>
+              <Text style={[calStyles.dayNum, isSelected && calStyles.dayNumSelected]}>{d.getDate()}</Text>
+              {count > 0 && <View style={[calStyles.dot, isSelected && calStyles.dotSelected]} />}
+              {isToday && !isSelected && <View style={calStyles.todayUnderline} />}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {/* Selected day header */}
+      <Text style={calStyles.selectedHeader}>{selectedLabel}</Text>
+
+      {/* Items */}
+      {isEmpty ? (
+        <Card>
+          <View style={calStyles.empty}>
+            <Text style={calStyles.emptyEmoji}>🗓</Text>
+            <Text style={calStyles.emptyText}>Nothing scheduled.</Text>
+          </View>
+        </Card>
+      ) : (
+        <>
+          {selectedAppts.length > 0 && (
+            <Card>
+              <Text style={calStyles.groupLabel}>Appointments</Text>
+              {selectedAppts.map((appt, i) => (
+                <View key={appt.id} style={[calStyles.apptItem, i < selectedAppts.length - 1 && calStyles.itemBorder]}>
+                  <Text style={calStyles.apptTime}>{formatApptDate(appt.appointment_date)}</Text>
+                  <Text style={calStyles.apptTitle}>{appt.title}</Text>
+                  {appt.location && <Text style={calStyles.apptLoc}>📍 {appt.location}</Text>}
+                </View>
+              ))}
+            </Card>
+          )}
+          {selectedTodos.length > 0 && (
+            <Card>
+              <Text style={calStyles.groupLabel}>Todos</Text>
+              {selectedTodos.map((t, i) => (
+                <TouchableOpacity
+                  key={t.id}
+                  style={[calStyles.todoItem, i < selectedTodos.length - 1 && calStyles.itemBorder]}
+                  onPress={() => onToggleTodo(t)}
+                  activeOpacity={0.7}
+                >
+                  <View style={calStyles.checkbox} />
+                  <Text style={calStyles.todoTitle}>{t.title}</Text>
+                  <Badge label={t.priority} variant={PRIORITY_BADGE[t.priority]} />
+                </TouchableOpacity>
+              ))}
+            </Card>
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+const calStyles = StyleSheet.create({
+  strip:           { gap: 6, paddingVertical: spacing.xs },
+  day:             { width: 52, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radii.md, backgroundColor: colors.surface, gap: 2 },
+  daySelected:     { backgroundColor: colors.primary },
+  dayWeek:         { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 0.5 },
+  dayWeekSelected: { color: 'rgba(255,255,255,0.75)' },
+  dayNum:          { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.text },
+  dayNumSelected:  { color: '#FFFFFF' },
+  dot:             { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
+  dotSelected:     { backgroundColor: '#FFFFFF' },
+  todayUnderline:  { width: 16, height: 2, borderRadius: 1, backgroundColor: colors.primary, marginTop: 2 },
+
+  selectedHeader:  { fontFamily: fonts.heading.semibold, fontSize: 16, color: colors.text, marginTop: spacing.sm },
+  groupLabel:      { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase', marginBottom: spacing.sm },
+  itemBorder:      { borderBottomWidth: 1, borderBottomColor: colors.border },
+
+  apptItem:        { paddingVertical: spacing.md, gap: 2 },
+  apptTime:        { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
+  apptTitle:       { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
+  apptLoc:         { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
+
+  todoItem:        { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  checkbox:        { width: 20, height: 20, borderRadius: 5, borderWidth: 2, borderColor: colors.accent },
+  todoTitle:       { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text, flex: 1 },
+
+  empty:           { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
+  emptyEmoji:      { fontSize: 32 },
+  emptyText:       { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
+});
 
 const styles = StyleSheet.create({
   screen:   { flex: 1, backgroundColor: colors.background },

@@ -28,18 +28,20 @@ export default function RootLayout() {
     DMSans_600SemiBold,
   });
 
-  const [session,    setSession]    = useState<Session | null>(null);
-  const [loading,    setLoading]    = useState(true);
-  const [hasUserRow, setHasUserRow] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const { setHousehold, setCurrentUser, setPartnerUser, clearAll } = useHouseholdStore();
+  // Derive the auth-gate trigger directly from the store so any path that
+  // populates currentUser (root-layout hydration, signin, signup → household
+  // insert in login.tsx) flips the gate without needing local state sync.
+  const hasUserRow = useHouseholdStore((s) => s.currentUser !== null);
 
   const loadHousehold = useCallback(async (userId: string) => {
     try {
       const { data: user } = await supabase
         .from('users').select('*').eq('id', userId).maybeSingle();
-      if (!user) { setHasUserRow(false); return; }
-      setHasUserRow(true);
+      if (!user) return; // currentUser stays null → (auth) stack
       setCurrentUser(user);
       const { data: hh } = await supabase
         .from('households').select('*').eq('id', user.household_id).single();
@@ -63,7 +65,10 @@ export default function RootLayout() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
-      if (!s) { clearAll(); setHasUserRow(false); setLoading(false); }
+      if (!s) { clearAll(); setLoading(false); }
+      // On sign-in we don't re-hydrate here — login.tsx populates the store
+      // directly via setCurrentUser/setHousehold during its multi-step flow,
+      // and that triggers the gate via the store selector above.
     });
 
     return () => subscription.unsubscribe();

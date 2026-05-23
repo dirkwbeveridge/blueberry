@@ -142,7 +142,7 @@ export default function PartnerScreen() {
       <View style={styles.quickActions}>
         <TouchableOpacity
           style={styles.quickBtn}
-          onPress={() => router.push('/(tabs)/weeks')}
+          onPress={() => router.push('/(modals)/week-detail')}
           activeOpacity={0.75}
         >
           <Text style={styles.quickBtnEmoji}>🫐</Text>
@@ -150,15 +150,15 @@ export default function PartnerScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.quickBtn}
-          onPress={() => router.push('/(modals)/log-symptom')}
+          onPress={() => router.push('/(modals)/add-todo')}
           activeOpacity={0.75}
         >
-          <Text style={styles.quickBtnEmoji}>💜</Text>
-          <Text style={styles.quickBtnLabel}>Log together</Text>
+          <Text style={styles.quickBtnEmoji}>✅</Text>
+          <Text style={styles.quickBtnLabel}>Add task</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.quickBtn}
-          onPress={() => router.push('/(tabs)/plan')}
+          onPress={() => router.push('/(tabs)/todo')}
           activeOpacity={0.75}
         >
           <Text style={styles.quickBtnEmoji}>📋</Text>

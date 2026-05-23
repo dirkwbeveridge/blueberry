@@ -30,7 +30,7 @@ export function WeekHeroCard({ week, household }: WeekHeroCardProps) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => router.push('/(tabs)/weeks')}
+      onPress={() => router.push('/(modals)/week-detail')}
       activeOpacity={0.9}
     >
       <View style={styles.left}>

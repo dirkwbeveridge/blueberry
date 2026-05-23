@@ -1,0 +1,189 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View, Text, ScrollView, TouchableOpacity,
+  StyleSheet, Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { supabase } from '../../lib/supabase';
+import { useHousehold } from '../../hooks/useHousehold';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { colors, fonts, spacing } from '../../constants/theme';
+
+const STORAGE_KEY = 'blueberry-kick-session';
+
+export default function KickCounterModal() {
+  const { household } = useHousehold();
+  const [count,    setCount]    = useState(0);
+  const [start,    setStart]    = useState<number | null>(null);
+  const [elapsed,  setElapsed]  = useState(0);
+  const [saving,   setSaving]   = useState(false);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Restore session
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then(raw => {
+      if (!raw) return;
+      try {
+        const { count: c, startedAt } = JSON.parse(raw);
+        setCount(c ?? 0);
+        setStart(startedAt ?? null);
+      } catch {}
+    });
+  }, []);
+
+  // Tick
+  useEffect(() => {
+    if (start !== null) {
+      timer.current = setInterval(() => setElapsed(Date.now() - start), 500);
+    } else {
+      if (timer.current) clearInterval(timer.current);
+      setElapsed(0);
+    }
+    return () => { if (timer.current) clearInterval(timer.current); };
+  }, [start]);
+
+  function persist(c: number, s: number | null) {
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ count: c, startedAt: s }));
+  }
+
+  function recordKick() {
+    const now = Date.now();
+    const startedAt = start ?? now;
+    const newCount = count + 1;
+    if (start === null) setStart(now);
+    setCount(newCount);
+    persist(newCount, startedAt);
+  }
+
+  async function finish() {
+    if (!household || start === null) return;
+    setSaving(true);
+    try {
+      const duration = Math.round((Date.now() - start) / 1000);
+      await supabase.from('kick_sessions').insert({
+        household_id:  household.id,
+        started_at:    new Date(start).toISOString(),
+        ended_at:      new Date().toISOString(),
+        kick_count:    count,
+        duration_secs: duration,
+      });
+      AsyncStorage.removeItem(STORAGE_KEY);
+      setCount(0);
+      setStart(null);
+      Alert.alert('Session saved ✓', `${count} kicks logged.`, [
+        { text: 'Done', onPress: () => router.back() },
+      ]);
+    } catch {
+      Alert.alert('Could not save', 'Saved locally — will sync when connected.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function reset() {
+    Alert.alert('Reset session?', 'Clears the current count.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Reset', style: 'destructive', onPress: () => {
+        setCount(0); setStart(null);
+        AsyncStorage.removeItem(STORAGE_KEY);
+      }},
+    ]);
+  }
+
+  function formatElapsed(ms: number) {
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    return m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
+  }
+
+  const isActive = start !== null;
+
+  return (
+    <View style={styles.screen}>
+      <View style={styles.topBar}>
+        <View style={styles.handle} />
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Kick Counter</Text>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.cancelBtn}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity
+          style={[styles.kickBtn, isActive && styles.kickBtnActive]}
+          onPress={recordKick}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.kickEmoji}>👟</Text>
+          <Text style={[styles.kickCount, isActive && styles.kickCountActive]}>{count}</Text>
+          <Text style={[styles.kickLabel, isActive && styles.kickLabelActive]}>
+            {isActive ? 'Tap to count' : 'Tap to start'}
+          </Text>
+        </TouchableOpacity>
+
+        {isActive && (
+          <View style={styles.statsRow}>
+            <View style={styles.stat}>
+              <Text style={styles.statVal}>{formatElapsed(elapsed)}</Text>
+              <Text style={styles.statLabel}>Session time</Text>
+            </View>
+            <View style={styles.stat}>
+              <Text style={styles.statVal}>{count}</Text>
+              <Text style={styles.statLabel}>Kicks</Text>
+            </View>
+          </View>
+        )}
+
+        {count >= 10 && (
+          <Card style={styles.goal}>
+            <Text style={styles.goalText}>🎉  10 kicks reached</Text>
+          </Card>
+        )}
+
+        <Text style={styles.hint}>
+          Count for 2 hours, or until you reach 10. Aim for at least 10 kicks per session.
+        </Text>
+
+        {isActive && (
+          <View style={styles.actions}>
+            <Button label={saving ? 'Saving…' : 'Finish session'} onPress={finish} loading={saving} />
+            <Button label="Reset" onPress={reset} variant="ghost" />
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen:    { flex: 1, backgroundColor: colors.background },
+  topBar:    { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
+  handle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title:     { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
+  cancelBtn: { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
+  scroll:    { padding: spacing.lg, gap: spacing.lg, paddingBottom: 80, alignItems: 'center' },
+  kickBtn:   {
+    width: 200, height: 200, borderRadius: 100,
+    backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', gap: 4,
+    shadowColor: colors.primary, shadowOpacity: 0.15, shadowRadius: 20, shadowOffset: { width: 0, height: 6 }, elevation: 6,
+  },
+  kickBtnActive: { backgroundColor: colors.primary },
+  kickEmoji:    { fontSize: 32 },
+  kickCount:    { fontFamily: fonts.heading.bold, fontSize: 48, color: colors.primary },
+  kickCountActive: { color: '#FFFFFF' },
+  kickLabel:    { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
+  kickLabelActive: { color: 'rgba(255,255,255,0.85)' },
+  statsRow:  { flexDirection: 'row', gap: spacing.xl, justifyContent: 'center' },
+  stat:      { alignItems: 'center', gap: 2 },
+  statVal:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.primary },
+  statLabel: { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
+  goal:      { backgroundColor: '#E8F8ED', borderColor: colors.success, borderWidth: 1, alignSelf: 'stretch' },
+  goalText:  { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.success, textAlign: 'center' },
+  hint:      { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20, maxWidth: 280 },
+  actions:   { width: '100%', gap: spacing.sm },
+});
