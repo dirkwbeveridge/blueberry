@@ -1,0 +1,268 @@
+import React, { useState } from 'react';
+import {
+  View, Text, ScrollView, StyleSheet,
+  TouchableOpacity, KeyboardAvoidingView, Platform, Alert,
+} from 'react-native';
+import { supabase } from '../../lib/supabase';
+import { useHouseholdStore } from '../../store/household';
+import { Button } from '../../components/ui/Button';
+import { Input }  from '../../components/ui/Input';
+import { colors, fonts, radii, spacing } from '../../constants/theme';
+import type { BabyGender, Stage, UserRole } from '../../types';
+
+type Step = 'credentials' | 'role' | 'household' | 'setup';
+type AuthMode = 'signin' | 'signup';
+
+function generateInviteCode() {
+  return Math.random().toString(36).toUpperCase().slice(2, 8);
+}
+
+export default function LoginScreen() {
+  const { setHousehold, setCurrentUser, setPartnerUser } = useHouseholdStore();
+
+  const [step,      setStep]      = useState<Step>('credentials');
+  const [authMode,  setAuthMode]  = useState<AuthMode>('signin');
+  const [email,     setEmail]     = useState('');
+  const [password,  setPassword]  = useState('');
+  const [role,      setRole]      = useState<UserRole>('mother');
+  const [joinCode,  setJoinCode]  = useState('');
+  const [isJoining, setIsJoining] = useState(false);
+  const [stage,     setStage]     = useState<Stage>('pregnant');
+  const [dueDate,   setDueDate]   = useState('');
+  const [babyName,  setBabyName]  = useState('');
+  const [babyGender,setBabyGender]= useState<BabyGender>('unknown');
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState('');
+  const [userId,    setUserId]    = useState('');
+
+  async function handleCredentials() {
+    setError('');
+    if (!email.trim() || !password.trim()) { setError('Email and password required.'); return; }
+    setLoading(true);
+    try {
+      if (authMode === 'signup') {
+        const { data, error: err } = await supabase.auth.signUp({ email, password });
+        if (err) throw err;
+        setUserId(data.user?.id ?? '');
+      } else {
+        const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
+        if (err) throw err;
+        setUserId(data.user?.id ?? '');
+        // Check if user row exists
+        const { data: existingUser } = await supabase.from('users').select('*').eq('id', data.user.id).maybeSingle();
+        if (existingUser) {
+          setCurrentUser(existingUser);
+          const { data: hh } = await supabase.from('households').select('*').eq('id', existingUser.household_id).single();
+          if (hh) setHousehold(hh);
+          const { data: partner } = await supabase.from('users').select('*').eq('household_id', existingUser.household_id).neq('id', data.user.id).maybeSingle();
+          if (partner) setPartnerUser(partner);
+          return; // Root layout will redirect
+        }
+      }
+      setStep('role');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Authentication failed.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleHousehold() {
+    setError('');
+    setLoading(true);
+    try {
+      if (isJoining) {
+        const { data: hh, error: hhErr } = await supabase
+          .from('households').select('*').eq('invite_code', joinCode.trim().toUpperCase()).single();
+        if (hhErr || !hh) { setError('Invite code not found.'); return; }
+        const { data: user, error: uErr } = await supabase.from('users').insert({
+          id: userId, household_id: hh.id, role,
+        }).select().single();
+        if (uErr) throw uErr;
+        setCurrentUser(user);
+        setHousehold(hh);
+        const { data: partner } = await supabase.from('users').select('*').eq('household_id', hh.id).neq('id', userId).maybeSingle();
+        if (partner) setPartnerUser(partner);
+      } else {
+        const invite_code = generateInviteCode();
+        const { data: hh, error: hhErr } = await supabase.from('households').insert({
+          invite_code, stage: 'pregnant',
+        }).select().single();
+        if (hhErr || !hh) throw hhErr ?? new Error('Failed to create household');
+        const { data: user, error: uErr } = await supabase.from('users').insert({
+          id: userId, household_id: hh.id, role,
+        }).select().single();
+        if (uErr) throw uErr;
+        setCurrentUser(user);
+        setHousehold(hh);
+        Alert.alert('Your invite code', `Share this with your partner:\n\n${invite_code}`, [{ text: 'Got it' }]);
+        setStep('setup');
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSetup() {
+    setError('');
+    setLoading(true);
+    try {
+      const updates: Record<string, unknown> = { stage };
+      if (dueDate) updates.due_date = dueDate;
+      if (babyName.trim()) updates.baby_name = babyName.trim();
+      updates.baby_gender = babyGender;
+
+      const { data: hh, error: err } = await supabase
+        .from('households')
+        .update(updates)
+        .eq('id', useHouseholdStore.getState().household?.id ?? '')
+        .select().single();
+      if (err) throw err;
+      if (hh) setHousehold(hh);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Could not save setup.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <Text style={styles.logo}>🫐</Text>
+        <Text style={styles.appName}>Blueberry</Text>
+        <Text style={styles.tagline}>Your pregnancy companion</Text>
+
+        {/* ── STEP: CREDENTIALS ── */}
+        {step === 'credentials' && (
+          <View style={styles.form}>
+            <Text style={styles.stepTitle}>{authMode === 'signup' ? 'Create your account' : 'Welcome back'}</Text>
+            <Input label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} placeholder="you@email.com" />
+            <Input label="Password" value={password} onChangeText={setPassword} secureTextEntry placeholder="At least 8 characters" error={error} />
+            <Button label={authMode === 'signup' ? 'Create account' : 'Sign in'} onPress={handleCredentials} loading={loading} />
+            <TouchableOpacity onPress={() => { setAuthMode(m => m === 'signup' ? 'signin' : 'signup'); setError(''); }}>
+              <Text style={styles.switchAuth}>
+                {authMode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ── STEP: ROLE ── */}
+        {step === 'role' && (
+          <View style={styles.form}>
+            <Text style={styles.stepTitle}>Who are you?</Text>
+            {(['mother', 'partner'] as UserRole[]).map(r => (
+              <TouchableOpacity
+                key={r}
+                style={[styles.roleBtn, role === r && styles.roleBtnSelected]}
+                onPress={() => setRole(r)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.roleEmoji}>{r === 'mother' ? '🤱' : '💙'}</Text>
+                <Text style={[styles.roleLabel, role === r && styles.roleLabelSelected]}>
+                  {r === 'mother' ? 'The mother' : 'The partner'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            <Button label="Continue" onPress={() => setStep('household')} />
+          </View>
+        )}
+
+        {/* ── STEP: HOUSEHOLD ── */}
+        {step === 'household' && (
+          <View style={styles.form}>
+            <Text style={styles.stepTitle}>Your household</Text>
+            <View style={styles.toggleRow}>
+              {['create', 'join'].map(m => (
+                <TouchableOpacity
+                  key={m}
+                  style={[styles.toggleBtn, !isJoining && m === 'create' && styles.toggleBtnActive, isJoining && m === 'join' && styles.toggleBtnActive]}
+                  onPress={() => setIsJoining(m === 'join')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.toggleLabel, (!isJoining && m === 'create') || (isJoining && m === 'join') ? styles.toggleLabelActive : null]}>
+                    {m === 'create' ? '+ Create new' : 'Join with code'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {isJoining && (
+              <Input label="Invite code" value={joinCode} onChangeText={setJoinCode} autoCapitalize="characters" placeholder="BLU3RY" autoCorrect={false} error={error} />
+            )}
+            {!isJoining && error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <Button label={isJoining ? 'Join household' : 'Create household'} onPress={handleHousehold} loading={loading} />
+          </View>
+        )}
+
+        {/* ── STEP: SETUP ── */}
+        {step === 'setup' && (
+          <View style={styles.form}>
+            <Text style={styles.stepTitle}>Set up your journey</Text>
+            <Text style={styles.sectionLabel}>Stage</Text>
+            <View style={styles.stageRow}>
+              {(['ttc', 'pregnant', 'postpartum'] as Stage[]).map(s => (
+                <TouchableOpacity key={s} style={[styles.stageBtn, stage === s && styles.stageBtnSelected]} onPress={() => setStage(s)} activeOpacity={0.7}>
+                  <Text style={[styles.stageLabel, stage === s && styles.stageLabelSelected]}>
+                    {s === 'ttc' ? 'TTC' : s === 'pregnant' ? 'Pregnant' : 'Postpartum'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {stage === 'pregnant' && (
+              <Input label="Due date" value={dueDate} onChangeText={setDueDate} placeholder="YYYY-MM-DD" keyboardType="numbers-and-punctuation" autoCorrect={false} />
+            )}
+            <Input label="Baby's name (optional)" value={babyName} onChangeText={setBabyName} placeholder="Or a nickname for now" />
+            <Text style={styles.sectionLabel}>Baby gender</Text>
+            <View style={styles.genderRow}>
+              {(['unknown', 'male', 'female'] as BabyGender[]).map(g => (
+                <TouchableOpacity key={g} style={[styles.genderBtn, babyGender === g && styles.genderBtnSelected]} onPress={() => setBabyGender(g)} activeOpacity={0.7}>
+                  <Text style={[styles.genderLabel, babyGender === g && styles.genderLabelSelected]}>
+                    {g === 'unknown' ? '🤫 Secret' : g === 'male' ? '💙 Boy' : '💜 Girl'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <Button label="Finish setup" onPress={handleSetup} loading={loading} />
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen:      { flex: 1, backgroundColor: colors.background },
+  scroll:      { flexGrow: 1, alignItems: 'center', padding: spacing.lg, gap: spacing.md },
+  logo:        { fontSize: 56, marginTop: spacing.xl },
+  appName:     { fontFamily: fonts.heading.bold, fontSize: 32, color: colors.primary },
+  tagline:     { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted, marginBottom: spacing.md },
+  form:        { width: '100%', gap: spacing.md },
+  stepTitle:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.text, marginBottom: spacing.xs },
+  switchAuth:  { fontFamily: fonts.body.medium, fontSize: 14, color: colors.primary, textAlign: 'center', marginTop: spacing.xs },
+  sectionLabel:{ fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text },
+  roleBtn:     { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radii.lg, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
+  roleBtnSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },
+  roleEmoji:   { fontSize: 28 },
+  roleLabel:   { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
+  roleLabelSelected: { color: colors.primary },
+  toggleRow:   { flexDirection: 'row', backgroundColor: colors.border, borderRadius: radii.md, padding: 3 },
+  toggleBtn:   { flex: 1, paddingVertical: spacing.sm, borderRadius: radii.sm, alignItems: 'center' },
+  toggleBtnActive: { backgroundColor: colors.surface },
+  toggleLabel: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
+  toggleLabelActive: { color: colors.primary, fontFamily: fonts.body.semibold },
+  stageRow:    { flexDirection: 'row', gap: spacing.sm },
+  stageBtn:    { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center' },
+  stageBtnSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },
+  stageLabel:  { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
+  stageLabelSelected: { color: colors.primary },
+  genderRow:   { flexDirection: 'row', gap: spacing.sm },
+  genderBtn:   { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center' },
+  genderBtnSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },
+  genderLabel: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
+  genderLabelSelected: { color: colors.primary },
+  errorText:   { fontFamily: fonts.body.regular, fontSize: 12, color: colors.error },
+});

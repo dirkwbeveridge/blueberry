@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blueberry — Session Handoff</title>
+<style>
+  :root {
+    --plum:       #3D2B6B;
+    --plum-light: #6B4FA0;
+    --accent:     #C4B5E8;
+    --bg:         #FAF8F5;
+    --surface:    #FFFFFF;
+    --border:     #EDE8F5;
+    --text:       #1A1A2E;
+    --muted:      #7B6F8A;
+    --green:      #6DBF82;
+    --amber:      #F4A261;
+    --red:        #E76F51;
+    --radius:     12px;
+    --shadow:     0 2px 12px rgba(61,43,107,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--plum-light); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Layout */
+  .page { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+  .header { margin-bottom: 48px; }
+  .header h1 { font-size: 32px; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
+  .header .subtitle { font-size: 15px; color: var(--muted); }
+  .header .tag {
+    display: inline-block; background: var(--accent); color: var(--plum);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 99px; margin-top: 10px;
+  }
+
+  /* Section */
+  section { margin-bottom: 48px; }
+  section > h2 {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+    box-shadow: var(--shadow); margin-bottom: 12px;
+  }
+  .card h3 { font-size: 16px; font-weight: 600; color: var(--plum); margin-bottom: 6px; }
+  .card p, .card li { font-size: 14px; color: var(--muted); }
+  .card ul { padding-left: 18px; }
+  .card ul li { margin-bottom: 4px; }
+
+  /* Status pills */
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 9px; border-radius: 99px; margin-left: 8px; vertical-align: middle;
+  }
+  .pill-done   { background: #E8F8EE; color: #2E7D4F; }
+  .pill-ready  { background: #EEF2FF; color: var(--plum); }
+  .pill-active { background: #FFF4E5; color: #9A5800; }
+  .pill-block  { background: #FEF0ED; color: #B83A2B; }
+
+  /* Phase table */
+  .phase-grid { display: grid; gap: 10px; }
+  .phase-row {
+    display: grid; grid-template-columns: 80px 1fr auto;
+    align-items: start; gap: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px;
+    box-shadow: var(--shadow);
+  }
+  .phase-num { font-size: 12px; font-weight: 700; color: var(--plum-light); text-transform: uppercase; padding-top: 2px; }
+  .phase-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .phase-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* Tab variant comparison */
+  .variant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .variant-grid { grid-template-columns: 1fr; } }
+  .variant-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .variant-card.active { border-color: var(--plum); }
+  .variant-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--plum-light); margin-bottom: 8px;
+  }
+  .variant-card h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .tab-strip {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .tab-chip {
+    font-size: 12px; font-weight: 500; padding: 4px 10px;
+    border-radius: 99px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text);
+  }
+  .tab-chip.unique { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .variant-card p { font-size: 13px; color: var(--muted); }
+
+  /* Tab capability table */
+  .cap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cap-table th {
+    text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .cap-table td { padding: 12px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  .cap-table tr:last-child td { border-bottom: none; }
+  .cap-table td:first-child { font-weight: 600; color: var(--plum); white-space: nowrap; }
+  .who-chip {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 1px 7px; border-radius: 99px; margin-left: 6px; vertical-align: middle;
+  }
+  .who-mom  { background: #F3EEF9; color: var(--plum); }
+  .who-both { background: #E8F8EE; color: #2E7D4F; }
+  .who-partner { background: #EEF5FF; color: #1A4FAA; }
+
+  /* File tree */
+  .file-tree { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+  .file-tree .line { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; color: var(--text); }
+  .file-tree .line .path { color: var(--plum-light); }
+  .file-tree .line .note { font-size: 11px; color: var(--muted); }
+  .file-tree .indent { padding-left: 20px; }
+  .file-tree .changed { color: var(--amber); font-weight: 600; }
+  .file-tree .new { color: var(--green); font-weight: 600; }
+  .file-tree .exists { color: var(--muted); }
+
+  /* Decision list */
+  .decision-list { list-style: none; display: grid; gap: 8px; }
+  .decision-list li {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 16px;
+    box-shadow: var(--shadow); font-size: 14px;
+  }
+  .decision-list li strong { color: var(--plum); }
+
+  /* Checklist */
+  .checklist { list-style: none; display: grid; gap: 6px; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; }
+  .checklist li .icon { flex-shrink: 0; margin-top: 1px; }
+  .checklist li.done .icon { color: var(--green); }
+  .checklist li.todo .icon { color: var(--border); }
+  .checklist li.block .icon { color: var(--red); }
+  .checklist li.done span { color: var(--muted); text-decoration: line-through; }
+  .checklist li.todo span { color: var(--text); }
+  .checklist li.block span { color: var(--red); }
+
+  /* Next step cards */
+  .next-grid { display: grid; gap: 12px; }
+  .next-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px;
+    box-shadow: var(--shadow); display: grid;
+    grid-template-columns: 36px 1fr; gap: 14px; align-items: start;
+  }
+  .next-card .step-num {
+    width: 36px; height: 36px; border-radius: 99px;
+    background: var(--plum); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .next-card h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .next-card p  { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .next-card .files { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--plum-light); }
+
+  /* Blocker box */
+  .blocker-box {
+    background: #FEF0ED; border: 1px solid #F4C7BF;
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px;
+  }
+  .blocker-box h4 { font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+  .blocker-box p { font-size: 13px; color: #7A2C1E; }
+
+  /* Code block */
+  pre {
+    background: #F4F0FA; border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+    color: var(--plum); margin-top: 8px;
+  }
+
+  /* Tech stack row */
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .stack-chip {
+    font-size: 12px; font-weight: 500; padding: 4px 12px;
+    border-radius: 99px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Blueberry</h1>
+    <p class="subtitle">Session handoff &mdash; resumed in Claude Code after Codex usage limit</p>
+    <span class="tag">Updated 2026-05-22</span>
+  </div>
+
+  <!-- What This Is -->
+  <section>
+    <h2>What Blueberry Is</h2>
+    <div class="card">
+      <h3>Private two-user pregnancy companion app</h3>
+      <p style="margin-bottom:12px;">A household mobile app for exactly two users: <strong>Mother</strong> and <strong>Partner</strong>. Not a public product. Both users share one household view from separate phones — pregnancy progress, shared todos, health logs, journal entries, appointments, kick counting, and labor timing.</p>
+      <div class="stack-row">
+        <span class="stack-chip">Expo Router</span>
+        <span class="stack-chip">TypeScript strict</span>
+        <span class="stack-chip">Supabase (Auth + Postgres + Realtime)</span>
+        <span class="stack-chip">Zustand</span>
+        <span class="stack-chip">Playfair Display + DM Sans</span>
+        <span class="stack-chip">Plum / Ivory palette</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phase Status -->
+  <section>
+    <h2>Phase Status</h2>
+    <div class="phase-grid">
+      <div class="phase-row">
+        <div class="phase-num">Phase 0</div>
+        <div>
+          <div class="phase-name">Clean Planning</div>
+          <div class="phase-desc">Legacy artifacts reviewed, new .planning/ created, preserve/discard decisions documented.</div>
+        </div>
+        <span class="pill pill-done">Complete</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 1</div>
+        <div>
+          <div class="phase-name">Foundation</div>
+          <div class="phase-desc">Expo app running, TypeScript passes, Supabase schema ready, theme + UI primitives in place, device verified in Expo Go.</div>
+        </div>
+        <span class="pill pill-done">Complete</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">IA Spike</div>
+        <div>
+          <div class="phase-name">Role-Based Navigation Design</div>
+          <div class="phase-desc">Prototype compared 3 nav variants. Decision: role-aware dual variant. Design locked. <strong>Not yet implemented in the active repo.</strong></div>
+        </div>
+        <span class="pill pill-ready">Decided, pending impl</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 2</div>
+        <div>
+          <div class="phase-name">Auth and Household</div>
+          <div class="phase-desc">Supabase schema artifacts exist. Auth flow prototyped but golden path (sign up → role → household → Home) not yet E2E verified against live Supabase.</div>
+        </div>
+        <span class="pill pill-active">Blocked on tab restructure first</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 3</div>
+        <div>
+          <div class="phase-name">Home and Shared Todos</div>
+          <div class="phase-desc">Home screen is implemented with realtime todos, week hero, trimester progress, health log summary, and quick actions.</div>
+        </div>
+        <span class="pill pill-ready">Ported, pending phase unlock</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 4</div>
+        <div>
+          <div class="phase-name">Health Logging and Journal</div>
+          <div class="phase-desc">Health logging ported. Journal not in active tab set yet.</div>
+        </div>
+        <span class="pill pill-ready">Partial</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 5</div>
+        <div>
+          <div class="phase-name">Pregnancy Tracking Tools</div>
+          <div class="phase-desc">Kick counter and contraction timer ported into health screen. Currently mixed into the Health tab.</div>
+        </div>
+        <span class="pill pill-ready">Ported</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 6</div>
+        <div>
+          <div class="phase-name">Partner and Appointments</div>
+          <div class="phase-desc">Partner, plan, todos, and appointments screens ported.</div>
+        </div>
+        <span class="pill pill-ready">Ported</span>
+      </div>
+      <div class="phase-row">
+        <div class="phase-num">Phase 7</div>
+        <div>
+          <div class="phase-name">Integrations</div>
+          <div class="phase-desc">Google Calendar, push notifications, AI content, Apple Health. Scope not confirmed. Do not start.</div>
+        </div>
+        <span class="pill pill-block">Not started</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Decision -->
+  <section>
+    <h2>Locked Navigation Decision</h2>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">
+      The Codex session ran a full IA prototype pass comparing three nav variants. The decision is locked but has not been applied to the active repo yet.
+      Role is selected once at account setup and stored on the user record.
+    </p>
+    <div class="variant-grid">
+      <div class="variant-card active">
+        <div class="variant-label">Mom variant &mdash; locked</div>
+        <h3>Daily Companion</h3>
+        <div class="tab-strip">
+          <span class="tab-chip">Home</span>
+          <span class="tab-chip unique">Health</span>
+          <span class="tab-chip">To Do</span>
+          <span class="tab-chip">Memories</span>
+          <span class="tab-chip">More</span>
+        </div>
+        <p>Health tab is Mom-exclusive. Symptom logs, wellness tracking, kick counter, Apple Health placeholder.</p>
+      </div>
+      <div class="variant-card active">
+        <div class="variant-label">Partner variant &mdash; locked</div>
+        <h3>Couple OS</h3>
+        <div class="tab-strip">
+          <span class="tab-chip">Home</span>
+          <span class="tab-chip unique">Together</span>
+          <span class="tab-chip">To Do</span>
+          <span class="tab-chip">Memories</span>
+          <span class="tab-chip">More</span>
+        </div>
+        <p>Together tab replaces Health for Partner. Support mode, shared check-ins, household handoff, conversation prompts.</p>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;">
+      Shared tabs: <strong>Home, To Do, Memories, More</strong>. Role-specific tab is the second position.
+      The inactive role tab is not shown in the bottom bar; it is accessible only from More.
+    </p>
+  </section>
+
+  <!-- Tab Capabilities -->
+  <section>
+    <h2>Tab Capabilities (Locked)</h2>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="cap-table">
+        <thead>
+          <tr>
+            <th>Tab</th>
+            <th>Who</th>
+            <th>Capabilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Home <span class="who-chip who-both">Both</span></td>
+            <td></td>
+            <td>Pregnancy stage, weeks, trimester progress, baby development this week, next appointment, Today&rsquo;s Focus, quick actions (Add Note, Share Update)</td>
+          </tr>
+          <tr>
+            <td>Health <span class="who-chip who-mom">Mom only</span></td>
+            <td></td>
+            <td>Symptom and wellness logs (body, energy, mindfulness, sleep), health history, Apple Health connector placeholder, data insight visualizations, Add Question for Provider</td>
+          </tr>
+          <tr>
+            <td>Together <span class="who-chip who-partner">Partner only</span></td>
+            <td></td>
+            <td>Support mode, what she needs today (based on current stage/shared updates), shared check-ins, household handoff, conversation prompts, support idea generator, Add Note, Share Update</td>
+          </tr>
+          <tr>
+            <td>To Do <span class="who-chip who-both">Both</span></td>
+            <td></td>
+            <td>Task + Calendar + Appointment control center. Create/update/delete/close todos and appointments. Categories: owner, must-do/nice-to-do, due date, notes. Two dashboards: Todos (upcoming/priority) and Appointments (next visit, question log, notes, prep). Google Calendar sync placeholder.</td>
+          </tr>
+          <tr>
+            <td>Memories <span class="who-chip who-both">Both</span></td>
+            <td></td>
+            <td>Journal, photos, milestones, little notes without daily obligation. Recent moments, Share update with partner.</td>
+          </tr>
+          <tr>
+            <td>More <span class="who-chip who-both">Both</span></td>
+            <td></td>
+            <td>Everything else: partner support (if Mom), household settings, appointments overflow, future postpartum tools. Inactive role-specific tab reachable here only. Mom health logs are <strong>not</strong> exposed to Partner via More.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px;">
+      Realtime sync + push notifications planned for: new todos (partner), new appointments (both), new shared update/check-in (both). These are Phase 7 scope.
+    </p>
+  </section>
+
+  <!-- Current Repo State -->
+  <section>
+    <h2>Current Active Repo State</h2>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px;">
+      Active implementation root: <code style="background:var(--border);padding:2px 6px;border-radius:4px;">OneDrive/_claude-codex/Personal Projects/Blueberry</code>
+    </p>
+    <div class="card">
+      <h3 style="margin-bottom:12px;">app/(tabs) &mdash; current vs. target</h3>
+      <div class="file-tree">
+        <div class="line"><span class="path">app/(tabs)/_layout.tsx</span><span class="changed">&#9679; needs role-aware rewrite</span></div>
+        <div class="indent">
+          <div class="line"><span>Current: Home / Weeks / Health / Plan / Partner</span></div>
+          <div class="line"><span>Target: role-aware Mom or Partner variant</span></div>
+        </div>
+        <div class="line"><span class="path">app/(tabs)/home.tsx</span><span class="pill pill-done" style="font-size:11px;margin-left:6px;">Keep</span></div>
+        <div class="indent"><div class="line"><span class="exists">Full implementation — week hero, todos, realtime, quick actions</span></div></div>
+        <div class="line"><span class="path">app/(tabs)/health.tsx</span><span class="changed">&#9679; scope change</span></div>
+        <div class="indent"><div class="line"><span class="exists">Has kick counter mixed in — split out to dedicated modal or move kicks to Memories/More</span></div></div>
+        <div class="line"><span class="path">app/(tabs)/weeks.tsx</span><span class="changed">&#9679; rename to memories.tsx</span></div>
+        <div class="line"><span class="path">app/(tabs)/plan.tsx</span><span class="changed">&#9679; rename to todo.tsx</span></div>
+        <div class="line"><span class="path">app/(tabs)/partner.tsx</span><span class="changed">&#9679; rename to together.tsx</span></div>
+        <div class="line"><span class="path new">app/(tabs)/more.tsx</span><span class="new">+ new file needed</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3 style="margin-bottom:12px;">What is already solid</h3>
+      <ul style="padding-left:18px;">
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">Theme tokens</strong> — <code>constants/theme.ts</code>: plum/ivory palette, Playfair Display + DM Sans, spacing, radii, card shadow. Do not change.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">Domain types</strong> — <code>types/index.ts</code>: Household, AppUser, HealthLog, Todo, Appointment, JournalEntry, KickSession, ContractionSession. <code>UserRole</code> is already <code>'mother' | 'partner'</code>.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">Zustand store</strong> — <code>store/household.ts</code>: persisted household + user state, currentWeek derived from due_date.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">Supabase artifacts</strong> — schema SQL, migration SQL, setup guide, env example. Ready to deploy.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">UI primitives</strong> — Card, Button, Input, Badge, ProgressBar, LoadingScreen.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--text);">Verified on device</strong> — Expo Go on iPhone, Metro starts successfully, Zustand selector bug fixed.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Design System -->
+  <section>
+    <h2>Design System (Locked)</h2>
+    <div class="card">
+      <h3 style="margin-bottom:14px;">Visual direction: soft editorial, warm private companion</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px;">
+        <div style="background:#FAF8F5;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#11044;</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);">Background</div>
+          <div style="font-size:11px;color:var(--muted);">#FAF8F5 Ivory</div>
+        </div>
+        <div style="background:#3D2B6B;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;color:#fff;">&#11044;</div>
+          <div style="font-size:12px;font-weight:600;color:#fff;">Primary</div>
+          <div style="font-size:11px;color:#C4B5E8;">#3D2B6B Deep Plum</div>
+        </div>
+        <div style="background:#C4B5E8;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#11044;</div>
+          <div style="font-size:12px;font-weight:600;color:var(--plum);">Accent</div>
+          <div style="font-size:11px;color:var(--muted);">#C4B5E8 Lavender</div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#11044;</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);">Surface</div>
+          <div style="font-size:11px;color:var(--muted);">#FFFFFF White</div>
+        </div>
+      </div>
+      <ul style="padding-left:18px;">
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Typography:</strong> Playfair Display (headings) + DM Sans (body). Already installed.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Cards:</strong> 24px border-radius, white surface, plum shadow at 6% opacity, 16px padding.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Styling runtime:</strong> React Native <code>StyleSheet</code> + typed theme tokens. No NativeWind.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Role styling:</strong> Shared system for both roles. Differentiation comes from content, not theme color changes.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Density:</strong> Calm dashboard — breathing room, one focal point per card, no data overload.</li>
+        <li style="font-size:14px;color:var(--muted);margin-bottom:5px;"><strong style="color:var(--text);">Icons:</strong> Emoji tab icons currently (inline, no extra dep). Migrate to lucide-react-native when design hardens.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Open Decisions -->
+  <section>
+    <h2>Open Decisions (Need Answers Before Phase 2)</h2>
+    <ul class="decision-list">
+      <li><strong>Due date and stage:</strong> The old due date (October 5, 2025) is stale. Confirm current due date and pregnancy week before seeding any defaults in the app or database. This gates HOME-01.</li>
+      <li><strong>Baby name/gender:</strong> Optional but needed if the Home screen &ldquo;Tracking [name]&rsquo;s journey&rdquo; line should show real data at setup.</li>
+      <li><strong>Supabase project:</strong> Has a Supabase project been created? The SQL schema is ready to deploy but needs a project URL and anon key in <code>.env</code>.</li>
+      <li><strong>Google Calendar and push notifications:</strong> Phase 7 candidates. Confirm whether these are v1 or post-MVP before Phase 7 planning starts. Do not block v1 on this answer.</li>
+    </ul>
+  </section>
+
+  <!-- Blockers -->
+  <section>
+    <h2>Current Blockers</h2>
+    <div class="blocker-box">
+      <h4>Tab structure not yet revised</h4>
+      <p>The active <code>app/(tabs)/_layout.tsx</code> still has the old Phase 1 scaffold: Home / Weeks / Health / Plan / Partner. This must be rewritten to the role-aware dual variant before auth (Phase 2) is implemented. Auth will store the role, so the nav must be ready to consume it.</p>
+    </div>
+    <div class="blocker-box">
+      <h4>Supabase golden path not verified</h4>
+      <p>The auth flow exists in code but has not been tested end-to-end against a live Supabase instance. Cannot declare Phase 2 done until: sign up → choose role → create household → land on Home works on a real device.</p>
+    </div>
+    <div class="blocker-box">
+      <h4>Expo web currently broken</h4>
+      <p><code>Cannot use 'import.meta' outside a module</code> error before React mounts on web. Not a product target for v1 — mobile only via Metro/Expo Go. Do not spend time fixing this now.</p>
+    </div>
+  </section>
+
+  <!-- Next Steps -->
+  <section>
+    <h2>Immediate Next Steps</h2>
+    <div class="next-grid">
+      <div class="next-card">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Revise the tab structure</h4>
+          <p>Apply the locked IA decision to the active repo. This is the unblocking step for everything else.</p>
+          <div class="files">
+            app/(tabs)/_layout.tsx &mdash; role-aware rewrite<br/>
+            app/(tabs)/weeks.tsx &rarr; memories.tsx<br/>
+            app/(tabs)/plan.tsx &rarr; todo.tsx<br/>
+            app/(tabs)/partner.tsx &rarr; together.tsx<br/>
+            app/(tabs)/more.tsx &mdash; new file<br/>
+            store/household.ts &mdash; add persona/role selector
+          </div>
+        </div>
+      </div>
+      <div class="next-card">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Add persona selection to account setup</h4>
+          <p>A role-choice screen must appear before the tab shell is shown. Persona drives which nav variant loads. Store the role in Zustand (and later in Supabase on the user record).</p>
+          <div class="files">
+            app/(setup)/persona.tsx &mdash; role picker screen<br/>
+            app/_layout.tsx &mdash; gate tabs until role is set
+          </div>
+        </div>
+      </div>
+      <div class="next-card">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Deploy Supabase schema</h4>
+          <p>Run the SQL against a live Supabase project. Add the project URL + anon key to <code>.env</code>. Prerequisite for auth testing.</p>
+          <div class="files">
+            supabase-schema.sql<br/>
+            supabase_migration.sql<br/>
+            .env (from .env.example)
+          </div>
+        </div>
+      </div>
+      <div class="next-card">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Verify the auth golden path</h4>
+          <p>End-to-end on device: sign up &rarr; choose role &rarr; create household &rarr; land on Home with correct tab variant. Phase 2 is not done until this passes.</p>
+          <div class="files">
+            app/(auth)/login.tsx<br/>
+            app/(auth)/_layout.tsx
+          </div>
+        </div>
+      </div>
+      <div class="next-card">
+        <div class="step-num">5</div>
+        <div>
+          <h4>Confirm due date, then implement Home fully</h4>
+          <p>Once the real due date is known, seed it during setup and verify Home shows correct week, trimester progress, and baby development copy. This completes Phase 3.</p>
+          <div class="files">
+            app/(tabs)/home.tsx &mdash; already implemented, needs live data<br/>
+            lib/pregnancy.ts &mdash; week/trimester calculations
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What NOT To Do -->
+  <section>
+    <h2>Hard Guardrails</h2>
+    <ul class="checklist">
+      <li class="block"><span class="icon">&#9940;</span><span>Do not copy files from the old Claude project at <code>Blueberry App/blueberry</code> or <code>z-Archive-Blueberry</code></span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not seed the stale October 5, 2025 due date anywhere</span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not add Firebase</span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not install NativeWind — use StyleSheet tokens</span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not start Phase 7 integrations (Google Calendar, push notifications, AI content) until core app works</span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not expose Mom health logs to Partner via the More tab or any shared view</span></li>
+      <li class="block"><span class="icon">&#9940;</span><span>Do not allow more than two users per household at the Supabase RLS level</span></li>
+    </ul>
+  </section>
+
+  <!-- Verification Evidence -->
+  <section>
+    <h2>Verified Working (Do Not Break)</h2>
+    <ul class="checklist">
+      <li class="done"><span class="icon">&#10003;</span><span><code>npm run typecheck</code> passes</span></li>
+      <li class="done"><span class="icon">&#10003;</span><span><code>npm run lint</code> passes</span></li>
+      <li class="done"><span class="icon">&#10003;</span><span><code>npx expo start --localhost --port 8081</code> starts Metro successfully</span></li>
+      <li class="done"><span class="icon">&#10003;</span><span>Expo Go on iPhone: app loads, Stage not set state shown, pages clickable, Zustand selector bug resolved</span></li>
+      <li class="done"><span class="icon">&#10003;</span><span><code>npm ci</code> completes cleanly</span></li>
+      <li class="todo"><span class="icon">&#9675;</span><span>Expo Go: sign up &rarr; role &rarr; household &rarr; Home (blocked on tab restructure)</span></li>
+      <li class="todo"><span class="icon">&#9675;</span><span>Supabase golden path on live instance (blocked on schema deploy)</span></li>
+    </ul>
+  </section>
+
+  <footer style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);">
+    Blueberry &mdash; active repo: <code>OneDrive/_claude-codex/Personal Projects/Blueberry</code> &mdash;
+    Reference/archive only: <code>Blueberry App/blueberry</code>, <code>z-Archive-Blueberry</code>, <code>/Users/dbeveridge/Documents/Blueberry</code>
+  </footer>
+
+</div>
+</body>
+</html>
