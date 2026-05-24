@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blueberry · A Quieter Companion for Two</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:        #FAF8F5;
+    --plum:         #3D2B6B;
+    --plum-light:   #6B4FA0;
+    --lavender:     #C4B5E8;
+    --lavender-50:  #ECE6F8;
+    --lavender-25:  #F5F1FB;
+    --surface:      #FFFFFF;
+    --border:       #EDE8F5;
+    --ink:          #1A1A2E;
+    --muted:        #7B6F8A;
+    --hair:         rgba(61,43,107,0.10);
+    --shadow-card:  0 10px 40px -12px rgba(61,43,107,0.18), 0 2px 6px rgba(61,43,107,0.06);
+    --shadow-tab:   0 -6px 24px -8px rgba(61,43,107,0.18), 0 14px 32px -8px rgba(61,43,107,0.18);
+    --peach-mist:   #F5E8DE;
+    --sage-mist:    #E4ECDC;
+    --rose-mist:    #F4E1E4;
+    --honey:        #E9D5A9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html, body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background:
+      radial-gradient(900px 600px at 12% -10%, #EFE7FA 0%, transparent 60%),
+      radial-gradient(900px 600px at 95% 10%, #F3E4E4 0%, transparent 55%),
+      radial-gradient(900px 600px at 50% 110%, #E7E2F4 0%, transparent 60%),
+      #F1ECE3;
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page { max-width: 1440px; margin: 0 auto; padding: 64px 32px 96px; }
+
+  /* ---------- Opening ---------- */
+  .opener {
+    max-width: 880px;
+    margin-bottom: 72px;
+  }
+  .opener .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--plum-light); margin-bottom: 18px;
+  }
+  .opener h1 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: clamp(44px, 5.4vw, 72px); line-height: 1.02; letter-spacing: -0.02em;
+    color: var(--plum);
+  }
+  .opener h1 em { font-style: italic; color: var(--plum-light); font-weight: 400; }
+  .opener .lede {
+    margin-top: 22px; font-size: 17px; color: var(--ink); max-width: 620px;
+    line-height: 1.6;
+  }
+  .opener .lede strong { color: var(--plum); font-weight: 600; }
+  .opener .signature {
+    margin-top: 28px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 14px; color: var(--muted);
+  }
+
+  /* ---------- Belief pillars ---------- */
+  .pillars {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px;
+    margin: 56px 0 0;
+    padding: 32px 0;
+    border-top: 1px solid rgba(61,43,107,0.12);
+    border-bottom: 1px solid rgba(61,43,107,0.12);
+  }
+  .pillar .n {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; color: var(--plum-light); font-style: italic;
+    line-height: 1; margin-bottom: 8px;
+  }
+  .pillar .t {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; color: var(--plum); font-weight: 500;
+    margin-bottom: 6px; letter-spacing: -0.005em;
+  }
+  .pillar .d { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* ---------- Chapter breaks ---------- */
+  .chapter {
+    margin: 96px auto 40px;
+    max-width: 720px;
+    text-align: center;
+  }
+  .chapter .marker {
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--plum-light);
+    margin-bottom: 20px;
+  }
+  .chapter .marker::before, .chapter .marker::after {
+    content: ''; width: 36px; height: 1px; background: rgba(61,43,107,0.25);
+  }
+  .chapter h2 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: clamp(34px, 4vw, 52px); line-height: 1.05; letter-spacing: -0.015em;
+    color: var(--plum);
+  }
+  .chapter h2 em { font-style: italic; color: var(--plum-light); font-weight: 400; }
+  .chapter .blurb {
+    margin-top: 16px; font-size: 15px; color: var(--muted);
+    max-width: 580px; margin-left: auto; margin-right: auto; line-height: 1.6;
+  }
+
+  /* ---------- Frame gallery ---------- */
+  .gallery {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 64px 48px; align-items: start;
+    justify-items: center;
+  }
+  .gallery.duo { grid-template-columns: repeat(2, minmax(360px, 440px)); justify-content: center; }
+  .gallery.solo { grid-template-columns: minmax(360px, 440px); justify-content: center; }
+
+  .stage { display: flex; flex-direction: column; align-items: center; }
+  .stage .caption { margin-top: 22px; text-align: center; max-width: 360px; }
+  .stage .caption .role {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+    background: var(--plum); color: #fff; margin-bottom: 10px;
+  }
+  .stage .caption .role.partner { background: var(--lavender); color: var(--plum); }
+  .stage .caption .role.both { background: var(--ivory); color: var(--plum); border: 1px solid var(--hair); }
+  .stage .caption .role.family { background: var(--peach-mist); color: #8E5A2E; border: 1px solid rgba(142,90,46,0.15); }
+  .stage .caption h3 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: var(--plum); letter-spacing: -0.01em;
+  }
+  .stage .caption p {
+    font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.55;
+  }
+
+  /* ---------- iPhone frame ---------- */
+  .iphone {
+    --w: 390px; --h: 844px; --bezel: 14px;
+    width: var(--w); height: var(--h);
+    position: relative;
+    background: #0A0612;
+    border-radius: 56px;
+    padding: var(--bezel);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 0 0 1.5px #2A1E4B,
+      0 30px 80px -30px rgba(61,43,107,0.45),
+      0 12px 28px -10px rgba(61,43,107,0.25);
+  }
+  .iphone .side-btn { position: absolute; left: -2.5px; background: #1A1230; border-radius: 2px; }
+  .iphone .side-btn.silent { top: 92px; width: 3px; height: 26px; }
+  .iphone .side-btn.up     { top: 134px; width: 3px; height: 56px; }
+  .iphone .side-btn.down   { top: 200px; width: 3px; height: 56px; }
+  .iphone .side-btn.power  { right: -2.5px; left: auto; top: 174px; width: 3px; height: 84px; }
+  .screen {
+    width: 100%; height: 100%; border-radius: 44px; overflow: hidden;
+    background: var(--ivory); position: relative;
+    display: flex; flex-direction: column;
+  }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 36px; border-radius: 22px; background: #0A0612;
+    z-index: 20;
+  }
+  .status-bar {
+    height: 54px; padding: 18px 32px 0; display: flex; justify-content: space-between;
+    align-items: center; font-size: 15px; font-weight: 600; color: var(--ink);
+    z-index: 5; position: relative;
+  }
+  .status-bar .icons { display: inline-flex; gap: 6px; align-items: center; }
+
+  /* ---------- Atmospheres ---------- */
+  .atmos { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .atmos.mom {
+    background:
+      radial-gradient(420px 280px at 85% -10%, #DCCDF2 0%, transparent 65%),
+      radial-gradient(380px 260px at -10% 8%, #F2D9DC 0%, transparent 60%),
+      radial-gradient(600px 300px at 50% 105%, #E6DEF6 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.partner {
+    background:
+      radial-gradient(420px 280px at 8% -8%, #D8CEF1 0%, transparent 65%),
+      radial-gradient(380px 260px at 110% 12%, #E8E0CC 0%, transparent 55%),
+      radial-gradient(600px 300px at 50% 105%, #E5DDEF 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.calm {
+    background:
+      radial-gradient(500px 320px at 50% -6%, #E4DCF4 0%, transparent 65%),
+      radial-gradient(500px 320px at 50% 110%, #F1E4DD 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.memo {
+    background:
+      radial-gradient(420px 280px at 80% -6%, #F5E2DA 0%, transparent 60%),
+      radial-gradient(420px 280px at -5% 30%, #E5DDF4 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.prep {
+    background:
+      radial-gradient(420px 280px at -8% -10%, #E2D9F0 0%, transparent 62%),
+      radial-gradient(420px 280px at 100% 30%, #F2E4D2 0%, transparent 55%),
+      radial-gradient(500px 280px at 50% 110%, #ECE6F8 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.family {
+    background:
+      radial-gradient(420px 280px at 12% -6%, #F2DFCA 0%, transparent 60%),
+      radial-gradient(420px 280px at 100% 12%, #E4ECDC 0%, transparent 60%),
+      radial-gradient(600px 300px at 50% 108%, #F5E2DA 0%, transparent 60%),
+      #FFF8EF;
+  }
+  .atmos.nursery {
+    background:
+      radial-gradient(420px 280px at 90% -8%, #E4ECDC 0%, transparent 62%),
+      radial-gradient(420px 280px at -8% 24%, #F2DFCA 0%, transparent 60%),
+      #FFFAF1;
+  }
+
+  /* ---------- Content rail ---------- */
+  .content {
+    position: relative; z-index: 2;
+    flex: 1; overflow: hidden;
+    padding: 6px 20px 110px;
+  }
+
+  /* ---------- Tab bar ---------- */
+  .tabbar {
+    position: absolute; bottom: 16px; left: 14px; right: 14px;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(61,43,107,0.08);
+    border-radius: 28px;
+    padding: 10px 8px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    box-shadow: var(--shadow-tab);
+    z-index: 6;
+  }
+  .tabbar .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 4px; font-size: 10px; color: var(--muted); font-weight: 500;
+    border-radius: 20px;
+  }
+  .tabbar .tab .ico {
+    width: 26px; height: 26px; display: grid; place-items: center; border-radius: 14px;
+  }
+  .tabbar .tab.active { color: var(--plum); font-weight: 600; }
+  .tabbar .tab.active .ico { background: var(--lavender-50); }
+  .tabbar svg { width: 18px; height: 18px; }
+  .tabbar svg path, .tabbar svg circle, .tabbar svg rect {
+    stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .tabbar .tab.active svg path,
+  .tabbar .tab.active svg circle,
+  .tabbar .tab.active svg rect { stroke: var(--plum); }
+
+  /* Family mode tab tint (post-baby) */
+  .tabbar.family .tab.active .ico { background: #F4E3D2; }
+  .tabbar.family .tab.active { color: #8E5A2E; }
+  .tabbar.family .tab.active svg path,
+  .tabbar.family .tab.active svg circle,
+  .tabbar.family .tab.active svg rect { stroke: #8E5A2E; }
+
+  /* ---------- Top bar / shared interior pieces ---------- */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 4px 16px;
+  }
+  .topbar .hello { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .topbar .hello strong {
+    display: block; font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: var(--plum); letter-spacing: -0.01em; margin-top: 2px;
+  }
+  .topbar h1.section {
+    font-family: 'Playfair Display', serif; font-weight: 500; font-size: 26px;
+    color: var(--plum); letter-spacing: -0.01em;
+  }
+  .topbar .avatar {
+    width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #fff;
+    box-shadow: 0 4px 10px rgba(61,43,107,0.18);
+    background: linear-gradient(135deg, #C4B5E8, #6B4FA0);
+    display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 14px;
+  }
+  .topbar .avatar.partner { background: linear-gradient(135deg, #E8D6C4, #B8855E); }
+  .topbar .avatar.baby   { background: linear-gradient(135deg, #F2DFCA, #E29B66); color: #fff; }
+  .topbar .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.7); display: grid; place-items: center;
+    border: 1px solid var(--hair);
+  }
+  .topbar .icon-btn svg { width: 16px; height: 16px; }
+  .topbar .right { display: flex; gap: 8px; align-items: center; }
+
+  /* Week strip */
+  .week-strip {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    margin-bottom: 18px; padding: 0 2px;
+  }
+  .week-strip .day { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0; border-radius: 14px; }
+  .week-strip .day .dow { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; }
+  .week-strip .day .num { font-size: 14px; color: var(--ink); font-weight: 500; }
+  .week-strip .day.today { background: var(--plum); }
+  .week-strip .day.today .dow,
+  .week-strip .day.today .num { color: #fff; }
+  .week-strip .day.today .num { font-weight: 700; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border-radius: 24px; padding: 18px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(61,43,107,0.04);
+    margin-bottom: 14px;
+  }
+  .card .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .card .h h3 {
+    font-family: 'DM Sans'; font-weight: 600; font-size: 13px; color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  .card .h .more { font-size: 11px; color: var(--plum-light); font-weight: 600; }
+  .label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--plum-light);
+  }
+  .muted { color: var(--muted); font-size: 12px; }
+
+  /* Hero / week card */
+  .hero {
+    border-radius: 28px;
+    padding: 22px 22px 24px;
+    background:
+      radial-gradient(220px 160px at 88% 12%, #EADFF7 0%, transparent 65%),
+      radial-gradient(180px 160px at -6% 100%, #F5E1DC 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FCFAF6 100%);
+    border: 1px solid rgba(61,43,107,0.06);
+    box-shadow: var(--shadow-card);
+    position: relative; overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .hero.family {
+    background:
+      radial-gradient(220px 160px at 88% 12%, #F4E3D2 0%, transparent 65%),
+      radial-gradient(180px 160px at -6% 100%, #E4ECDC 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FFFAF1 100%);
+  }
+  .hero .meta { display: flex; justify-content: space-between; align-items: flex-start; }
+  .hero .meta .label { color: var(--plum-light); }
+  .hero .week-num {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: 64px; line-height: 1; color: var(--plum); letter-spacing: -0.03em;
+    margin-top: 6px;
+  }
+  .hero .week-num em { font-style: italic; }
+  .hero .size-line {
+    margin-top: 8px; font-size: 13px; color: var(--ink); line-height: 1.45; max-width: 220px;
+  }
+  .hero .size-line strong { color: var(--plum); }
+  .hero .fruit { position: absolute; right: -10px; bottom: -10px; width: 140px; height: 140px; }
+  .hero .cta {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+    font-size: 12px; font-weight: 600; color: var(--plum); border-bottom: 1px solid var(--plum);
+    padding-bottom: 2px;
+  }
+
+  /* Trimester */
+  .trimester { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px; }
+  .trimester .seg { height: 6px; border-radius: 99px; background: var(--lavender-50); overflow: hidden; }
+  .trimester .seg .fill { height: 100%; background: var(--plum); border-radius: 99px; }
+  .trimester .seg.done .fill { width: 100%; }
+  .trimester .seg.now .fill  { width: 62%; }
+  .trimester .seg.next .fill { width: 0%; }
+
+  /* Focus list */
+  .focus { display: flex; flex-direction: column; gap: 8px; }
+  .focus .row { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 14px; }
+  .focus .row .check {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.6px solid var(--lavender);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .focus .row.done .check { background: var(--plum); border-color: var(--plum); }
+  .focus .row.done .check svg { display: block; }
+  .focus .row.done .label-text { color: var(--muted); text-decoration: line-through; }
+  .focus .row .check svg { display: none; width: 12px; height: 12px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .focus .row .emoji { font-size: 16px; }
+  .focus .row .label-text { font-size: 13px; color: var(--ink); flex: 1; }
+  .focus .row .when { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+  /* Quick actions */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-actions .qa {
+    background: rgba(255,255,255,0.7); border: 1px solid var(--hair);
+    border-radius: 18px; padding: 14px 14px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .quick-actions .qa .ico {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--lavender-50); display: grid; place-items: center; color: var(--plum);
+  }
+  .quick-actions .qa .ico svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .quick-actions .qa .qa-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-top: 4px; }
+  .quick-actions .qa .qa-sub { font-size: 10.5px; color: var(--muted); }
+
+  /* Appointment */
+  .appt { display: flex; gap: 14px; align-items: flex-start; }
+  .appt .date-pill {
+    flex-shrink: 0;
+    background: var(--ivory); border: 1px solid var(--hair); border-radius: 14px;
+    width: 52px; padding: 8px 0; text-align: center;
+  }
+  .appt .date-pill .mon { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--plum-light); text-transform: uppercase; }
+  .appt .date-pill .day { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--plum); line-height: 1; margin-top: 2px; }
+  .appt .info .title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .appt .info .loc { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .appt .info .actions { display: flex; gap: 6px; margin-top: 10px; }
+  .pill-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 10px; border-radius: 99px; border: 1px solid var(--hair);
+    background: #fff; font-size: 11px; font-weight: 600; color: var(--plum);
+  }
+  .pill-btn.solid { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .pill-btn.ghost { background: transparent; }
+  .pill-btn.honey { background: #F2DFCA; color: #8E5A2E; border-color: rgba(142,90,46,0.15); }
+
+  /* Chips */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 12px; border-radius: 99px;
+    background: #fff; border: 1px solid var(--hair);
+    font-size: 12px; color: var(--ink); font-weight: 500;
+  }
+  .chip.selected { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .chip.lavender { background: var(--lavender-50); border-color: transparent; color: var(--plum); }
+  .chip.honey { background: #F4E3D2; border-color: transparent; color: #8E5A2E; }
+
+  /* Slider */
+  .slider { height: 10px; background: var(--lavender-50); border-radius: 99px; position: relative; }
+  .slider .thumb {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--plum); box-shadow: 0 4px 10px rgba(61,43,107,0.35);
+    border: 3px solid #fff;
+  }
+  .slider .fill { height: 100%; background: var(--plum); border-radius: 99px; }
+
+  /* List rows */
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--hair); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .ico {
+    width: 36px; height: 36px; border-radius: 12px;
+    background: var(--lavender-50); display: grid; place-items: center;
+    color: var(--plum); flex-shrink: 0;
+  }
+  .list-row .ico svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .list-row .text { flex: 1; min-width: 0; }
+  .list-row .text .t { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .list-row .text .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .list-row .chev { color: var(--muted); }
+
+  /* Segmented */
+  .segmented {
+    display: grid; grid-template-columns: 1fr 1fr;
+    background: var(--lavender-50);
+    border-radius: 14px; padding: 4px; gap: 4px;
+    margin-bottom: 14px;
+  }
+  .segmented.three { grid-template-columns: repeat(3, 1fr); }
+  .segmented .seg {
+    text-align: center; padding: 8px 0; border-radius: 10px;
+    font-size: 12px; font-weight: 600; color: var(--plum-light);
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .segmented .seg svg {
+    width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .segmented .seg.active { background: #fff; color: var(--plum); box-shadow: 0 1px 4px rgba(61,43,107,0.12); }
+
+  /* Todos */
+  .todo {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px; background: #fff; border: 1px solid var(--hair);
+    border-radius: 18px; margin-bottom: 8px;
+  }
+  .todo .check { width: 22px; height: 22px; border-radius: 8px; border: 1.6px solid var(--lavender); margin-top: 1px; flex-shrink: 0; }
+  .todo.done .check { background: var(--plum); border-color: var(--plum); position: relative; }
+  .todo.done .check::after {
+    content: ''; position: absolute; top: 4px; left: 7px; width: 5px; height: 10px;
+    border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .todo .body { flex: 1; min-width: 0; }
+  .todo .body .t { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .todo.done .body .t { color: var(--muted); text-decoration: line-through; }
+  .todo .body .meta { display: flex; gap: 10px; align-items: center; margin-top: 4px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+  .todo .body .meta .owner { display: inline-flex; align-items: center; gap: 4px; }
+  .todo .body .meta .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--plum-light); }
+  .todo .body .meta .dot.high { background: #C25C5C; }
+  .todo .body .meta .dot.med  { background: #D69A4A; }
+  .mini-avatar {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: linear-gradient(135deg, #C4B5E8, #6B4FA0); border: 1.5px solid #fff;
+    color: #fff; font-size: 8px; font-weight: 700; display: inline-grid; place-items: center;
+  }
+  .mini-avatar.partner { background: linear-gradient(135deg, #E8D6C4, #B8855E); }
+  .badge-tiny { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; letter-spacing: 0.06em; }
+  .badge-tiny.must  { background: #F4E1E4; color: #8E3848; }
+  .badge-tiny.nice  { background: var(--lavender-50); color: var(--plum); }
+  .badge-tiny.ai    { background: var(--ivory); color: var(--plum-light); border: 1px solid var(--hair); }
+  .badge-tiny.honey { background: #F4E3D2; color: #8E5A2E; }
+
+  /* FAB */
+  .fab {
+    position: absolute; bottom: 100px; right: 22px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--plum); color: #fff;
+    display: grid; place-items: center;
+    box-shadow: 0 14px 28px -8px rgba(61,43,107,0.5), 0 4px 10px rgba(61,43,107,0.25);
+    z-index: 5;
+  }
+  .fab.honey { background: #8E5A2E; box-shadow: 0 14px 28px -8px rgba(142,90,46,0.5), 0 4px 10px rgba(142,90,46,0.25); }
+  .fab svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+
+  /* Memories mosaic */
+  .mosaic {
+    display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: 110px 110px; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mosaic .tile { border-radius: 18px; overflow: hidden; position: relative; padding: 12px; color: #fff; }
+  .mosaic .tile.big { grid-row: 1 / span 2; }
+  .mosaic .tile .cap { font-size: 11px; font-weight: 600; position: absolute; bottom: 10px; left: 12px; right: 12px; }
+  .mosaic .tile .meta { font-size: 9px; opacity: 0.9; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tile-bg-1 { background: linear-gradient(160deg, #BBA8E0 0%, #6B4FA0 100%); }
+  .tile-bg-2 { background: linear-gradient(160deg, #E8C9B8 0%, #B8855E 100%); }
+  .tile-bg-3 { background: linear-gradient(160deg, #DCD1F0 0%, #3D2B6B 100%); }
+  .tile-bg-4 { background: linear-gradient(160deg, #F2DFCA 0%, #B27445 100%); }
+  .tile-bg-5 { background: linear-gradient(160deg, #C7D7B4 0%, #5E7445 100%); }
+
+  /* Milestones */
+  .scroll-row {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+    margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+    margin-bottom: 14px;
+  }
+  .milestone {
+    flex-shrink: 0; width: 130px; padding: 12px;
+    background: #fff; border-radius: 18px; border: 1px solid var(--hair);
+  }
+  .milestone .week { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--plum); line-height: 1; }
+  .milestone .week.honey { color: #8E5A2E; }
+  .milestone .t { font-size: 11px; color: var(--ink); font-weight: 600; margin-top: 8px; }
+  .milestone .s { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* Together card */
+  .needs-card {
+    padding: 20px 22px;
+    background:
+      radial-gradient(200px 140px at 100% 0%, #EADFF7 0%, transparent 65%),
+      linear-gradient(160deg, #FFFFFF 0%, #FCFAF6 100%);
+  }
+  .needs-card .lead {
+    font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.2;
+    color: var(--plum); letter-spacing: -0.01em; margin-bottom: 6px;
+  }
+  .needs-card .lead em { font-style: italic; }
+  .needs-card .from {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+    font-size: 11px; color: var(--muted);
+  }
+
+  /* Readiness card (Partner prep) */
+  .ready {
+    border-radius: 24px; padding: 22px 22px 20px;
+    background:
+      radial-gradient(220px 180px at 110% 0%, #EADFF7 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FAF7F0 100%);
+    border: 1px solid rgba(61,43,107,0.06);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 14px;
+    position: relative; overflow: hidden;
+  }
+  .ready .lab {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--plum-light);
+  }
+  .ready .head {
+    font-family: 'Playfair Display', serif; font-size: 26px; color: var(--plum);
+    line-height: 1.1; margin-top: 6px; letter-spacing: -0.01em;
+  }
+  .ready .head em { font-style: italic; color: var(--plum-light); }
+  .ready .pct {
+    display: flex; align-items: baseline; gap: 8px; margin-top: 14px;
+  }
+  .ready .pct .big {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 44px; color: var(--plum); line-height: 1; letter-spacing: -0.02em;
+  }
+  .ready .pct .sub { font-size: 12px; color: var(--muted); }
+  .ready .progress-track {
+    margin-top: 10px; height: 8px; border-radius: 99px;
+    background: var(--lavender-50); overflow: hidden;
+  }
+  .ready .progress-fill { height: 100%; width: 64%; background: var(--plum); border-radius: 99px; }
+
+  .ready-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    margin-top: 14px;
+  }
+  .ready-grid .cell {
+    background: #fff; border: 1px solid var(--hair); border-radius: 14px;
+    padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .ready-grid .cell .t { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .ready-grid .cell .s { font-size: 10.5px; color: var(--muted); }
+  .ready-grid .cell.done { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .ready-grid .cell.done .t { color: #fff; }
+  .ready-grid .cell.done .s { color: rgba(255,255,255,0.7); }
+
+  /* Family mode specific */
+  .baby-card {
+    border-radius: 28px; padding: 22px;
+    background:
+      radial-gradient(220px 160px at 88% 12%, #F4E3D2 0%, transparent 65%),
+      radial-gradient(180px 160px at -6% 100%, #E4ECDC 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FFFAF1 100%);
+    border: 1px solid rgba(142,90,46,0.10);
+    box-shadow: var(--shadow-card);
+    position: relative; overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .baby-card .age {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-size: 48px; color: #8E5A2E; letter-spacing: -0.02em; line-height: 1;
+    margin-top: 6px;
+  }
+  .baby-card .age em { font-style: italic; }
+  .baby-card .name {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 17px; color: #8E5A2E; margin-top: 8px;
+  }
+  .baby-card .sub {
+    margin-top: 8px; font-size: 13px; color: var(--ink); max-width: 220px; line-height: 1.45;
+  }
+  .baby-card .face {
+    position: absolute; right: -8px; bottom: -8px; width: 130px; height: 130px;
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-grid .stat-cell {
+    background: #fff; border: 1px solid var(--hair); border-radius: 18px;
+    padding: 12px 10px; text-align: center;
+  }
+  .stat-grid .stat-cell .lab {
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .stat-grid .stat-cell .big {
+    font-family: 'Playfair Display', serif; font-size: 24px; color: #8E5A2E;
+    line-height: 1; margin-top: 6px; letter-spacing: -0.01em;
+  }
+  .stat-grid .stat-cell .unit { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .feeding-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; background: #fff; border: 1px solid var(--hair);
+    border-radius: 16px; margin-bottom: 8px;
+  }
+  .feeding-row .dotty {
+    width: 8px; height: 8px; border-radius: 50%; background: #C7A06B;
+  }
+  .feeding-row .dotty.right { background: #B2C49B; }
+  .feeding-row .when { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .feeding-row .dur { font-size: 11px; color: var(--muted); margin-left: auto; }
+  .feeding-row .side {
+    font-size: 10px; font-weight: 700; color: var(--plum-light);
+    background: var(--lavender-50); padding: 3px 8px; border-radius: 99px; letter-spacing: 0.06em;
+  }
+  .feeding-row .side.honey { color: #8E5A2E; background: #F4E3D2; }
+
+  /* Roadmap callout (Phase 2 narrative) */
+  .roadmap-note {
+    max-width: 720px; margin: 32px auto 0;
+    padding: 28px 32px;
+    background: linear-gradient(160deg, #FFFFFF 0%, #FFFAF1 100%);
+    border: 1px solid rgba(142,90,46,0.12);
+    border-radius: 28px;
+    box-shadow: var(--shadow-card);
+  }
+  .roadmap-note .pill {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+    background: #F4E3D2; color: #8E5A2E; border: 1px solid rgba(142,90,46,0.15);
+  }
+  .roadmap-note h3 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 26px; color: #8E5A2E; letter-spacing: -0.01em;
+    margin-top: 12px;
+  }
+  .roadmap-note h3 em { font-style: italic; color: #B27445; }
+  .roadmap-note p { font-size: 14px; color: var(--ink); margin-top: 10px; line-height: 1.55; }
+  .roadmap-note .ts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-top: 20px;
+  }
+  .roadmap-note .ts .t {
+    font-family: 'Playfair Display', serif; font-size: 16px; color: #8E5A2E;
+    font-weight: 500; margin-bottom: 4px;
+  }
+  .roadmap-note .ts .d { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  /* Footer */
+  .footer-note {
+    margin-top: 96px; padding-top: 24px; border-top: 1px solid rgba(61,43,107,0.1);
+    font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 16px;
+  }
+  .footer-note code {
+    background: rgba(61,43,107,0.06); padding: 2px 6px; border-radius: 4px; color: var(--plum);
+    font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  }
+
+  /* Utility */
+  .row-flex { display: flex; align-items: center; gap: 10px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="sg1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#6B4FA0" />
+      <stop offset="1" stop-color="#6B4FA0" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id="papaya" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#F7D6B2" />
+      <stop offset="0.5" stop-color="#E29B66" />
+      <stop offset="1" stop-color="#A86232" />
+    </radialGradient>
+    <radialGradient id="moodblob" cx="35%" cy="35%" r="65%">
+      <stop offset="0" stop-color="#F5E8DE" />
+      <stop offset="0.55" stop-color="#D9C9EF" />
+      <stop offset="1" stop-color="#9C82C6" />
+    </radialGradient>
+    <radialGradient id="babyface" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#FBE9D2" />
+      <stop offset="0.6" stop-color="#E8C29A" />
+      <stop offset="1" stop-color="#A86232" />
+    </radialGradient>
+  </defs>
+</svg>
+
+<div class="page">
+
+  <!-- ============================= OPENING ============================= -->
+  <header class="opener">
+    <div class="eyebrow">Blueberry · A story in three chapters</div>
+    <h1>Most apps watch you.<br/><em>Blueberry sits with you.</em></h1>
+    <p class="lede">
+      Pregnancy apps tend to do one of two things: chase data like a fitness tracker, or fill your morning with feeds and forums. Blueberry is built for the two people actually living the pregnancy: <strong>her</strong>, and the person walking beside her. One household. Two phones. No audience.
+    </p>
+    <p class="lede" style="margin-top:14px;">
+      What you see on each device is shaped by the role you play. Mom opens the <strong>Daily Companion</strong>: her week, her body, her notes to herself. Partner opens <strong>Couple OS</strong>: the same pregnancy from his side, framed as support. The data underneath is shared. The view is not.
+    </p>
+    <p class="signature">A quieter way to walk through forty weeks, together.</p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <div class="n">01</div>
+        <div class="t">Two views, one household</div>
+        <div class="d">Designed for two people. Mom's view focuses inward. Partner's view focuses on her. Same source of truth, two different lenses.</div>
+      </div>
+      <div class="pillar">
+        <div class="n">02</div>
+        <div class="t">Private by default</div>
+        <div class="d">Mom's symptom logs and journals are hers. Partner sees only what she chose to share. Usually a sentence, a chip, a mood.</div>
+      </div>
+      <div class="pillar">
+        <div class="n">03</div>
+        <div class="t">Quiet, not anxious</div>
+        <div class="d">No streaks. No feeds. No comparisons. One focal week, one paced focus list, one upcoming appointment.</div>
+      </div>
+      <div class="pillar">
+        <div class="n">04</div>
+        <div class="t">Grows with the family</div>
+        <div class="d">When baby arrives, Blueberry shifts into Family Mode. Same household, new rhythm. None of your story is left behind.</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= CHAPTER 1 · STAGE ============================= -->
+  <div class="chapter">
+    <div class="marker">Chapter One</div>
+    <h2>The same morning,<br/><em>two different phones.</em></h2>
+    <p class="blurb">Wednesday, May 22. Week 22. Olivia opens her phone over coffee. James opens his on the train. The week is the same. The view is not.</p>
+  </div>
+
+  <div class="gallery duo">
+
+    <!-- HOME · MOM (Daily Companion) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos mom"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div class="hello">
+                <span>Wednesday, May 22</span>
+                <strong>Good morning, Olivia</strong>
+              </div>
+              <div class="right">
+                <div class="icon-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                </div>
+                <div class="avatar">OW</div>
+              </div>
+            </div>
+
+            <div class="week-strip">
+              <div class="day"><span class="dow">SUN</span><span class="num">18</span></div>
+              <div class="day"><span class="dow">MON</span><span class="num">19</span></div>
+              <div class="day"><span class="dow">TUE</span><span class="num">20</span></div>
+              <div class="day"><span class="dow">WED</span><span class="num">21</span></div>
+              <div class="day today"><span class="dow">THU</span><span class="num">22</span></div>
+              <div class="day"><span class="dow">FRI</span><span class="num">23</span></div>
+              <div class="day"><span class="dow">SAT</span><span class="num">24</span></div>
+            </div>
+
+            <div class="hero">
+              <div class="meta">
+                <div>
+                  <span class="label">Pregnancy · 2nd trimester</span>
+                  <div class="week-num">Week <em>22</em></div>
+                  <p class="size-line">Your baby is about the size of a <strong>papaya</strong>. Roughly 11 inches, just under a pound.</p>
+                </div>
+              </div>
+              <svg class="fruit" viewBox="0 0 140 140">
+                <ellipse cx="70" cy="86" rx="44" ry="50" fill="url(#papaya)"/>
+                <path d="M70 42 c-2 -8 -6 -12 -10 -14" stroke="#5C3A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <ellipse cx="64" cy="78" rx="20" ry="26" fill="#F5C58B" opacity="0.55"/>
+                <circle cx="58" cy="78" r="2" fill="#4A2A12"/>
+                <circle cx="68" cy="86" r="2" fill="#4A2A12"/>
+                <circle cx="76" cy="78" r="2" fill="#4A2A12"/>
+                <circle cx="72" cy="94" r="2" fill="#4A2A12"/>
+                <circle cx="62" cy="92" r="2" fill="#4A2A12"/>
+              </svg>
+              <span class="cta">Open this week
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+              </span>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Today's focus</h3><span class="more">Edit</span></div>
+              <div class="focus">
+                <div class="row done">
+                  <div class="check"><svg viewBox="0 0 14 14"><path d="M2 7l3.5 3.5L12 4"/></svg></div>
+                  <span class="emoji">💊</span>
+                  <span class="label-text">Prenatal vitamin</span>
+                  <span class="when">8:00 am</span>
+                </div>
+                <div class="row">
+                  <div class="check"></div>
+                  <span class="emoji">💧</span>
+                  <span class="label-text">32 oz water · 12 oz so far</span>
+                  <span class="when">all day</span>
+                </div>
+                <div class="row">
+                  <div class="check"></div>
+                  <span class="emoji">🚶‍♀️</span>
+                  <span class="label-text">20-min walk after lunch</span>
+                  <span class="when">1 pm</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Next appointment</h3><span class="more">All</span></div>
+              <div class="appt">
+                <div class="date-pill"><div class="mon">Jun</div><div class="day">04</div></div>
+                <div class="info">
+                  <div class="title">20-week anatomy scan</div>
+                  <div class="loc">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Mercy West · Dr. Chen · 10:15 am
+                  </div>
+                  <div class="actions">
+                    <span class="pill-btn solid">+ Add question</span>
+                    <span class="pill-btn ghost">Directions</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab active">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>
+              Home
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>
+              Health
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>
+              To Do
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>
+              Memories
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>
+              More
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom · Daily Companion</span>
+        <h3>Her morning</h3>
+        <p>One focal week. One paced focus list. The next appointment, with room to add the questions she keeps almost forgetting. Nothing is asking for her attention twice.</p>
+      </div>
+    </div>
+
+    <!-- HOME · PARTNER (Couple OS) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos partner"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div class="hello">
+                <span>Wednesday, May 22</span>
+                <strong>Good morning, James</strong>
+              </div>
+              <div class="right">
+                <div class="icon-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                </div>
+                <div class="avatar partner">JW</div>
+              </div>
+            </div>
+
+            <div class="week-strip">
+              <div class="day"><span class="dow">SUN</span><span class="num">18</span></div>
+              <div class="day"><span class="dow">MON</span><span class="num">19</span></div>
+              <div class="day"><span class="dow">TUE</span><span class="num">20</span></div>
+              <div class="day"><span class="dow">WED</span><span class="num">21</span></div>
+              <div class="day today"><span class="dow">THU</span><span class="num">22</span></div>
+              <div class="day"><span class="dow">FRI</span><span class="num">23</span></div>
+              <div class="day"><span class="dow">SAT</span><span class="num">24</span></div>
+            </div>
+
+            <div class="hero">
+              <div class="meta">
+                <div>
+                  <span class="label">Together · Week 22</span>
+                  <div class="week-num" style="font-size:44px; line-height:1.05; margin-top:8px;">Olivia is in her<br/><em>second trimester</em>.</div>
+                  <p class="size-line" style="margin-top:10px;">Baby is the size of a <strong>papaya</strong>. She felt the first kick last Wednesday.</p>
+                </div>
+              </div>
+              <span class="cta">Open week 22 with her
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+              </span>
+            </div>
+
+            <div class="card">
+              <div class="h">
+                <h3>How Olivia is feeling</h3>
+                <span class="more">From her share</span>
+              </div>
+              <p style="font-size:14px; color:var(--ink); font-family:'Playfair Display'; font-style:italic; line-height:1.4; margin-bottom:10px;">
+                "Tired this morning, settling by lunch. Heartburn at night again."
+              </p>
+              <div class="chip-row">
+                <span class="chip lavender">😌 Mostly okay</span>
+                <span class="chip lavender">😴 Low energy</span>
+                <span class="chip lavender">🔥 Heartburn</span>
+              </div>
+              <div class="muted" style="margin-top:10px; font-size:11px;">Shared 6:42 am · Health details stay with her</div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>How I can help today</h3><span class="more">+ Add</span></div>
+              <div class="focus">
+                <div class="row done">
+                  <div class="check"><svg viewBox="0 0 14 14"><path d="M2 7l3.5 3.5L12 4"/></svg></div>
+                  <span class="emoji">🛒</span>
+                  <span class="label-text">Pick up Tums + ginger tea</span>
+                  <span class="when">on the way</span>
+                </div>
+                <div class="row">
+                  <div class="check"></div>
+                  <span class="emoji">🍳</span>
+                  <span class="label-text">Make dinner, something light</span>
+                  <span class="when">7 pm</span>
+                </div>
+                <div class="row">
+                  <div class="check"></div>
+                  <span class="emoji">❓</span>
+                  <span class="label-text">Ask: anything to add to next scan?</span>
+                  <span class="when">tonight</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab active">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>
+              Home
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>
+              Together
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>
+              To Do
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>
+              Memories
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>
+              More
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role partner">Partner · Couple OS</span>
+        <h3>His morning</h3>
+        <p>The same week, translated into ways to show up. Her shared signal becomes three small acts of support. Her raw logs never appear here. They don't need to.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================= CHAPTER 2 · HER ============================= -->
+  <div class="chapter">
+    <div class="marker">Chapter Two · For her</div>
+    <h2>A Daily Companion,<br/><em>not a dashboard.</em></h2>
+    <p class="blurb">Her side of the app stays close to her body and her week. Mood first. Symptoms in one tap. The baby's growth told the way a friend would tell it. Warm and specific, never alarmist.</p>
+  </div>
+
+  <div class="gallery">
+
+    <!-- HEALTH · MOM -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos calm"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <h1 class="section">Health</h1>
+              <div class="right">
+                <div class="icon-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </div>
+                <div class="avatar">OW</div>
+              </div>
+            </div>
+
+            <div class="hero" style="padding:24px 22px 26px;">
+              <span class="label">Today · Thu 22 May</span>
+              <h2 style="font-family:'Playfair Display'; font-weight:500; font-size:30px; line-height:1.1; color:var(--plum); margin-top:8px; letter-spacing:-0.015em;">How are you feeling<br/><em>this morning?</em></h2>
+
+              <div style="display:flex; justify-content:center; margin:14px 0 8px;">
+                <svg width="140" height="120" viewBox="0 0 140 120">
+                  <path d="M70 12 C95 8, 125 28, 122 60 C128 88, 100 110, 72 108 C40 112, 12 90, 16 60 C12 28, 45 6, 70 12 Z" fill="url(#moodblob)"/>
+                  <circle cx="58" cy="58" r="2.6" fill="#1A1A2E"/>
+                  <circle cx="80" cy="58" r="2.6" fill="#1A1A2E"/>
+                  <path d="M58 72 Q69 80 80 72" stroke="#1A1A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <div style="text-align:center; font-family:'Playfair Display'; font-style:italic; font-size:18px; color:var(--plum); margin-bottom:14px;">Pleasant</div>
+
+              <div class="slider">
+                <div class="fill" style="width:68%;"></div>
+                <div class="thumb" style="left:68%;"></div>
+              </div>
+              <div class="row-flex" style="justify-content:space-between; margin-top:8px; font-size:10px; color:var(--muted); letter-spacing:0.1em;">
+                <span>VERY UNPLEASANT</span><span>VERY PLEASANT</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Today's log</h3><span class="more">+ Symptom</span></div>
+              <div class="chip-row" style="margin-bottom:10px;">
+                <span class="chip selected">🤰 Body · 2</span>
+                <span class="chip selected">⚡ Energy · low</span>
+                <span class="chip">🧘 Mindfulness</span>
+                <span class="chip">😴 Sleep · 6h 12m</span>
+              </div>
+              <button style="width:100%; margin-top:6px; padding:14px; background:var(--plum); color:#fff; border:none; border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:13px; letter-spacing:0.02em;">Log symptoms</button>
+            </div>
+
+            <div class="card chart-card" style="padding:16px 18px 12px;">
+              <div class="h"><h3>Energy · last 7 days</h3><span class="more">All trends</span></div>
+              <div class="row-flex" style="justify-content:space-between; align-items:flex-end;">
+                <div style="font-family:'Playfair Display'; font-size:28px; color:var(--plum); line-height:1;">3.4<span style="font-family:'DM Sans'; font-size:11px; color:var(--muted); margin-left:4px;">/ 5 avg</span></div>
+                <div style="font-size:11px; color:var(--plum-light); font-weight:600;">↗ +0.3 vs last wk</div>
+              </div>
+              <svg style="width:100%; height:56px; margin-top:8px;" viewBox="0 0 300 60" preserveAspectRatio="none">
+                <path fill="url(#sg1)" opacity="0.4" d="M0,40 L40,32 L80,42 L120,28 L160,22 L200,30 L240,18 L280,24 L300,20 L300,60 L0,60 Z"/>
+                <path stroke="#3D2B6B" stroke-width="2" fill="none" stroke-linecap="round" d="M0,40 L40,32 L80,42 L120,28 L160,22 L200,30 L240,18 L280,24 L300,20"/>
+                <circle cx="280" cy="24" r="3.5" fill="#3D2B6B" stroke="#fff" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <div class="card" style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:12px; background:var(--peach-mist); display:grid; place-items:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8E5A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-3-6.2L21 4v5h-5"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600;">Add a question for Dr. Chen</div>
+                <div class="muted" style="font-size:11px;">3 saved · review before scan</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#7B6F8A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom only</span>
+        <h3>Health</h3>
+        <p>Mood is the first ask, the way Apple Health does it. Symptoms log in a tap. Trends are quiet underneath. For her, not a feed. None of this appears on Partner's phone unless she shares it.</p>
+      </div>
+    </div>
+
+    <!-- WEEK DETAIL · MOM -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos mom"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div>
+                <span class="label">Week 22 · Second trimester</span>
+                <h1 class="section" style="font-size:28px; margin-top:4px;">Your papaya<br/><em style="color:var(--plum-light);">is finding her voice.</em></h1>
+              </div>
+              <div class="right"><div class="avatar">OW</div></div>
+            </div>
+
+            <div class="hero" style="padding:22px;">
+              <span class="label">Baby this week</span>
+              <p style="margin-top:10px; font-family:'Playfair Display'; font-style:italic; font-size:17px; color:var(--plum); line-height:1.4;">
+                "She can hear you now. Her own little inner ear has finished forming this week. Your voice is the loudest thing in her world."
+              </p>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px;">
+                <div style="background:var(--lavender-50); border-radius:14px; padding:10px 12px;">
+                  <div class="label">Length</div>
+                  <div style="font-family:'Playfair Display'; font-size:20px; color:var(--plum); margin-top:2px;">11.0<span style="font-family:'DM Sans'; font-size:11px; color:var(--muted); margin-left:3px;">in</span></div>
+                </div>
+                <div style="background:var(--ivory); border:1px solid var(--hair); border-radius:14px; padding:10px 12px;">
+                  <div class="label">Weight</div>
+                  <div style="font-family:'Playfair Display'; font-size:20px; color:var(--plum); margin-top:2px;">15.2<span style="font-family:'DM Sans'; font-size:11px; color:var(--muted); margin-left:3px;">oz</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>What you might notice</h3><span class="more">Common</span></div>
+              <div class="focus">
+                <div class="row">
+                  <div class="check" style="border-color:var(--plum-light);"></div>
+                  <span class="emoji">💓</span>
+                  <span class="label-text">Stronger, more rhythmic kicks</span>
+                </div>
+                <div class="row">
+                  <div class="check" style="border-color:var(--plum-light);"></div>
+                  <span class="emoji">🔥</span>
+                  <span class="label-text">Heartburn in the evenings</span>
+                </div>
+                <div class="row">
+                  <div class="check" style="border-color:var(--plum-light);"></div>
+                  <span class="emoji">😴</span>
+                  <span class="label-text">A second wind in energy</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>One small thing this week</h3><span class="more">Skip</span></div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:15px; color:var(--plum); line-height:1.45;">
+                "Talk to her, out loud, even just narrating dinner. She knows your voice already."
+              </p>
+              <div class="row-flex" style="margin-top:14px; gap:8px;">
+                <span class="pill-btn solid">I'll try this</span>
+                <span class="pill-btn ghost">Save</span>
+              </div>
+            </div>
+
+            <div class="card" style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:12px; background:var(--lavender-50); display:grid; place-items:center; color:var(--plum);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600;">Count a kick session</div>
+                <div class="muted" style="font-size:11px;">Roughly 10 in an hour is the ask</div>
+              </div>
+              <span class="pill-btn">Start</span>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom only</span>
+        <h3>This week</h3>
+        <p>Stage-aware copy that reads like a friend, not a Wikipedia page. One small thing to try. Common feelings named, not diagnosed. Kick counter quietly within reach.</p>
+      </div>
+    </div>
+
+    <!-- MEMORIES (Mom POV) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos memo"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div>
+                <h1 class="section">Memories</h1>
+                <div class="muted" style="font-size:11px; margin-top:2px;">A book you're writing without trying.</div>
+              </div>
+              <div class="right"><div class="avatar">OW</div></div>
+            </div>
+
+            <div class="label" style="padding-left:4px; margin-bottom:10px;">THIS WEEK · WEEK 22</div>
+            <div class="mosaic">
+              <div class="tile big tile-bg-1">
+                <span class="meta">JOURNAL · OLIVIA</span>
+                <svg style="position:absolute; top:14px; right:14px; opacity:0.5;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M5 4h14v16l-7-3-7 3z"/></svg>
+                <span class="cap" style="font-family:'Playfair Display'; font-style:italic; font-size:15px; line-height:1.3;">"Felt the first real kick during dinner. James froze with his fork halfway up."</span>
+              </div>
+              <div class="tile tile-bg-2">
+                <span class="meta">PHOTO · 2</span>
+                <span class="cap">Anatomy scan glow</span>
+              </div>
+              <div class="tile tile-bg-3">
+                <span class="meta">MILESTONE</span>
+                <span class="cap">First kick · Wk 21</span>
+              </div>
+            </div>
+
+            <div class="label" style="padding-left:4px; margin-bottom:8px;">MILESTONES</div>
+            <div class="scroll-row">
+              <div class="milestone" style="background:linear-gradient(160deg, #fff 0%, var(--lavender-25) 100%);">
+                <div class="week">Wk 8</div>
+                <div class="t">First heartbeat</div>
+                <div class="s">Mar 4</div>
+              </div>
+              <div class="milestone">
+                <div class="week">Wk 12</div>
+                <div class="t">End of T1</div>
+                <div class="s">Apr 1</div>
+              </div>
+              <div class="milestone" style="background:linear-gradient(160deg, #fff 0%, #F5E1DC 100%);">
+                <div class="week">Wk 16</div>
+                <div class="t">Gender reveal</div>
+                <div class="s">Apr 29</div>
+              </div>
+              <div class="milestone" style="background:linear-gradient(160deg, #fff 0%, var(--lavender-50) 100%);">
+                <div class="week">Wk 21</div>
+                <div class="t">First kick</div>
+                <div class="s">May 15</div>
+              </div>
+              <div class="milestone">
+                <div class="week">Wk 24</div>
+                <div class="t" style="color:var(--muted);">Viability</div>
+                <div class="s">Coming</div>
+              </div>
+            </div>
+
+            <div class="label" style="padding-left:4px; margin-bottom:8px;">RECENT MOMENTS</div>
+            <div class="card" style="padding:14px 16px;">
+              <div class="row-flex" style="gap:10px; margin-bottom:6px;">
+                <span class="mini-avatar partner" style="width:20px; height:20px; font-size:9px;">JW</span>
+                <span style="font-size:12px; font-weight:600;">James</span>
+                <span class="muted" style="font-size:10.5px;">· Mon 8:14 pm</span>
+              </div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:14px; line-height:1.4; color:var(--ink);">"Picked up the crib paint sample. Sage looks like a forest in the corner."</p>
+            </div>
+            <div class="card" style="padding:14px 16px;">
+              <div class="row-flex" style="gap:10px; margin-bottom:6px;">
+                <span class="mini-avatar" style="width:20px; height:20px; font-size:9px;">OW</span>
+                <span style="font-size:12px; font-weight:600;">Olivia</span>
+                <span class="muted" style="font-size:10.5px;">· Sat 11:02 am</span>
+                <span class="badge-tiny nice" style="margin-left:auto;">📷 1</span>
+              </div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:14px; line-height:1.4; color:var(--ink);">"Mom's old rocking chair fits perfectly under the window."</p>
+            </div>
+          </div>
+
+          <div class="fab">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Shared · Both</span>
+        <h3>Memories</h3>
+        <p>The book without the daily obligation. A photo, a sentence, a milestone. Nothing performative. Just a place for the small lines you'll want to read back in a year.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================= CHAPTER 3 · HIM ============================= -->
+  <div class="chapter">
+    <div class="marker">Chapter Three · For him</div>
+    <h2>A Couple OS<br/><em>for the one walking beside her.</em></h2>
+    <p class="blurb">Partner apps are an afterthought in this category: a "view-only" mode bolted onto a mom app. Here, Partner gets his own operating system. How to help today, what to remember, how to be ready when it counts.</p>
+  </div>
+
+  <div class="gallery">
+
+    <!-- TOGETHER · PARTNER -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos partner"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <h1 class="section">Together</h1>
+              <div class="right">
+                <div class="icon-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </div>
+                <div class="avatar partner">JW</div>
+              </div>
+            </div>
+
+            <div class="hero needs-card">
+              <span class="label">What she needs today</span>
+              <p class="lead" style="margin-top:8px;">Olivia mentioned <em>heartburn last night.</em> Tums and ginger tea on the way home would land.</p>
+              <div class="row-flex" style="gap:8px; margin-top:8px;">
+                <span class="pill-btn solid">+ Add to To Do</span>
+                <span class="pill-btn ghost">Already done</span>
+              </div>
+              <div class="from">
+                <span class="avatar" style="width:18px; height:18px; font-size:8px;">OW</span>
+                From her share, 6:42 am
+              </div>
+            </div>
+
+            <div class="card" style="background:linear-gradient(160deg, #FFFFFF 0%, var(--lavender-25) 100%);">
+              <div class="h">
+                <h3>AI suggestions · Week 22</h3>
+                <span class="more">↻ More</span>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 0;">
+                <span class="badge-tiny ai" style="margin-top:2px;">AI</span>
+                <div style="flex:1;">
+                  <p style="font-size:13px; line-height:1.45; color:var(--ink);">She's been low-energy three mornings in a row. Tonight is a good night to take dinner off her plate completely.</p>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-top:1px solid var(--hair);">
+                <span class="badge-tiny ai" style="margin-top:2px;">AI</span>
+                <div style="flex:1;">
+                  <p style="font-size:13px; line-height:1.45; color:var(--ink);">Her anatomy scan is in 13 days. Two questions from her notes are still unanswered. Review them with her this weekend.</p>
+                </div>
+              </div>
+              <div class="muted" style="font-size:10.5px; margin-top:8px;">Suggestions read her shared signals, not her logs.</div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Tonight's conversation</h3><span class="more">↻ Another</span></div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:17px; line-height:1.35; color:var(--plum); margin-top:4px;">
+                "What's one thing that felt good about this week, and one thing that felt hard?"
+              </p>
+              <div class="muted" style="font-size:11px; margin-top:10px;">Stage prompt · Second trimester</div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Tonight's household</h3><span class="more">Swap</span></div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div style="background:var(--lavender-50); border-radius:14px; padding:12px;">
+                  <div class="row-flex" style="gap:8px; margin-bottom:6px;">
+                    <span class="avatar partner" style="width:24px; height:24px; font-size:10px;">JW</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--plum);">James</span>
+                  </div>
+                  <div style="font-size:11.5px; color:var(--plum);">Dinner · dishes · Luna walk</div>
+                </div>
+                <div style="background:var(--ivory); border:1px solid var(--hair); border-radius:14px; padding:12px;">
+                  <div class="row-flex" style="gap:8px; margin-bottom:6px;">
+                    <span class="avatar" style="width:24px; height:24px; font-size:10px;">OW</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--plum);">Olivia</span>
+                  </div>
+                  <div style="font-size:11.5px; color:var(--muted);">Resting · early bed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>Together</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role partner">Partner only</span>
+        <h3>Together</h3>
+        <p>Her shared signals become his playbook. Quiet AI suggestions, a conversation prompt for tonight, and an honest division of the household, without her having to ask.</p>
+      </div>
+    </div>
+
+    <!-- TO DO (Partner-leaning, prep-focused) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos calm"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div>
+                <h1 class="section">To Do</h1>
+                <div class="muted" style="font-size:11px; margin-top:2px;">4 open · 1 due today · 18 weeks to go</div>
+              </div>
+              <div class="right">
+                <div class="icon-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+                </div>
+                <div class="avatar partner">JW</div>
+              </div>
+            </div>
+
+            <div class="segmented three">
+              <div class="seg active">
+                <svg viewBox="0 0 24 24"><path d="M5 6h14M9 12h10M5 18h14"/><circle cx="5" cy="12" r="1"/></svg>
+                Todos
+              </div>
+              <div class="seg">
+                <svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8"/></svg>
+                Appointments
+              </div>
+              <div class="seg">
+                <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+                Calendar
+              </div>
+            </div>
+
+            <div class="chip-row" style="margin-bottom:14px;">
+              <span class="chip lavender">All · 8</span>
+              <span class="chip">Must-do · 3</span>
+              <span class="chip">Mine · 5</span>
+              <span class="chip">Olivia's · 3</span>
+            </div>
+
+            <div class="label" style="margin-bottom:8px; padding-left:4px;">TODAY · MAY 22</div>
+
+            <div class="todo">
+              <div class="check"></div>
+              <div class="body">
+                <div class="t">Pick up Tums + ginger tea</div>
+                <div class="meta">
+                  <span class="owner"><span class="mini-avatar partner">JW</span> James</span>
+                  <span class="row-flex" style="gap:5px;"><span class="dot high"></span> Must-do</span>
+                  <span>Due today · 6 pm</span>
+                </div>
+              </div>
+              <span class="badge-tiny ai">AI</span>
+            </div>
+
+            <div class="todo">
+              <div class="check"></div>
+              <div class="body">
+                <div class="t">Confirm anatomy scan parking + check-in</div>
+                <div class="meta">
+                  <span class="owner"><span class="mini-avatar partner">JW</span> James</span>
+                  <span class="row-flex" style="gap:5px;"><span class="dot med"></span> Nice-to-do</span>
+                  <span>Before Jun 4</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="label" style="margin:14px 0 8px; padding-left:4px;">PREPARING FOR THE BIG DAY</div>
+
+            <div class="todo">
+              <div class="check"></div>
+              <div class="body">
+                <div class="t">Tour Mercy West birthing wing</div>
+                <div class="meta">
+                  <span class="owner"><span class="mini-avatar">OW</span><span class="mini-avatar partner" style="margin-left:-4px;">JW</span> Both</span>
+                  <span class="row-flex" style="gap:5px;"><span class="dot high"></span> Must-do</span>
+                  <span>Sat 24</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="todo">
+              <div class="check"></div>
+              <div class="body">
+                <div class="t">Install car seat + get it inspected</div>
+                <div class="meta">
+                  <span class="owner"><span class="mini-avatar partner">JW</span> James</span>
+                  <span class="row-flex" style="gap:5px;"><span class="dot high"></span> Must-do</span>
+                  <span>Week 36</span>
+                </div>
+              </div>
+              <span class="badge-tiny ai">AI</span>
+            </div>
+
+            <div class="todo">
+              <div class="check"></div>
+              <div class="body">
+                <div class="t">Pack the hospital bag</div>
+                <div class="meta">
+                  <span class="owner"><span class="mini-avatar">OW</span><span class="mini-avatar partner" style="margin-left:-4px;">JW</span> Both</span>
+                  <span class="row-flex" style="gap:5px;"><span class="dot high"></span> Must-do</span>
+                  <span>Week 35</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fab">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>Together</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Shared · Both</span>
+        <h3>To Do</h3>
+        <p>One list for both of them. Owner, must-do vs nice-to-do, today vs the big day. AI quietly proposes the ones easy to forget (car seat install, hospital pre-registration) and stage-times them for him.</p>
+      </div>
+    </div>
+
+    <!-- READINESS · PARTNER PREP -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos prep"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div>
+                <span class="label">Together · Be ready</span>
+                <h1 class="section" style="font-size:24px; margin-top:4px;">Getting ready<br/><em style="color:var(--plum-light);">for the big day.</em></h1>
+              </div>
+              <div class="right"><div class="avatar partner">JW</div></div>
+            </div>
+
+            <div class="ready">
+              <div class="lab">Readiness · Week 22</div>
+              <div class="head">You're <em>64% ready</em><br/>for the hospital.</div>
+              <div class="pct">
+                <div class="big">64<span style="font-size:18px;">%</span></div>
+                <div class="sub">9 of 14 essentials handled</div>
+              </div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+
+              <div class="ready-grid">
+                <div class="cell done">
+                  <div class="t">Hospital chosen</div>
+                  <div class="s">Mercy West · pre-registered</div>
+                </div>
+                <div class="cell done">
+                  <div class="t">Pediatrician</div>
+                  <div class="s">Dr. Patel · accepting</div>
+                </div>
+                <div class="cell">
+                  <div class="t">Car seat</div>
+                  <div class="s">Install + inspect by wk 36</div>
+                </div>
+                <div class="cell">
+                  <div class="t">Hospital bag</div>
+                  <div class="s">Start packing by wk 35</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h"><h3>Where to be when it starts</h3><span class="more">Edit</span></div>
+              <div class="list-row" style="padding:10px 4px;">
+                <div class="ico"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <div class="text"><div class="t">Mercy West · L&amp;D</div><div class="s">2200 W 12th · 22 min from home</div></div>
+                <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#7B6F8A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+              </div>
+              <div class="list-row" style="padding:10px 4px;">
+                <div class="ico" style="background:var(--peach-mist); color:#8E5A2E;"><svg viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/><circle cx="12" cy="12" r="9"/></svg></div>
+                <div class="text"><div class="t">Backup driver</div><div class="s">Em · 6 min away · saved</div></div>
+                <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#7B6F8A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+              </div>
+              <div class="list-row" style="padding:10px 4px; border-bottom:none;">
+                <div class="ico"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5z"/><path d="M9 7V3h6v4"/></svg></div>
+                <div class="text"><div class="t">Dog care · Luna</div><div class="s">Mom · 10 min · keys with her</div></div>
+                <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#7B6F8A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+              </div>
+            </div>
+
+            <div class="card" style="background:linear-gradient(160deg, #FFFFFF 0%, var(--lavender-25) 100%);">
+              <div class="h"><h3>If labor starts tonight</h3><span class="more">Walkthrough</span></div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:15px; line-height:1.4; color:var(--plum); margin-top:2px;">
+                "Bag by the door. Drive to Mercy West Entrance B. Call Em on the way. Luna stays. Mom has a key."
+              </p>
+              <div class="muted" style="font-size:11px; margin-top:8px;">Updates as your plan does. Always one tap away.</div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>Together</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role partner">Partner only</span>
+        <h3>Be ready</h3>
+        <p>The part most pregnancy apps skip. A living plan for the moment things start: where to go, who to call, who has the dog, what to grab. Updated as the weeks tick down. Never a panic search at 3 am.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================= CHAPTER 4 · FAMILY MODE (PHASE 2) ============================= -->
+  <div class="chapter">
+    <div class="marker">Chapter Four · Phase 2 · Family Mode</div>
+    <h2>When she arrives,<br/><em>the app changes with you.</em></h2>
+    <p class="blurb">Most pregnancy apps quietly retire at delivery. Blueberry doesn't. The day baby comes home, the household shifts into Family Mode. Same household, new rhythm. Nothing of your story gets left behind.</p>
+  </div>
+
+  <div class="gallery duo">
+
+    <!-- FAMILY HOME · MOM (post-baby) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos family"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div class="hello">
+                <span style="color:#8E5A2E;">Tuesday, Oct 6 · Family mode</span>
+                <strong style="color:#8E5A2E;">Good morning, Mom</strong>
+              </div>
+              <div class="right">
+                <div class="icon-btn" style="background:#FFFAF1;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#8E5A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                </div>
+                <div class="avatar">OW</div>
+              </div>
+            </div>
+
+            <div class="baby-card">
+              <span class="label" style="color:#B27445;">Maya · 13 days old</span>
+              <div class="age">Day <em>13</em></div>
+              <div class="name">Welcome home, little papaya.</div>
+              <p class="sub">She slept 4.5 hours straight last night. The longest stretch yet.</p>
+              <svg class="face" viewBox="0 0 130 130">
+                <circle cx="65" cy="75" r="48" fill="url(#babyface)"/>
+                <circle cx="52" cy="72" r="2.4" fill="#3A2114"/>
+                <circle cx="78" cy="72" r="2.4" fill="#3A2114"/>
+                <path d="M55 90 Q65 96 75 90" stroke="#3A2114" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M30 50 Q40 30 65 32 Q92 30 100 50" fill="#E29B66" opacity="0.55"/>
+              </svg>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-cell">
+                <div class="lab">Sleep · 24h</div>
+                <div class="big">14<span class="unit">h</span></div>
+                <div class="unit">7 stretches</div>
+              </div>
+              <div class="stat-cell">
+                <div class="lab">Feeds</div>
+                <div class="big">9</div>
+                <div class="unit">avg 26 min</div>
+              </div>
+              <div class="stat-cell">
+                <div class="lab">Diapers</div>
+                <div class="big">11</div>
+                <div class="unit">5 wet · 6 mixed</div>
+              </div>
+            </div>
+
+            <div class="card" style="border-color:rgba(142,90,46,0.10);">
+              <div class="h"><h3>Today's rhythm</h3><span class="more" style="color:#B27445;">+ Log</span></div>
+
+              <div class="feeding-row">
+                <span class="side">L</span>
+                <span class="when">6:42 am · Feeding</span>
+                <span class="dur">28 min</span>
+              </div>
+              <div class="feeding-row">
+                <span class="side honey">R</span>
+                <span class="when">4:14 am · Feeding</span>
+                <span class="dur">22 min</span>
+              </div>
+              <div class="feeding-row" style="margin-bottom:0;">
+                <span class="side" style="background:#F4E3D2; color:#8E5A2E;">💤</span>
+                <span class="when">2:15 am · Slept through diaper change</span>
+                <span class="dur">·</span>
+              </div>
+            </div>
+
+            <div class="card" style="background:linear-gradient(160deg, #FFFFFF 0%, #FFFAF1 100%); border-color:rgba(142,90,46,0.10);">
+              <div class="h"><h3 style="color:#8E5A2E;">Postpartum check-in</h3><span class="more" style="color:#B27445;">Skip</span></div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:15px; line-height:1.4; color:#8E5A2E;">
+                "And how are you doing today?"
+              </p>
+              <div class="row-flex" style="gap:6px; margin-top:10px; flex-wrap:wrap;">
+                <span class="chip honey">😊 Okay</span>
+                <span class="chip honey">😴 Exhausted</span>
+                <span class="chip honey">💭 Needs to talk</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar family">
+            <div class="tab active">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>
+              Home
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.5 5.5l2 2M16.5 16.5l2 2M5.5 18.5l2-2M16.5 7.5l2-2"/></svg></div>
+              Baby
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>
+              To Do
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>
+              Memories
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>
+              More
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role family">Mom · Family Mode</span>
+        <h3>The first weeks</h3>
+        <p>Feeding, sleep, diapers, all logged in seconds. A postpartum check-in that asks about her, gently. The pregnancy fades into history.</p>
+      </div>
+    </div>
+
+    <!-- FAMILY HOME · PARTNER (Family OS) -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span>
+        <span class="side-btn up"></span>
+        <span class="side-btn down"></span>
+        <span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos nursery"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="content">
+            <div class="topbar">
+              <div class="hello">
+                <span style="color:#8E5A2E;">Tuesday, Oct 6 · Family mode</span>
+                <strong style="color:#8E5A2E;">Good morning, James</strong>
+              </div>
+              <div class="right">
+                <div class="icon-btn" style="background:#FFFAF1;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#8E5A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                </div>
+                <div class="avatar partner">JW</div>
+              </div>
+            </div>
+
+            <div class="baby-card">
+              <span class="label" style="color:#B27445;">Together · Day 13</span>
+              <h2 style="font-family:'Playfair Display'; font-size:30px; color:#8E5A2E; line-height:1.1; margin-top:8px; letter-spacing:-0.01em;">Olivia slept<br/><em style="color:#B27445;">three hours straight.</em></h2>
+              <p class="sub">Maya woke twice. Both feedings handled by Olivia. Your turn tonight, 11 → 3.</p>
+              <svg class="face" viewBox="0 0 130 130">
+                <circle cx="65" cy="75" r="48" fill="url(#babyface)"/>
+                <circle cx="52" cy="72" r="2.4" fill="#3A2114"/>
+                <circle cx="78" cy="72" r="2.4" fill="#3A2114"/>
+                <path d="M55 90 Q65 96 75 90" stroke="#3A2114" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="card" style="border-color:rgba(142,90,46,0.10);">
+              <div class="h"><h3 style="color:#8E5A2E;">Tonight is on you</h3><span class="more" style="color:#B27445;">Swap</span></div>
+              <div class="focus">
+                <div class="row">
+                  <div class="check" style="border-color:#E29B66;"></div>
+                  <span class="emoji">🍼</span>
+                  <span class="label-text">Prep bottles before 9 pm</span>
+                  <span class="when">tonight</span>
+                </div>
+                <div class="row">
+                  <div class="check" style="border-color:#E29B66;"></div>
+                  <span class="emoji">🌙</span>
+                  <span class="label-text">11 pm + 3 am feed shifts</span>
+                  <span class="when">overnight</span>
+                </div>
+                <div class="row">
+                  <div class="check" style="border-color:#E29B66;"></div>
+                  <span class="emoji">☕</span>
+                  <span class="label-text">Coffee ready when Olivia wakes</span>
+                  <span class="when">7 am</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="background:linear-gradient(160deg, #FFFFFF 0%, #F2DFCA 100%); border-color:rgba(142,90,46,0.15);">
+              <div class="h"><h3 style="color:#8E5A2E;">Worth saying out loud</h3><span class="more" style="color:#B27445;">↻</span></div>
+              <p style="font-family:'Playfair Display'; font-style:italic; font-size:16px; line-height:1.35; color:#8E5A2E; margin-top:4px;">
+                "Two weeks in. You're doing more than you know."
+              </p>
+              <div class="muted" style="font-size:11px; margin-top:10px; color:#B27445;">Postpartum prompt · Week 2</div>
+            </div>
+
+            <div class="card" style="border-color:rgba(142,90,46,0.10);">
+              <div class="h"><h3 style="color:#8E5A2E;">Coming up</h3><span class="more" style="color:#B27445;">All</span></div>
+              <div class="appt">
+                <div class="date-pill" style="border-color:rgba(142,90,46,0.15);">
+                  <div class="mon" style="color:#B27445;">Oct</div>
+                  <div class="day" style="color:#8E5A2E;">10</div>
+                </div>
+                <div class="info">
+                  <div class="title">Maya · 2-week pediatric visit</div>
+                  <div class="loc">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Dr. Patel · 11:30 am
+                  </div>
+                  <div class="actions">
+                    <span class="pill-btn honey">✓ I'll drive</span>
+                    <span class="pill-btn ghost">Pack diaper bag</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar family">
+            <div class="tab active">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>
+              Home
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>
+              Together
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>
+              To Do
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>
+              Memories
+            </div>
+            <div class="tab">
+              <div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>
+              More
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role family">Partner · Family Mode</span>
+        <h3>Still showing up</h3>
+        <p>Couple OS doesn't end at the delivery room. Night shifts swap honestly. The app names what's worth saying out loud. The same household, two phones, a new shape.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ---------- Roadmap narrative ---------- -->
+  <div class="roadmap-note">
+    <span class="pill">On the Phase 2 roadmap</span>
+    <h3>Your story <em>follows you forward.</em></h3>
+    <p>The day Maya's date of birth is set, Blueberry quietly retires the week-by-week pregnancy view and unfolds Family Mode in its place. Same household. Same two phones. The journal entries, the milestones, the questions you saved for Dr. Chen all stay. They become the first chapter of her book.</p>
+    <div class="ts">
+      <div>
+        <div class="t">Baby's rhythm</div>
+        <div class="d">Feeding, sleep, diapers, growth, all logged in seconds and never demanded.</div>
+      </div>
+      <div>
+        <div class="t">Postpartum together</div>
+        <div class="d">Mom's check-ins continue. Partner's "what she needs" becomes "what tonight needs."</div>
+      </div>
+      <div>
+        <div class="t">Milestones, continued</div>
+        <div class="d">First smile, first laugh, first word. The same gentle ladder, now for her.</div>
+      </div>
+      <div>
+        <div class="t">Family memories</div>
+        <div class="d">Pregnancy chapter closes; nothing is deleted. The book just gets longer.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer-note">
+    <span>Blueberry · Story mockups for design review. Static HTML, no JS, no external assets beyond Google Fonts.</span>
+    <span>Open: <code>docs/blueberry-story.html</code></span>
+  </footer>
+
+</div>
+</body>
+</html>

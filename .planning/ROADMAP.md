@@ -101,17 +101,55 @@
 2. Appointments can be created and viewed by both users.
 3. Upcoming appointments are visible where users naturally need them.
 
-## Phase 7: Integration Decision and Add-ons
+## Phase 7a: Google Calendar Sync (promoted to Phase 1, 2026-05-23)
 
-**Goal:** Decide and implement only the integrations that remain worth the added complexity after the core private app works.
-
-**Candidates:** INTG-01 through INTG-04, POST-01
+**Goal:** Two-way sync of `appointments` with the user's Google Calendar.
 
 **Success Criteria**
 
-1. Google Calendar, push notifications, AI content, and postpartum trackers are each accepted, deferred, or rejected based on actual usage.
-2. Any accepted integration has credentials, privacy implications, and rollback behavior documented before code.
+1. User can connect Google Calendar via OAuth from the More tab.
+2. New appointments created in-app appear on Google Calendar.
+3. Updates and deletes propagate both directions.
+4. Both partners can see all appointments regardless of which one created them.
+5. `appointments.google_event_id` stores the bound event reference.
+
+## Phase 7b: Apple Calendar (EventKit) Sync (promoted to Phase 1, 2026-05-23)
+
+**Goal:** Two-way sync of `appointments` with iOS EventKit.
+
+**Success Criteria**
+
+1. iOS permission flow requested at the first appointment screen, not at launch.
+2. New appointments created in-app appear in the user's chosen calendar.
+3. EventKit changes flow back into Supabase on sync.
+4. Schema carries the EventKit identifier (add `apple_event_id` column when planning).
+
+## Phase 7c: Push Notifications (promoted to Phase 1, 2026-05-23)
+
+**Goal:** Push notifications for shared household events: appointment reminders, partner's check-in shared, todo assigned, kick session reminder.
+
+**Success Criteria**
+
+1. Push tokens registered and stored against the user row.
+2. Notification copy follows the locked voice rules (no exclamation points, no "Hey Mama!" energy).
+3. Payloads carry no raw health-log content. Only shared signals such as a chip, a sentence Mom chose to share, or an appointment title.
+4. User can adjust which categories ping them from More, Notifications.
+5. Quiet hours (default 9 pm to 7 am) honored across all categories except labor-stage emergencies.
+
+## Phase 7d: AI Content (still deferred)
+
+**Goal:** Stage-aware AI content for Mom's week detail, Partner's support suggestions, and the conversation prompt.
+
+**Status:** Deferred until Phase 1 (including 7a/7b/7c) is verified on real devices and shipped to the two-person household. The `todos.source = 'ai'` enum and the UI surfaces are scaffolded; the producer is not.
+
+## Phase 8: Family Mode (Postpartum)
+
+**Goal:** When `households.baby_dob` is set, the app transitions into Family Mode. Feeding, sleep, diaper logs; pediatric visits; baby milestones; postpartum check-in for Mom; honest night-shift swap for Partner.
+
+**Status:** Schema has reserved space (tables currently dropped, scheduled to return in `02-postpartum.sql`). Story exists in `docs/blueberry-story.html` Chapter 4. Implementation plan needed before code.
+
+**Trigger:** Test household's real due date is 2025-10-11; they are already postpartum. Family Mode planning should not lag behind Phase 1 verification by more than one phase.
 
 ## Immediate Next Step
 
-Run GSD Phase 1 planning in this repo. The Phase 1 plan should be generated fresh and should not execute old Claude plan files verbatim.
+Verify the Phase 1 golden path on a real device (sign up, create household, partner-join, realtime sync), then begin parallel planning of Phases 7a, 7b, and 7c.
