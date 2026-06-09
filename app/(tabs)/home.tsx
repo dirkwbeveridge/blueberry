@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
@@ -108,7 +109,7 @@ export default function HomeScreen() {
       <Card>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Open tasks</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/todo')}>
             <Text style={styles.seeAll}>See all →</Text>
           </TouchableOpacity>
         </View>

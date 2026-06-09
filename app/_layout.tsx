@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { SplashScreen, Stack } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { SplashScreen, Stack, router } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import { useFonts } from 'expo-font';
 import {
@@ -74,15 +74,26 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, [clearAll, loadHousehold]);
 
+  // Navigate to the correct root whenever auth state settles.
+  const didNavigate = useRef(false);
+  useEffect(() => {
+    if (loading || !fontsLoaded) return;
+    const dest = !session || !hasUserRow ? '/(auth)/login' : '/(tabs)/home';
+    if (!didNavigate.current) {
+      didNavigate.current = true;
+      router.replace(dest);
+    } else {
+      router.replace(dest);
+    }
+  }, [loading, fontsLoaded, session, hasUserRow]);
+
   if (loading || !fontsLoaded) return <LoadingScreen />;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {!session || !hasUserRow ? (
-        <Stack.Screen name="(auth)" />
-      ) : (
-        <Stack.Screen name="(tabs)" />
-      )}
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="index" />
       <Stack.Screen name="(modals)" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
     </Stack>
   );

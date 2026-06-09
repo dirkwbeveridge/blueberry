@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import Card from '@/components/ui/Card';
-import { colors, spacing, typography } from '@/constants/theme';
+import { Card } from '@/components/ui/Card';
+import { colors, fonts, spacing } from '@/constants/theme';
 
 interface PlaceholderScreenProps {
   title: string;
@@ -29,18 +29,18 @@ const styles = StyleSheet.create({
   },
   kicker: {
     color: colors.textMuted,
-    fontFamily: typography.bodyMedium,
+    fontFamily: fonts.body.medium,
     fontSize: 14,
     marginBottom: spacing.sm,
   },
   title: {
     color: colors.primary,
-    fontFamily: typography.heading,
+    fontFamily: fonts.heading.bold,
     fontSize: 34,
   },
   description: {
     color: colors.textMuted,
-    fontFamily: typography.body,
+    fontFamily: fonts.body.regular,
     fontSize: 16,
     lineHeight: 24,
     marginTop: spacing.sm,

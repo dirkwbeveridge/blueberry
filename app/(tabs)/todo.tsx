@@ -317,12 +317,11 @@ export default function PlanScreen() {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
-// Calendar pane — 14-day horizontal strip + selected day's items
-// Combines todos (with due_date) and appointments by date.
+// Calendar pane — 14-day strip + full month view, toggled
 // ───────────────────────────────────────────────────────────────────────────
 
 function toDateKey(d: Date) {
-  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  return d.toISOString().slice(0, 10);
 }
 
 function CalendarPane({
@@ -334,14 +333,9 @@ function CalendarPane({
 }) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const [selectedKey, setSelectedKey] = useState(toDateKey(today));
+  const [viewMode,    setViewMode]    = useState<'week' | 'month'>('week');
+  const [monthDate,   setMonthDate]   = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
-  // Build 14-day window
-  const days = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(today); d.setDate(today.getDate() + i);
-    return d;
-  });
-
-  // Group items by date key
   const todosByDate: Record<string, Todo[]> = {};
   for (const t of todos) {
     if (!t.due_date || t.is_done) continue;
@@ -357,41 +351,144 @@ function CalendarPane({
   const selectedTodos = todosByDate[selectedKey] ?? [];
   const selectedAppts = apptsByDate[selectedKey] ?? [];
   const isEmpty = selectedTodos.length === 0 && selectedAppts.length === 0;
-
-  const selectedDate = new Date(selectedKey);
+  const selectedDate  = new Date(selectedKey + 'T12:00:00');
   const selectedLabel = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // 14-day strip
+  const stripDays = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today); d.setDate(today.getDate() + i); return d;
+  });
+
+  // Month grid
+  const year  = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDow   = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstDow).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks = Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+
+  function prevMonth() {
+    setMonthDate(d => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+  function nextMonth() {
+    setMonthDate(d => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
 
   return (
     <>
-      {/* Day strip */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={calStyles.strip}>
-        {days.map(d => {
-          const key       = toDateKey(d);
-          const isSelected = key === selectedKey;
-          const isToday    = key === toDateKey(today);
-          const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
-          return (
-            <TouchableOpacity
-              key={key}
-              style={[calStyles.day, isSelected && calStyles.daySelected]}
-              onPress={() => setSelectedKey(key)}
-              activeOpacity={0.7}
-            >
-              <Text style={[calStyles.dayWeek, isSelected && calStyles.dayWeekSelected]}>
-                {d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3).toUpperCase()}
-              </Text>
-              <Text style={[calStyles.dayNum, isSelected && calStyles.dayNumSelected]}>{d.getDate()}</Text>
-              {count > 0 && <View style={[calStyles.dot, isSelected && calStyles.dotSelected]} />}
-              {isToday && !isSelected && <View style={calStyles.todayUnderline} />}
+      {/* View toggle */}
+      <View style={calStyles.viewToggle}>
+        {(['week', 'month'] as const).map(m => (
+          <TouchableOpacity
+            key={m}
+            style={[calStyles.viewToggleBtn, viewMode === m && calStyles.viewToggleBtnActive]}
+            onPress={() => setViewMode(m)}
+            activeOpacity={0.7}
+          >
+            <Text style={[calStyles.viewToggleLabel, viewMode === m && calStyles.viewToggleLabelActive]}>
+              {m === 'week' ? '14-Day' : 'Month'}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* ── WEEK STRIP ── */}
+      {viewMode === 'week' && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={calStyles.strip}>
+          {stripDays.map(d => {
+            const key        = toDateKey(d);
+            const isSelected = key === selectedKey;
+            const isToday    = key === toDateKey(today);
+            const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
+            return (
+              <TouchableOpacity
+                key={key}
+                style={[calStyles.day, isSelected && calStyles.daySelected]}
+                onPress={() => setSelectedKey(key)}
+                activeOpacity={0.7}
+              >
+                <Text style={[calStyles.dayWeek, isSelected && calStyles.dayWeekSelected]}>
+                  {d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3).toUpperCase()}
+                </Text>
+                <Text style={[calStyles.dayNum, isSelected && calStyles.dayNumSelected]}>{d.getDate()}</Text>
+                {count > 0 && <View style={[calStyles.dot, isSelected && calStyles.dotSelected]} />}
+                {isToday && !isSelected && <View style={calStyles.todayUnderline} />}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      )}
+
+      {/* ── MONTH GRID ── */}
+      {viewMode === 'month' && (
+        <View style={calStyles.monthContainer}>
+          {/* Month navigation */}
+          <View style={calStyles.monthHeader}>
+            <TouchableOpacity onPress={prevMonth} style={calStyles.monthNavBtn} activeOpacity={0.7}>
+              <Text style={calStyles.monthNavArrow}>‹</Text>
             </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+            <Text style={calStyles.monthTitle}>
+              {monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </Text>
+            <TouchableOpacity onPress={nextMonth} style={calStyles.monthNavBtn} activeOpacity={0.7}>
+              <Text style={calStyles.monthNavArrow}>›</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Day-of-week headers */}
+          <View style={calStyles.dowRow}>
+            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+              <Text key={d} style={calStyles.dowLabel}>{d}</Text>
+            ))}
+          </View>
+
+          {/* Weeks */}
+          {weeks.map((week, wi) => (
+            <View key={wi} style={calStyles.weekRow}>
+              {week.map((dayNum, di) => {
+                if (!dayNum) return <View key={di} style={calStyles.monthCell} />;
+                const d         = new Date(year, month, dayNum);
+                const key       = toDateKey(d);
+                const isSelected = key === selectedKey;
+                const isToday    = key === toDateKey(today);
+                const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
+                return (
+                  <TouchableOpacity
+                    key={di}
+                    style={[
+                      calStyles.monthCell,
+                      isToday    && calStyles.monthCellToday,
+                      isSelected && calStyles.monthCellSelected,
+                    ]}
+                    onPress={() => setSelectedKey(key)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[
+                      calStyles.monthDayNum,
+                      isToday    && calStyles.monthDayNumToday,
+                      isSelected && calStyles.monthDayNumSelected,
+                    ]}>
+                      {dayNum}
+                    </Text>
+                    {count > 0 && (
+                      <View style={[calStyles.monthDot, isSelected && calStyles.monthDotSelected]} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      )}
 
       {/* Selected day header */}
       <Text style={calStyles.selectedHeader}>{selectedLabel}</Text>
 
-      {/* Items */}
+      {/* Items for selected day */}
       {isEmpty ? (
         <Card>
           <View style={calStyles.empty}>
@@ -437,6 +534,14 @@ function CalendarPane({
 }
 
 const calStyles = StyleSheet.create({
+  // View toggle
+  viewToggle:            { flexDirection: 'row', backgroundColor: colors.border, borderRadius: radii.md, padding: 3, marginBottom: spacing.sm },
+  viewToggleBtn:         { flex: 1, paddingVertical: spacing.xs, borderRadius: radii.sm, alignItems: 'center' },
+  viewToggleBtnActive:   { backgroundColor: colors.surface },
+  viewToggleLabel:       { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
+  viewToggleLabelActive: { color: colors.primary, fontFamily: fonts.body.semibold },
+
+  // 14-day strip
   strip:           { gap: 6, paddingVertical: spacing.xs },
   day:             { width: 52, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radii.md, backgroundColor: colors.surface, gap: 2 },
   daySelected:     { backgroundColor: colors.primary },
@@ -448,19 +553,35 @@ const calStyles = StyleSheet.create({
   dotSelected:     { backgroundColor: '#FFFFFF' },
   todayUnderline:  { width: 16, height: 2, borderRadius: 1, backgroundColor: colors.primary, marginTop: 2 },
 
+  // Month grid
+  monthContainer:      { backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+  monthHeader:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  monthNavBtn:         { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  monthNavArrow:       { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.primary },
+  monthTitle:          { fontFamily: fonts.heading.semibold, fontSize: 16, color: colors.text },
+  dowRow:              { flexDirection: 'row', marginBottom: 4 },
+  dowLabel:            { flex: 1, textAlign: 'center', fontFamily: fonts.body.semibold, fontSize: 11, color: colors.textMuted },
+  weekRow:             { flexDirection: 'row' },
+  monthCell:           { flex: 1, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: radii.sm, gap: 2 },
+  monthCellToday:      { borderWidth: 1.5, borderColor: colors.primary },
+  monthCellSelected:   { backgroundColor: colors.primary },
+  monthDayNum:         { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text },
+  monthDayNumToday:    { color: colors.primary, fontFamily: fonts.body.semibold },
+  monthDayNumSelected: { color: '#FFFFFF', fontFamily: fonts.body.semibold },
+  monthDot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
+  monthDotSelected:    { backgroundColor: 'rgba(255,255,255,0.8)' },
+
+  // Selected day + items
   selectedHeader:  { fontFamily: fonts.heading.semibold, fontSize: 16, color: colors.text, marginTop: spacing.sm },
   groupLabel:      { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase', marginBottom: spacing.sm },
   itemBorder:      { borderBottomWidth: 1, borderBottomColor: colors.border },
-
   apptItem:        { paddingVertical: spacing.md, gap: 2 },
   apptTime:        { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
   apptTitle:       { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
   apptLoc:         { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-
   todoItem:        { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
   checkbox:        { width: 20, height: 20, borderRadius: 5, borderWidth: 2, borderColor: colors.accent },
   todoTitle:       { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text, flex: 1 },
-
   empty:           { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
   emptyEmoji:      { fontSize: 32 },
   emptyText:       { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },

@@ -34,7 +34,6 @@ export default function LogSymptomModal() {
   const [mood,             setMood]             = useState<string | null>(null);
   const [energy,           setEnergy]           = useState<number | null>(null);
   const [notes,            setNotes]            = useState('');
-  const [weight,           setWeight]           = useState('');
   const [loading,          setLoading]          = useState(false);
 
   function toggleSymptom(s: string) {
@@ -54,7 +53,6 @@ export default function LogSymptomModal() {
         mood:         mood,
         energy_level: energy,
         notes:        notes.trim() || null,
-        weight_kg:    weight ? parseFloat(weight) : null,
       });
       if (error) throw error;
       router.back();
@@ -147,15 +145,6 @@ export default function LogSymptomModal() {
           placeholder="Anything else on your mind…"
           multiline
           numberOfLines={3}
-        />
-
-        {/* Weight */}
-        <Input
-          label="Weight in kg (optional)"
-          value={weight}
-          onChangeText={setWeight}
-          placeholder="e.g. 68.5"
-          keyboardType="decimal-pad"
         />
 
         <Button

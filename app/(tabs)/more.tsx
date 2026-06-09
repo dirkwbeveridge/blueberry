@@ -6,6 +6,7 @@ import {
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
+import { useHouseholdStore } from '../../store/household';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { colors, fonts, spacing } from '../../constants/theme';
@@ -55,11 +56,15 @@ function Section({ title, rows }: { title: string; rows: Row[] }) {
 export default function MoreScreen() {
   const { household, currentUser, partnerUser, isMotherRole, isPartnerRole, isPregnant } = useHousehold();
 
+  const clearAll = useHouseholdStore((s) => s.clearAll);
+
   async function signOut() {
     Alert.alert('Sign out?', 'You can sign back in any time.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign out', style: 'destructive', onPress: async () => {
         await supabase.auth.signOut();
+        clearAll();
+        router.replace('/(auth)/login');
       }},
     ]);
   }
