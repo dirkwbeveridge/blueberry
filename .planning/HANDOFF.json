@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-06-09T12:59:08Z",
+  "phase": null,
+  "phase_name": "Multi-workstream planning complete — at execution boundary",
+  "phase_dir": ".planning/workstreams",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "active_workstream": "family-mode",
+  "workstreams": [
+    {
+      "name": "core-app",
+      "status": "not_started",
+      "blocker": "Supabase schema not deployed — blocks all execution"
+    },
+    {
+      "name": "calendar-sync",
+      "status": "planned",
+      "plan": ".planning/workstreams/calendar-sync/phases/01-calendar-sync/PLAN.md",
+      "blocker": "Google Cloud Console project not created; depends on core-app Phase 6"
+    },
+    {
+      "name": "push-notifications",
+      "status": "planned",
+      "plan": ".planning/workstreams/push-notifications/phases/01-push-notifications/01-01-PLAN.md",
+      "critical_issue": "Plan was written assuming expo-notifications + EAS. User explicitly rejected Expo push. Plan must be rewritten for native APNs/FCM."
+    },
+    {
+      "name": "family-mode",
+      "status": "planned",
+      "plan": ".planning/workstreams/family-mode/phases/01-family-mode/PLAN.md",
+      "note": "Can run in parallel with calendar/push — does not depend on Phases 7a/7b/7c"
+    }
+  ],
+  "completed_tasks": [
+    {"id": "workstream-scaffold", "name": "Create 4 workstreams with STATE.md files", "status": "done", "commit": "6520e00"},
+    {"id": "calendar-plan", "name": "calendar-sync PLAN.md (11 tasks)", "status": "done", "commit": "6520e00"},
+    {"id": "push-plan", "name": "push-notifications 01-01-PLAN.md (3 tasks)", "status": "done", "commit": "6520e00"},
+    {"id": "family-plan", "name": "family-mode PLAN.md (4 tasks)", "status": "done", "commit": "6520e00"},
+    {"id": "feature-mockups", "name": "docs/feature-mockups.html (7 screens, dark mode)", "status": "done", "commit": "6520e00"},
+    {"id": "permission-config", "name": ".claude/settings.json permission allowlist", "status": "done", "commit": "6520e00"},
+    {"id": "launch-config", "name": ".claude/launch.json docs preview server", "status": "done", "commit": "6520e00"}
+  ],
+  "remaining_tasks": [
+    {"id": "req-update", "name": "Move INTG-01-04 from Candidate v1.5/v2 to v1 in REQUIREMENTS.md", "status": "not_started", "priority": "high"},
+    {"id": "push-plan-rewrite", "name": "Rewrite push-notifications 01-01-PLAN.md for native APNs/FCM (not expo-notifications/EAS)", "status": "not_started", "priority": "high"},
+    {"id": "core-app-planning", "name": "Plan core-app workstream Phases 3-6", "status": "not_started"},
+    {"id": "placeholder-commit", "name": "Commit 4 untracked placeholder files", "status": "not_started"}
+  ],
+  "blockers": [
+    {
+      "description": "Supabase schema not deployed to fpfncmrkptwvmnaqdixx.supabase.co",
+      "type": "human_action",
+      "workaround": "Run supabase-schema.sql then supabase_migration.sql in Supabase SQL Editor"
+    },
+    {
+      "description": "Push notification plan uses expo-notifications/EAS which user rejected",
+      "type": "technical",
+      "workaround": "Rewrite 01-01-PLAN.md for native APNs/FCM via Supabase Edge Functions"
+    },
+    {
+      "description": "Google Cloud Console OAuth project not created",
+      "type": "human_action",
+      "workaround": "Manual prerequisite — create project, OAuth client, enable Calendar API"
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Deploy supabase-schema.sql then supabase_migration.sql in Supabase SQL Editor at fpfncmrkptwvmnaqdixx.supabase.co",
+      "context": "Blocks all core-app workstream execution; golden path E2E test cannot run without it",
+      "blocking": true
+    },
+    {
+      "action": "Create Google Cloud Console project with OAuth 2.0 client and Calendar API enabled",
+      "context": "Prerequisite for calendar-sync workstream Task 1",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {"decision": "INTG-01 through INTG-04 are v1 scope, not deferred to v1.5/v2", "rationale": "User stated explicitly: 'must be built in this first product launch'", "phase": "planning"},
+    {"decision": "Push notifications use native APNs/FCM via Supabase Edge Functions, NOT expo-notifications or EAS", "rationale": "User stated: 'I don't want to use Expo' for push", "phase": "planning"},
+    {"decision": "Push payloads never carry raw health-log data", "rationale": "Hard product rule; enforced by assertNoHealthData() server-side guard", "phase": "planning"},
+    {"decision": "Google OAuth tokens stored per users.id, not household-shared", "rationale": "Tokens are user-scoped credentials", "phase": "planning"},
+    {"decision": "appointments.notes never synced to external calendar services", "rationale": "Privacy — notes field stays on-device", "phase": "planning"},
+    {"decision": "Dark mode auto-activates at nighttime hours for both Mom and Partner", "rationale": "User feedback on feature mockups", "phase": "design"},
+    {"decision": "Family Mode triggered by More tab menu item 'Begin Family Mode'", "rationale": "User choice A from planning Q&A", "phase": "planning"},
+    {"decision": "Night-shift swap stored in household_events table (not Zustand-only)", "rationale": "Needs cross-device realtime visibility", "phase": "planning"},
+    {"decision": "Checkpoint before postpartum content ships for review", "rationale": "User requested mid-execution checkpoint", "phase": "planning"},
+    {"decision": "Conflict resolution: last-write-wins for Google Calendar sync", "rationale": "User decision from planning Q&A", "phase": "planning"}
+  ],
+  "uncommitted_files": [
+    "app/(tabs)/journal.tsx",
+    "app/(tabs)/partner.tsx",
+    "app/index.tsx",
+    "components/shared/PlaceholderScreen.tsx"
+  ],
+  "security_constraints": [
+    "Never add service-role key to client code",
+    "Never hardcode the October 2025 test due date",
+    "No Firebase",
+    "No NativeWind — StyleSheet + theme.ts tokens only",
+    "RLS is the security boundary; client-side filtering is additional defense only"
+  ],
+  "next_action": "1) Update REQUIREMENTS.md: move INTG-01-04 out of Candidate v1.5/v2 into v1 scope. 2) Rewrite push-notifications 01-01-PLAN.md for native APNs/FCM — remove all expo-notifications/EAS references."
+}
