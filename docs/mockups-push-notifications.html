@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blueberry — Push Notifications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:        #FAF8F5;
+    --plum:         #3D2B6B;
+    --plum-light:   #6B4FA0;
+    --lavender:     #C4B5E8;
+    --lavender-50:  #ECE6F8;
+    --lavender-25:  #F5F1FB;
+    --surface:      #FFFFFF;
+    --border:       #EDE8F5;
+    --ink:          #1A1A2E;
+    --muted:        #7B6F8A;
+    --hair:         rgba(61,43,107,0.10);
+    --shadow-card:  0 10px 40px -12px rgba(61,43,107,0.18), 0 2px 6px rgba(61,43,107,0.06);
+    --shadow-tab:   0 -6px 24px -8px rgba(61,43,107,0.18), 0 14px 32px -8px rgba(61,43,107,0.18);
+    --peach-mist:   #F5E8DE;
+    --sage-mist:    #E4ECDC;
+    --rose-mist:    #F4E1E4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html, body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #1A1A2E;
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page { max-width: 1440px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  .deck-header { margin-bottom: 48px; max-width: 720px; }
+  .deck-header .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--lavender); margin-bottom: 14px;
+  }
+  .deck-header h1 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: clamp(36px, 4vw, 58px); line-height: 1.05; letter-spacing: -0.015em;
+    color: #FFFFFF;
+  }
+  .deck-header h1 em { font-style: italic; color: var(--lavender); font-weight: 400; }
+  .deck-header .lede {
+    margin-top: 18px; font-size: 15px; color: rgba(255,255,255,0.5); max-width: 580px; line-height: 1.6;
+  }
+
+  .gallery {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 56px 48px; align-items: start;
+  }
+
+  .stage { display: flex; flex-direction: column; align-items: center; }
+  .stage .caption { margin-top: 22px; text-align: center; max-width: 360px; }
+  .stage .caption .role {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+    background: var(--plum); color: #fff; margin-bottom: 10px;
+  }
+  .stage .caption .role.partner { background: var(--lavender); color: var(--plum); }
+  .stage .caption .role.both    { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.14); }
+  .stage .caption h2 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: #FFFFFF; letter-spacing: -0.01em;
+  }
+  .stage .caption p { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; line-height: 1.55; }
+
+  /* ── iPhone frame ─────────────────────────────────────────────────── */
+  .iphone {
+    --w: 390px; --h: 844px; --bezel: 14px;
+    width: var(--w); height: var(--h);
+    position: relative; background: #0A0612;
+    border-radius: 56px; padding: var(--bezel);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 0 0 1.5px #2A1E4B,
+      0 30px 80px -30px rgba(61,43,107,0.45),
+      0 12px 28px -10px rgba(61,43,107,0.25);
+  }
+  .iphone .side-btn { position: absolute; left: -2.5px; background: #1A1230; border-radius: 2px; }
+  .iphone .side-btn.silent { top: 92px; width: 3px; height: 26px; }
+  .iphone .side-btn.up     { top: 134px; width: 3px; height: 56px; }
+  .iphone .side-btn.down   { top: 200px; width: 3px; height: 56px; }
+  .iphone .side-btn.power  { right: -2.5px; left: auto; top: 174px; width: 3px; height: 84px; }
+  .screen {
+    width: 100%; height: 100%; border-radius: 44px; overflow: hidden;
+    background: var(--ivory); position: relative; display: flex; flex-direction: column;
+  }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 36px; border-radius: 22px; background: #0A0612; z-index: 20;
+  }
+  .status-bar {
+    height: 54px; padding: 18px 32px 0; display: flex; justify-content: space-between;
+    align-items: center; font-size: 15px; font-weight: 600; color: var(--ink);
+    z-index: 5; position: relative;
+  }
+  .status-bar .icons { display: inline-flex; gap: 6px; align-items: center; }
+
+  /* ── Atmosphere backgrounds ──────────────────────────────────────── */
+  .atmos { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .atmos.mom {
+    background:
+      radial-gradient(420px 280px at 85% -10%, #DCCDF2 0%, transparent 65%),
+      radial-gradient(380px 260px at -10% 8%, #F2D9DC 0%, transparent 60%),
+      radial-gradient(600px 300px at 50% 105%, #E6DEF6 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.partner {
+    background:
+      radial-gradient(420px 280px at 8% -8%, #D8CEF1 0%, transparent 65%),
+      radial-gradient(380px 260px at 110% 12%, #E8E0CC 0%, transparent 55%),
+      radial-gradient(600px 300px at 50% 105%, #E5DDEF 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.calm {
+    background:
+      radial-gradient(500px 320px at 50% -6%, #E4DCF4 0%, transparent 65%),
+      radial-gradient(500px 320px at 50% 110%, #F1E4DD 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.more {
+    background:
+      radial-gradient(420px 280px at 90% -10%, #E0D6F0 0%, transparent 65%),
+      var(--ivory);
+  }
+  .atmos.setup {
+    background:
+      radial-gradient(500px 360px at 55% -8%, #E8DFF8 0%, transparent 60%),
+      radial-gradient(400px 300px at -5% 75%, #F5E6DE 0%, transparent 55%),
+      var(--ivory);
+  }
+
+  /* ── Content area ────────────────────────────────────────────────── */
+  .content { position: relative; z-index: 2; flex: 1; overflow: hidden; padding: 6px 20px 110px; }
+
+  /* ── Tab bar ─────────────────────────────────────────────────────── */
+  .tabbar {
+    position: absolute; bottom: 16px; left: 14px; right: 14px;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(61,43,107,0.08);
+    border-radius: 28px; padding: 10px 8px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    box-shadow: var(--shadow-tab); z-index: 6;
+  }
+  .tabbar .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 4px; font-size: 10px; color: var(--muted); font-weight: 500; border-radius: 20px;
+  }
+  .tabbar .tab .ico { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 14px; }
+  .tabbar .tab.active { color: var(--plum); font-weight: 600; }
+  .tabbar .tab.active .ico { background: var(--lavender-50); }
+  .tabbar svg { width: 18px; height: 18px; }
+  .tabbar svg path, .tabbar svg circle, .tabbar svg rect { stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .tabbar .tab.active svg path, .tabbar .tab.active svg circle, .tabbar .tab.active svg rect { stroke: var(--plum); }
+
+  /* ── Typography / layout primitives ─────────────────────────────── */
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 16px; }
+  .topbar .hello { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .topbar .hello strong {
+    display: block; font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: var(--plum); letter-spacing: -0.01em; margin-top: 2px;
+  }
+  .topbar h1.section {
+    font-family: 'Playfair Display', serif; font-weight: 500; font-size: 26px;
+    color: var(--plum); letter-spacing: -0.01em;
+  }
+  .topbar .avatar {
+    width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #fff;
+    box-shadow: 0 4px 10px rgba(61,43,107,0.18);
+    background: linear-gradient(135deg, #C4B5E8, #6B4FA0);
+    display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 14px;
+  }
+  .topbar .avatar.partner { background: linear-gradient(135deg, #E8D6C4, #B8855E); }
+  .topbar .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.7); display: grid; place-items: center;
+    border: 1px solid var(--hair);
+  }
+  .topbar .icon-btn svg { width: 16px; height: 16px; }
+  .topbar .right { display: flex; gap: 8px; align-items: center; }
+
+  .label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--plum-light); }
+  .muted { color: var(--muted); font-size: 12px; }
+
+  /* ── Card ─────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface); border-radius: 24px; padding: 18px;
+    box-shadow: var(--shadow-card); border: 1px solid rgba(61,43,107,0.04); margin-bottom: 14px;
+  }
+  .card .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .card .h h3 { font-family: 'DM Sans'; font-weight: 600; font-size: 13px; color: var(--ink); letter-spacing: 0.01em; }
+  .card .h .more { font-size: 11px; color: var(--plum-light); font-weight: 600; }
+
+  /* ── Hero card ────────────────────────────────────────────────────── */
+  .hero {
+    border-radius: 28px; padding: 22px 22px 24px;
+    background:
+      radial-gradient(220px 160px at 88% 12%, #EADFF7 0%, transparent 65%),
+      radial-gradient(180px 160px at -6% 100%, #F5E1DC 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FCFAF6 100%);
+    border: 1px solid rgba(61,43,107,0.06);
+    box-shadow: var(--shadow-card); position: relative; overflow: hidden; margin-bottom: 14px;
+  }
+
+  /* ── Pill button ─────────────────────────────────────────────────── */
+  .pill-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 99px; border: 1px solid var(--hair); background: #fff; font-size: 11px; font-weight: 600; color: var(--plum); }
+  .pill-btn.solid { background: var(--plum); color: #fff; border-color: var(--plum); }
+
+  /* ── Chip ─────────────────────────────────────────────────────────── */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--hair); font-size: 12px; color: var(--ink); font-weight: 500; }
+  .chip.selected { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .chip.lavender { background: var(--lavender-50); border-color: transparent; color: var(--plum); }
+  .chip.green    { background: #F0FFF4; border-color: #9AE6B4; color: #276749; }
+
+  /* ── List row ─────────────────────────────────────────────────────── */
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--hair); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .ico { width: 36px; height: 36px; border-radius: 12px; background: var(--lavender-50); display: grid; place-items: center; color: var(--plum); flex-shrink: 0; }
+  .list-row .ico svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .list-row .text { flex: 1; min-width: 0; }
+  .list-row .text .t { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .list-row .text .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .list-row .end { font-size: 11px; color: var(--muted); }
+  .list-row .chev { color: var(--muted); }
+
+  /* ── Toggle switch ────────────────────────────────────────────────── */
+  .toggle-on  { width: 44px; height: 26px; border-radius: 99px; background: var(--plum); position: relative; flex-shrink: 0; }
+  .toggle-off { width: 44px; height: 26px; border-radius: 99px; background: #D1D5DB; position: relative; flex-shrink: 0; }
+  .toggle-on::after, .toggle-off::after { content: ''; position: absolute; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .toggle-on::after  { right: 3px; }
+  .toggle-off::after { left: 3px; }
+
+  /* ── Utilities ────────────────────────────────────────────────────── */
+  .row-flex { display: flex; align-items: center; gap: 10px; }
+  .mt-8  { margin-top: 8px;  }
+  .mt-12 { margin-top: 12px; }
+  .mt-14 { margin-top: 14px; }
+
+  .footer-note { margin-top: 64px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: rgba(255,255,255,0.3); display: flex; justify-content: space-between; gap: 16px; }
+  .footer-note code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--lavender); font-family: 'SF Mono', 'JetBrains Mono', monospace; }
+
+  /* ── Settings-specific: hairline section group ─────────────────────── */
+  .settings-group {
+    background: var(--surface); border-radius: 18px;
+    box-shadow: var(--shadow-card); border: 1px solid rgba(61,43,107,0.04);
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px; border-bottom: 1px solid var(--hair);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .sr-left { display: flex; flex-direction: column; gap: 2px; }
+  .settings-row .sr-label { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .settings-row .sr-sub { font-size: 11px; color: var(--muted); }
+  .settings-row .sr-right { display: flex; align-items: center; gap: 8px; }
+  .settings-row .sr-value { font-size: 13px; color: var(--muted); }
+
+  /* ── iOS-style notification banner ──────────────────────────────── */
+  .notif-banner {
+    position: absolute; top: 58px; left: 14px; right: 14px; z-index: 30;
+    background: rgba(248,246,252,0.92);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.72);
+    box-shadow:
+      0 8px 32px -8px rgba(61,43,107,0.28),
+      0 2px 8px rgba(61,43,107,0.10),
+      0 0 0 0.5px rgba(61,43,107,0.08);
+    padding: 11px 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .notif-banner .nb-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+    background: linear-gradient(160deg, #6B4FA0 0%, #3D2B6B 100%);
+    display: grid; place-items: center;
+    box-shadow: 0 2px 6px rgba(61,43,107,0.3);
+  }
+  .notif-banner .nb-body { flex: 1; min-width: 0; }
+  .notif-banner .nb-app { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px; }
+  .notif-banner .nb-title { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .notif-banner .nb-msg { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 1px; }
+  .notif-banner .nb-time { font-size: 11px; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Blurred screen layer (behind banner) ─────────────────────────── */
+  .screen-blur {
+    position: absolute; inset: 0; z-index: 25;
+    backdrop-filter: blur(4px) brightness(0.94);
+    -webkit-backdrop-filter: blur(4px) brightness(0.94);
+    pointer-events: none;
+  }
+
+  /* ── iOS system permission dialog ──────────────────────────────────── */
+  .sys-dialog-overlay {
+    position: absolute; inset: 0; z-index: 28;
+    background: rgba(0,0,0,0.38);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 44px;
+  }
+  .sys-dialog {
+    width: 270px;
+    background: rgba(242,242,247,0.96);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -12px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.14);
+  }
+  .sys-dialog .sd-body {
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.14);
+  }
+  .sys-dialog .sd-app-icon {
+    width: 60px; height: 60px; border-radius: 14px; margin: 0 auto 12px;
+    background: linear-gradient(160deg, #6B4FA0 0%, #3D2B6B 100%);
+    display: grid; place-items: center;
+    box-shadow: 0 4px 12px rgba(61,43,107,0.4);
+  }
+  .sys-dialog .sd-title {
+    font-size: 17px; font-weight: 700; color: #000; line-height: 1.3;
+    font-family: -apple-system, 'SF Pro Display', 'DM Sans', sans-serif;
+    margin-bottom: 6px;
+  }
+  .sys-dialog .sd-sub {
+    font-size: 13px; color: #666; line-height: 1.45;
+    font-family: -apple-system, 'SF Pro Text', 'DM Sans', sans-serif;
+  }
+  .sys-dialog .sd-actions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid rgba(0,0,0,0.14);
+  }
+  .sys-dialog .sd-btn {
+    padding: 12px 8px; text-align: center; font-size: 17px;
+    font-family: -apple-system, 'SF Pro Text', 'DM Sans', sans-serif;
+    font-weight: 400; color: #007AFF; cursor: default;
+  }
+  .sys-dialog .sd-btn.deny { color: #007AFF; border-right: 1px solid rgba(0,0,0,0.14); font-weight: 400; }
+  .sys-dialog .sd-btn.allow { color: #007AFF; font-weight: 700; }
+
+  /* ── Blueberry app icon SVG shorthand ────────────────────────────── */
+  .bb-icon-sm {
+    width: 28px; height: 28px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="deck-header">
+    <div class="eyebrow">Blueberry · Push Notifications · v1</div>
+    <h1>Settings, banners, <em>and permission.</em></h1>
+    <p class="lede">Native APNs delivery. Privacy-first payloads. User-controlled categories and quiet hours.</p>
+  </header>
+
+  <div class="gallery">
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 1: NOTIFICATION SETTINGS — CATEGORIES                   -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos calm"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+
+            <!-- Back row -->
+            <div class="row-flex" style="gap:6px; padding:2px 0 14px; color:var(--plum-light);">
+              <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L3 5l4 4"/></svg>
+              <span style="font-size:13px; font-weight:600;">More</span>
+            </div>
+
+            <!-- Screen title -->
+            <div style="padding: 0 4px 22px;">
+              <h1 style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:var(--plum); letter-spacing:-0.01em;">Notifications</h1>
+            </div>
+
+            <!-- Section label -->
+            <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); padding:0 4px 8px;">What to send you</div>
+
+            <!-- Settings group -->
+            <div class="settings-group">
+
+              <!-- Appointment reminders -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Appointment reminders</span>
+                  <span class="sr-sub">24 hours before</span>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <!-- Partner check-ins -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Partner check-ins</span>
+                  <span class="sr-sub">When they share one</span>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <!-- New to-dos -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">New to-dos</span>
+                  <span class="sr-sub">When your partner adds one</span>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <!-- Kick reminder -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Kick reminder</span>
+                  <span class="sr-sub">Daily prompt</span>
+                </div>
+                <div class="toggle-off"></div>
+              </div>
+
+            </div>
+
+            <!-- Privacy note -->
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:rgba(255,255,255,0.55); border-radius:14px; border:1px solid var(--hair); margin-top:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><path d="M12 22s-8-4-8-10V5l8-3 8 3v7c0 6-8 10-8 10z"/></svg>
+              <span style="font-size:11px; color:var(--muted); line-height:1.5;">Health data never appears in a notification. Appointment titles and shared notes only.</span>
+            </div>
+
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · More tab</span>
+        <h2>Notification Categories</h2>
+        <p>Four categories, each independently toggled. Kick reminder ships off by default — it only applies once she reaches the third trimester kick-count window.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 2: NOTIFICATION SETTINGS — QUIET HOURS                  -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos calm"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+
+            <!-- Back row -->
+            <div class="row-flex" style="gap:6px; padding:2px 0 14px; color:var(--plum-light);">
+              <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L3 5l4 4"/></svg>
+              <span style="font-size:13px; font-weight:600;">More</span>
+            </div>
+
+            <!-- Screen title -->
+            <div style="padding: 0 4px 18px;">
+              <h1 style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:var(--plum); letter-spacing:-0.01em;">Notifications</h1>
+            </div>
+
+            <!-- Categories (scrolled, partially visible) -->
+            <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); padding:0 4px 8px;">What to send you</div>
+            <div class="settings-group" style="opacity:0.42; margin-bottom:10px;">
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Appointment reminders</span>
+                  <span class="sr-sub">24 hours before</span>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Partner check-ins</span>
+                  <span class="sr-sub">When they share one</span>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+            </div>
+
+            <!-- Quiet hours section -->
+            <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); padding:0 4px 8px; margin-top:8px;">Quiet hours</div>
+
+            <div class="settings-group">
+
+              <!-- Quiet from -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Quiet from</span>
+                </div>
+                <div class="sr-right">
+                  <span class="sr-value" style="color:var(--plum); font-weight:600;">9:00 PM</span>
+                  <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+                </div>
+              </div>
+
+              <!-- Quiet until -->
+              <div class="settings-row">
+                <div class="sr-left">
+                  <span class="sr-label">Quiet until</span>
+                </div>
+                <div class="sr-right">
+                  <span class="sr-value" style="color:var(--plum); font-weight:600;">7:00 AM</span>
+                  <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Quiet hours note -->
+            <div style="padding:2px 6px; margin-top:2px;">
+              <span style="font-size:12px; color:var(--muted);">No notifications during these hours.</span>
+            </div>
+
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · More tab</span>
+        <h2>Quiet Hours</h2>
+        <p>Default window is 9 PM to 7 AM. Both values are tappable — each opens a native time picker. The category rows ghost out above to show scroll context.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 3: BANNER — APPOINTMENT REMINDER                        -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <!-- Blurred home background -->
+          <div class="atmos mom"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <!-- Blurred app content behind banner -->
+          <div style="position:relative; z-index:1; flex:1; padding:6px 20px 110px; filter:blur(3px); opacity:0.7;">
+            <div style="padding:0 4px 20px;">
+              <div style="font-size:13px; color:var(--muted); font-weight:500; margin-bottom:4px;">Good morning</div>
+              <div style="font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:var(--plum); letter-spacing:-0.01em;">Week 24</div>
+            </div>
+            <div class="hero" style="padding:18px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--plum-light); margin-bottom:8px;">This week</div>
+              <div style="font-size:15px; font-weight:600; color:var(--ink); margin-bottom:6px;">Baby is the size of an ear of corn</div>
+              <div style="font-size:12px; color:var(--muted); line-height:1.5;">Hearing is developing rapidly. Loud noises may prompt a response.</div>
+            </div>
+            <div class="card">
+              <div style="font-size:13px; font-weight:600; color:var(--ink);">Anatomy Scan</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:4px;">Tomorrow · 2:30 PM · Dr. Chen</div>
+            </div>
+          </div>
+
+          <!-- Blur overlay -->
+          <div class="screen-blur" style="top:54px; border-radius:0;"></div>
+
+          <!-- Notification banner -->
+          <div class="notif-banner">
+            <div class="nb-icon">
+              <!-- Blueberry app icon (berry SVG) -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="13" r="7" fill="rgba(255,255,255,0.22)"/>
+                <circle cx="12" cy="13" r="5.2" fill="rgba(255,255,255,0.85)"/>
+                <circle cx="12" cy="13" r="3.2" fill="#C4B5E8"/>
+                <circle cx="10.4" cy="11.4" r="0.9" fill="rgba(255,255,255,0.9)"/>
+                <!-- stem -->
+                <path d="M12 8.5 C12 8.5 11.2 6.5 13 5.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="nb-body">
+              <div class="nb-app">Blueberry</div>
+              <div class="nb-title">Appointment tomorrow</div>
+              <div class="nb-msg">Anatomy Scan · 2:30 PM</div>
+            </div>
+            <div class="nb-time">now</div>
+          </div>
+
+          <nav class="tabbar" style="z-index:22;">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom</span>
+        <h2>Appointment Reminder</h2>
+        <p>Payload contains only the appointment title and time — no provider name, no location, no health context. Delivered 24 hours before.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 4: BANNER — PARTNER CHECK-IN                            -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <!-- Partner home background -->
+          <div class="atmos partner"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <!-- Blurred partner home content -->
+          <div style="position:relative; z-index:1; flex:1; padding:6px 20px 110px; filter:blur(3px); opacity:0.7;">
+            <div style="padding:0 4px 20px;">
+              <div style="font-size:13px; color:var(--muted); font-weight:500; margin-bottom:4px;">Good morning</div>
+              <div style="font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:var(--plum); letter-spacing:-0.01em;">Week 24</div>
+            </div>
+            <div class="hero" style="padding:18px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--plum-light); margin-bottom:8px;">Her last check-in</div>
+              <div style="font-size:13px; color:var(--muted); line-height:1.5;">A moment ago</div>
+            </div>
+            <div class="card">
+              <div style="font-size:13px; font-weight:600; color:var(--ink);">Upcoming together</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:4px;">Anatomy Scan · Tomorrow</div>
+            </div>
+          </div>
+
+          <!-- Blur overlay -->
+          <div class="screen-blur" style="top:54px; border-radius:0;"></div>
+
+          <!-- Notification banner -->
+          <div class="notif-banner">
+            <div class="nb-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="13" r="7" fill="rgba(255,255,255,0.22)"/>
+                <circle cx="12" cy="13" r="5.2" fill="rgba(255,255,255,0.85)"/>
+                <circle cx="12" cy="13" r="3.2" fill="#C4B5E8"/>
+                <circle cx="10.4" cy="11.4" r="0.9" fill="rgba(255,255,255,0.9)"/>
+                <path d="M12 8.5 C12 8.5 11.2 6.5 13 5.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="nb-body">
+              <div class="nb-app">Blueberry</div>
+              <div class="nb-title">From your partner</div>
+              <div class="nb-msg">Feeling a bit tired today, but the baby is moving a lot.</div>
+            </div>
+            <div class="nb-time">now</div>
+          </div>
+
+          <nav class="tabbar" style="z-index:22;">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role partner">Partner</span>
+        <h2>Partner Check-In</h2>
+        <p>The body is the verbatim shared_note she typed — a complete, natural sentence she chose to send. No inference, no symptom extraction, no raw health values.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 5: BANNER — TODO ASSIGNED                               -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos mom"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <!-- Blurred home content -->
+          <div style="position:relative; z-index:1; flex:1; padding:6px 20px 110px; filter:blur(3px); opacity:0.7;">
+            <div style="padding:0 4px 20px;">
+              <div style="font-size:13px; color:var(--muted); font-weight:500; margin-bottom:4px;">Good morning</div>
+              <div style="font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:var(--plum); letter-spacing:-0.01em;">Week 24</div>
+            </div>
+            <div class="card">
+              <div style="font-size:13px; font-weight:600; color:var(--ink);">Your list</div>
+              <div class="list-row" style="padding:10px 0 0;">
+                <div class="text">
+                  <div class="t">Pick up iron supplements</div>
+                  <div class="s">Added by Marcus</div>
+                </div>
+              </div>
+              <div class="list-row">
+                <div class="text">
+                  <div class="t">Pack hospital bag</div>
+                  <div class="s">Due Week 34</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Blur overlay -->
+          <div class="screen-blur" style="top:54px; border-radius:0;"></div>
+
+          <!-- Notification banner -->
+          <div class="notif-banner">
+            <div class="nb-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="13" r="7" fill="rgba(255,255,255,0.22)"/>
+                <circle cx="12" cy="13" r="5.2" fill="rgba(255,255,255,0.85)"/>
+                <circle cx="12" cy="13" r="3.2" fill="#C4B5E8"/>
+                <circle cx="10.4" cy="11.4" r="0.9" fill="rgba(255,255,255,0.9)"/>
+                <path d="M12 8.5 C12 8.5 11.2 6.5 13 5.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="nb-body">
+              <div class="nb-app">Blueberry</div>
+              <div class="nb-title">New item for your list</div>
+              <div class="nb-msg">Pick up iron supplements</div>
+            </div>
+            <div class="nb-time">now</div>
+          </div>
+
+          <nav class="tabbar" style="z-index:22;">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom</span>
+        <h2>Todo Assigned</h2>
+        <p>Payload is the exact todo title her partner entered. No added context, no interpretation. Tapping the banner opens the To Do tab directly.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 6: PUSH PERMISSION DIALOG                               -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <!-- Home screen background (blurred) -->
+          <div class="atmos setup"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <!-- App content blurred behind dialog -->
+          <div style="position:relative; z-index:1; flex:1; padding:6px 20px 110px; filter:blur(5px); opacity:0.55;">
+            <div style="padding:4px 4px 20px;">
+              <div style="font-family:'Playfair Display',serif; font-weight:500; font-size:26px; color:var(--plum); letter-spacing:-0.01em;">Welcome to<br>Blueberry</div>
+            </div>
+            <div class="hero">
+              <div style="font-size:13px; color:var(--muted); line-height:1.6;">A companion for you and your partner through every week of this pregnancy.</div>
+            </div>
+          </div>
+
+          <!-- System dialog overlay -->
+          <div class="sys-dialog-overlay">
+            <div class="sys-dialog">
+              <div class="sd-body">
+                <!-- App icon -->
+                <div class="sd-app-icon">
+                  <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="22" r="12" fill="rgba(255,255,255,0.18)"/>
+                    <circle cx="20" cy="22" r="9" fill="rgba(255,255,255,0.78)"/>
+                    <circle cx="20" cy="22" r="5.5" fill="#C4B5E8"/>
+                    <circle cx="17.2" cy="19.2" r="1.6" fill="rgba(255,255,255,0.92)"/>
+                    <!-- stem -->
+                    <path d="M20 14 C20 14 18.5 10.5 22 9" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                    <!-- leaf -->
+                    <path d="M22 9 C23.5 9.5 24 11 22.5 11.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <div class="sd-title">"Blueberry" Would Like to<br>Send You Notifications</div>
+                <div class="sd-sub">Notifications may include alerts, sounds, and icon badges.</div>
+              </div>
+              <div class="sd-actions">
+                <div class="sd-btn deny">Don't Allow</div>
+                <div class="sd-btn allow">Allow</div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar" style="z-index:22;">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom</span>
+        <h2>Push Permission</h2>
+        <p>Standard iOS permission dialog rendered over the Blueberry home screen. Triggered once, early in onboarding. The prompt text is iOS-controlled — Blueberry supplies only the app name and icon.</p>
+      </div>
+    </div>
+
+  </div><!-- /.gallery -->
+
+  <footer class="footer-note">
+    <span>Blueberry · Push Notifications · v1 · <code>docs/mockups-push-notifications.html</code></span>
+    <span>Dispatch: native APNs · No Expo push service · Privacy-first payloads</span>
+  </footer>
+
+</div><!-- /.page -->
+</body>
+</html>
