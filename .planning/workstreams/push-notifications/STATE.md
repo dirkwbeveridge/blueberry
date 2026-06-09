@@ -39,7 +39,7 @@ updated: 2026-06-09 (plan rewritten for native APNs/FCM)
 
 ## Schema Changes Required
 
-- `users`: add `push_token`, `push_platform`, `notif_appointments`, `notif_partner_checkin`, `notif_todo_assigned`, `notif_kick_reminder`, `quiet_start`, `quiet_end`
+- `users`: add `push_token`, `notif_appointments`, `notif_partner_checkin`, `notif_todo_assigned`, `notif_kick_reminder`, `quiet_start`, `quiet_end`
 - `health_logs`: add `share_with_partner`, `shared_note`
 
 ## Required Secrets (Supabase Edge Functions)
@@ -51,13 +51,13 @@ updated: 2026-06-09 (plan rewritten for native APNs/FCM)
 | `APNS_TEAM_ID` | 10-char Team ID from developer.apple.com |
 | `APNS_BUNDLE_ID` | App bundle identifier, e.g. `com.blueberry.app` |
 | `APNS_ENV` | `sandbox` (dev) or `production` (App Store/TestFlight) |
-| `FCM_SERVICE_ACCOUNT_JSON` | Firebase Console → Project Settings → Service Accounts |
-| `FCM_PROJECT_ID` | Firebase project ID (in service account JSON) |
+| ~~FCM_SERVICE_ACCOUNT_JSON~~ | Not required — Android/FCM deferred |
+| ~~FCM_PROJECT_ID~~ | Not required — Android/FCM deferred |
 
 ## Open Items Before Execution
 
 1. **APNs Auth Key:** Create at developer.apple.com → Keys → Add → Apple Push Notifications service. Requires Apple Developer Program. Download p8 file once and store as `APNS_AUTH_KEY` Supabase secret.
-2. **FCM Setup:** Create Firebase project, enable Cloud Messaging, generate service account key (Project Settings → Service Accounts). Store full JSON as `FCM_SERVICE_ACCOUNT_JSON`.
+2. ~~FCM Setup~~ — Android/FCM deferred. Not required for v1.
 3. **DB webhook configuration:** `notify-partner-checkin` and `notify-todo-assigned` require manual webhook setup in Supabase Dashboard after deployment. Document in `SUPABASE-SETUP.md`.
 4. **pg_cron jobs:** `notify-appointment-reminder` and `notify-kick-reminder` require pg_cron extension and cron job SQL. Document in `SUPABASE-SETUP.md`.
 5. **Real device for testing:** APNs tokens cannot be obtained on iOS Simulator. At least one real device needed for full end-to-end test.
