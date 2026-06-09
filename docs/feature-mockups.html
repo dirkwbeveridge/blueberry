@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blueberry — Feature Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory:        #FAF8F5;
+    --plum:         #3D2B6B;
+    --plum-light:   #6B4FA0;
+    --lavender:     #C4B5E8;
+    --lavender-50:  #ECE6F8;
+    --lavender-25:  #F5F1FB;
+    --surface:      #FFFFFF;
+    --border:       #EDE8F5;
+    --ink:          #1A1A2E;
+    --muted:        #7B6F8A;
+    --hair:         rgba(61,43,107,0.10);
+    --shadow-card:  0 10px 40px -12px rgba(61,43,107,0.18), 0 2px 6px rgba(61,43,107,0.06);
+    --shadow-tab:   0 -6px 24px -8px rgba(61,43,107,0.18), 0 14px 32px -8px rgba(61,43,107,0.18);
+    --peach-mist:   #F5E8DE;
+    --sage-mist:    #E4ECDC;
+    --rose-mist:    #F4E1E4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html, body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #1A1A2E;
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page { max-width: 1440px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  .deck-header { margin-bottom: 48px; max-width: 720px; }
+  .deck-header .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--lavender); margin-bottom: 14px;
+  }
+  .deck-header h1 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: clamp(36px, 4vw, 58px); line-height: 1.05; letter-spacing: -0.015em;
+    color: #FFFFFF;
+  }
+  .deck-header h1 em { font-style: italic; color: var(--lavender); font-weight: 400; }
+  .deck-header .lede {
+    margin-top: 18px; font-size: 15px; color: rgba(255,255,255,0.5); max-width: 580px; line-height: 1.6;
+  }
+
+  .gallery {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 56px 48px; align-items: start;
+  }
+
+  .stage { display: flex; flex-direction: column; align-items: center; }
+  .stage .caption { margin-top: 22px; text-align: center; max-width: 360px; }
+  .stage .caption .role {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+    background: var(--plum); color: #fff; margin-bottom: 10px;
+  }
+  .stage .caption .role.partner { background: var(--lavender); color: var(--plum); }
+  .stage .caption .role.both    { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.14); }
+  .stage .caption h2 {
+    font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: #FFFFFF; letter-spacing: -0.01em;
+  }
+  .stage .caption p { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; line-height: 1.55; }
+
+  /* ── iPhone frame ─────────────────────────────────────────────────── */
+  .iphone {
+    --w: 390px; --h: 844px; --bezel: 14px;
+    width: var(--w); height: var(--h);
+    position: relative; background: #0A0612;
+    border-radius: 56px; padding: var(--bezel);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 0 0 1.5px #2A1E4B,
+      0 30px 80px -30px rgba(61,43,107,0.45),
+      0 12px 28px -10px rgba(61,43,107,0.25);
+  }
+  .iphone .side-btn { position: absolute; left: -2.5px; background: #1A1230; border-radius: 2px; }
+  .iphone .side-btn.silent { top: 92px; width: 3px; height: 26px; }
+  .iphone .side-btn.up     { top: 134px; width: 3px; height: 56px; }
+  .iphone .side-btn.down   { top: 200px; width: 3px; height: 56px; }
+  .iphone .side-btn.power  { right: -2.5px; left: auto; top: 174px; width: 3px; height: 84px; }
+  .screen {
+    width: 100%; height: 100%; border-radius: 44px; overflow: hidden;
+    background: var(--ivory); position: relative; display: flex; flex-direction: column;
+  }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 36px; border-radius: 22px; background: #0A0612; z-index: 20;
+  }
+  .status-bar {
+    height: 54px; padding: 18px 32px 0; display: flex; justify-content: space-between;
+    align-items: center; font-size: 15px; font-weight: 600; color: var(--ink);
+    z-index: 5; position: relative;
+  }
+  .status-bar .icons { display: inline-flex; gap: 6px; align-items: center; }
+
+  /* ── Atmosphere backgrounds ──────────────────────────────────────── */
+  .atmos { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .atmos.mom {
+    background:
+      radial-gradient(420px 280px at 85% -10%, #DCCDF2 0%, transparent 65%),
+      radial-gradient(380px 260px at -10% 8%, #F2D9DC 0%, transparent 60%),
+      radial-gradient(600px 300px at 50% 105%, #E6DEF6 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.partner {
+    background:
+      radial-gradient(420px 280px at 8% -8%, #D8CEF1 0%, transparent 65%),
+      radial-gradient(380px 260px at 110% 12%, #E8E0CC 0%, transparent 55%),
+      radial-gradient(600px 300px at 50% 105%, #E5DDEF 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.calm {
+    background:
+      radial-gradient(500px 320px at 50% -6%, #E4DCF4 0%, transparent 65%),
+      radial-gradient(500px 320px at 50% 110%, #F1E4DD 0%, transparent 60%),
+      var(--ivory);
+  }
+  .atmos.more {
+    background:
+      radial-gradient(420px 280px at 90% -10%, #E0D6F0 0%, transparent 65%),
+      var(--ivory);
+  }
+  .atmos.setup {
+    background:
+      radial-gradient(500px 360px at 55% -8%, #E8DFF8 0%, transparent 60%),
+      radial-gradient(400px 300px at -5% 75%, #F5E6DE 0%, transparent 55%),
+      var(--ivory);
+  }
+  .atmos.baby {
+    background:
+      radial-gradient(460px 300px at 10% -6%, #DCF0E4 0%, transparent 60%),
+      radial-gradient(400px 280px at 95% 20%, #E4DCF4 0%, transparent 55%),
+      var(--ivory);
+  }
+  .atmos.night {
+    background:
+      radial-gradient(420px 280px at 50% -6%, #1E1640 0%, transparent 60%),
+      radial-gradient(500px 320px at 50% 110%, #2C1F52 0%, transparent 55%),
+      #0E0B1E;
+  }
+
+  /* ── Content area ────────────────────────────────────────────────── */
+  .content { position: relative; z-index: 2; flex: 1; overflow: hidden; padding: 6px 20px 110px; }
+
+  /* ── Tab bar ─────────────────────────────────────────────────────── */
+  .tabbar {
+    position: absolute; bottom: 16px; left: 14px; right: 14px;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(61,43,107,0.08);
+    border-radius: 28px; padding: 10px 8px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    box-shadow: var(--shadow-tab); z-index: 6;
+  }
+  .tabbar-dark {
+    position: absolute; bottom: 16px; left: 14px; right: 14px;
+    background: rgba(18,12,36,0.92);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(196,181,232,0.12);
+    border-radius: 28px; padding: 10px 8px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    box-shadow: 0 -6px 24px -8px rgba(0,0,0,0.4); z-index: 6;
+  }
+  .tabbar .tab, .tabbar-dark .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 4px; font-size: 10px; color: var(--muted); font-weight: 500; border-radius: 20px;
+  }
+  .tabbar-dark .tab { color: rgba(255,255,255,0.35); }
+  .tabbar .tab .ico, .tabbar-dark .tab .ico { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 14px; }
+  .tabbar .tab.active { color: var(--plum); font-weight: 600; }
+  .tabbar .tab.active .ico { background: var(--lavender-50); }
+  .tabbar-dark .tab.active { color: var(--lavender); font-weight: 600; }
+  .tabbar-dark .tab.active .ico { background: rgba(196,181,232,0.15); }
+  .tabbar svg, .tabbar-dark svg { width: 18px; height: 18px; }
+  .tabbar svg path, .tabbar svg circle, .tabbar svg rect,
+  .tabbar-dark svg path, .tabbar-dark svg circle, .tabbar-dark svg rect { stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .tabbar .tab.active svg path, .tabbar .tab.active svg circle, .tabbar .tab.active svg rect { stroke: var(--plum); }
+  .tabbar-dark .tab.active svg path, .tabbar-dark .tab.active svg circle, .tabbar-dark .tab.active svg rect { stroke: var(--lavender); }
+
+  /* ── Typography / layout primitives ─────────────────────────────── */
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 16px; }
+  .topbar .hello { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .topbar .hello strong {
+    display: block; font-family: 'Playfair Display', serif; font-weight: 500;
+    font-size: 22px; color: var(--plum); letter-spacing: -0.01em; margin-top: 2px;
+  }
+  .topbar h1.section {
+    font-family: 'Playfair Display', serif; font-weight: 500; font-size: 26px;
+    color: var(--plum); letter-spacing: -0.01em;
+  }
+  .topbar h1.section-dark {
+    font-family: 'Playfair Display', serif; font-weight: 500; font-size: 26px;
+    color: #FFFFFF; letter-spacing: -0.01em;
+  }
+  .topbar .avatar {
+    width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #fff;
+    box-shadow: 0 4px 10px rgba(61,43,107,0.18);
+    background: linear-gradient(135deg, #C4B5E8, #6B4FA0);
+    display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 14px;
+  }
+  .topbar .avatar.partner { background: linear-gradient(135deg, #E8D6C4, #B8855E); }
+  .topbar .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.7); display: grid; place-items: center;
+    border: 1px solid var(--hair);
+  }
+  .topbar .icon-btn svg { width: 16px; height: 16px; }
+  .topbar .right { display: flex; gap: 8px; align-items: center; }
+
+  .label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--plum-light); }
+  .muted { color: var(--muted); font-size: 12px; }
+
+  /* ── Card ─────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface); border-radius: 24px; padding: 18px;
+    box-shadow: var(--shadow-card); border: 1px solid rgba(61,43,107,0.04); margin-bottom: 14px;
+  }
+  .card .h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .card .h h3 { font-family: 'DM Sans'; font-weight: 600; font-size: 13px; color: var(--ink); letter-spacing: 0.01em; }
+  .card .h .more { font-size: 11px; color: var(--plum-light); font-weight: 600; }
+
+  /* ── Hero card ────────────────────────────────────────────────────── */
+  .hero {
+    border-radius: 28px; padding: 22px 22px 24px;
+    background:
+      radial-gradient(220px 160px at 88% 12%, #EADFF7 0%, transparent 65%),
+      radial-gradient(180px 160px at -6% 100%, #F5E1DC 0%, transparent 60%),
+      linear-gradient(160deg, #FFFFFF 0%, #FCFAF6 100%);
+    border: 1px solid rgba(61,43,107,0.06);
+    box-shadow: var(--shadow-card); position: relative; overflow: hidden; margin-bottom: 14px;
+  }
+
+  /* ── Pill button ─────────────────────────────────────────────────── */
+  .pill-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 99px; border: 1px solid var(--hair); background: #fff; font-size: 11px; font-weight: 600; color: var(--plum); }
+  .pill-btn.solid { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .pill-btn.solid-green { background: #38A169; color: #fff; border-color: #38A169; }
+  .pill-btn.ghost { background: transparent; }
+
+  /* ── Chip ─────────────────────────────────────────────────────────── */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--hair); font-size: 12px; color: var(--ink); font-weight: 500; }
+  .chip.selected { background: var(--plum); color: #fff; border-color: var(--plum); }
+  .chip.lavender { background: var(--lavender-50); border-color: transparent; color: var(--plum); }
+  .chip.green    { background: #F0FFF4; border-color: #9AE6B4; color: #276749; }
+
+  /* ── List row ─────────────────────────────────────────────────────── */
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--hair); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .ico { width: 36px; height: 36px; border-radius: 12px; background: var(--lavender-50); display: grid; place-items: center; color: var(--plum); flex-shrink: 0; }
+  .list-row .ico svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .list-row .text { flex: 1; min-width: 0; }
+  .list-row .text .t { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .list-row .text .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .list-row .end { font-size: 11px; color: var(--muted); }
+  .list-row .chev { color: var(--muted); }
+
+  /* ── Toggle switch ────────────────────────────────────────────────── */
+  .toggle-on  { width: 44px; height: 26px; border-radius: 99px; background: var(--plum); position: relative; flex-shrink: 0; }
+  .toggle-off { width: 44px; height: 26px; border-radius: 99px; background: #D1D5DB; position: relative; flex-shrink: 0; }
+  .toggle-on::after, .toggle-off::after { content: ''; position: absolute; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .toggle-on::after  { right: 3px; }
+  .toggle-off::after { left: 3px; }
+
+  /* ── Segmented control ───────────────────────────────────────────── */
+  .segmented { display: grid; grid-template-columns: 1fr 1fr; background: var(--lavender-50); border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 14px; }
+  .segmented .seg-btn { text-align: center; padding: 8px 0; border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--plum-light); }
+  .segmented .seg-btn.active { background: #fff; color: var(--plum); box-shadow: 0 1px 4px rgba(61,43,107,0.12); }
+
+  /* ── Quick actions ────────────────────────────────────────────────── */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-actions .qa { background: rgba(255,255,255,0.7); border: 1px solid var(--hair); border-radius: 18px; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .quick-actions .qa .ico { width: 28px; height: 28px; border-radius: 50%; background: var(--lavender-50); display: grid; place-items: center; color: var(--plum); }
+  .quick-actions .qa .ico svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .quick-actions .qa .qa-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-top: 4px; }
+  .quick-actions .qa .qa-sub { font-size: 10.5px; color: var(--muted); }
+
+  /* ── Appointment card ─────────────────────────────────────────────── */
+  .appt { display: flex; gap: 14px; align-items: flex-start; }
+  .appt .date-pill { flex-shrink: 0; background: var(--ivory); border: 1px solid var(--hair); border-radius: 14px; width: 52px; padding: 8px 0; text-align: center; }
+  .appt .date-pill .mon { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--plum-light); text-transform: uppercase; }
+  .appt .date-pill .day { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--plum); line-height: 1; margin-top: 2px; }
+  .appt .info .title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .appt .info .loc { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+
+  /* ── Utilities ────────────────────────────────────────────────────── */
+  .row-flex { display: flex; align-items: center; gap: 10px; }
+  .mt-8  { margin-top: 8px;  }
+  .mt-12 { margin-top: 12px; }
+  .mt-14 { margin-top: 14px; }
+  .fab { position: absolute; bottom: 100px; right: 22px; width: 56px; height: 56px; border-radius: 50%; background: var(--plum); color: #fff; display: grid; place-items: center; box-shadow: 0 14px 28px -8px rgba(61,43,107,0.5), 0 4px 10px rgba(61,43,107,0.25); z-index: 5; }
+  .fab svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+  .mini-avatar { width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #C4B5E8, #6B4FA0); border: 1.5px solid #fff; color: #fff; font-size: 8px; font-weight: 700; display: inline-grid; place-items: center; font-family: 'DM Sans'; }
+
+  /* ── Status bar SVG shorthand ─────────────────────────────────────── */
+  .sb-signal  { display:inline-flex; align-items:center; gap:6px; }
+
+  .footer-note { margin-top: 64px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: rgba(255,255,255,0.3); display: flex; justify-content: space-between; gap: 16px; }
+  .footer-note code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--lavender); font-family: 'SF Mono', 'JetBrains Mono', monospace; }
+
+  /* ── Night / dark mode screen (auto-activates 9 pm – 7 am for both roles) ── */
+  .screen.dark {
+    --plum:         #C4B5E8;
+    --plum-light:   rgba(196,181,232,0.65);
+    --ink:          rgba(255,255,255,0.88);
+    --muted:        rgba(255,255,255,0.45);
+    --surface:      rgba(255,255,255,0.07);
+    --hair:         rgba(255,255,255,0.10);
+    --lavender-50:  rgba(196,181,232,0.12);
+    --lavender-25:  rgba(196,181,232,0.06);
+    --shadow-card:  none;
+    background: #0E0B1E;
+  }
+  .screen.dark .hero {
+    background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    border-color: rgba(255,255,255,0.07);
+    box-shadow: none;
+  }
+  .screen.dark .topbar .icon-btn { background: rgba(255,255,255,0.08); }
+  .screen.dark .topbar .icon-btn svg * { stroke: rgba(255,255,255,0.65); }
+  /* Literal white div backgrounds (baby status strip, et al.) */
+  .screen.dark div[style*="background:#fff"] {
+    background: rgba(255,255,255,0.07) !important;
+    box-shadow: none !important;
+  }
+  /* Ghost button with rgba white background */
+  .screen.dark button[style*="background:rgba(255,255,255"] {
+    background: rgba(255,255,255,0.10) !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="sg1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#6B4FA0"/><stop offset="1" stop-color="#6B4FA0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="nightGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#1E1640"/><stop offset="1" stop-color="#3D2B6B"/>
+    </linearGradient>
+    <radialGradient id="moodblob" cx="35%" cy="35%" r="65%">
+      <stop offset="0" stop-color="#F5E8DE"/><stop offset="0.55" stop-color="#D9C9EF"/><stop offset="1" stop-color="#9C82C6"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<!-- Shared status bar snippet macro (inlined per screen for correctness) -->
+
+<div class="page">
+  <header class="deck-header">
+    <div class="eyebrow">Blueberry · Feature Screens · v1</div>
+    <h1>Calendar, notifications, <em>and family mode.</em></h1>
+    <p class="lede">Seven Phase 1 feature screens extending the established token system. Google and Apple Calendar sync, notification preferences, postpartum home views for both roles, baby tracking dashboard, and the baby-arrival onboarding flow.</p>
+  </header>
+
+  <div class="gallery">
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 1: CALENDAR SYNC SETUP                                  -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos more"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+            <!-- Back row -->
+            <div class="row-flex" style="gap:6px; padding:2px 0 18px; color:var(--plum-light);">
+              <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L3 5l4 4"/></svg>
+              <span style="font-size:13px; font-weight:600;">Connected</span>
+            </div>
+            <div class="topbar" style="padding-top:0; padding-bottom:20px;">
+              <h1 class="section">Connect your<br>calendar</h1>
+            </div>
+
+            <!-- Google Calendar card -->
+            <div class="card" style="padding:18px 20px; margin-bottom:12px;">
+              <div class="row-flex" style="justify-content:space-between; margin-bottom:14px;">
+                <div class="row-flex" style="gap:12px;">
+                  <!-- Google-color G logo -->
+                  <div style="width:40px; height:40px; border-radius:12px; background:#fff; border:1px solid #E0E0E0; display:grid; place-items:center; flex-shrink:0;">
+                    <svg width="22" height="22" viewBox="0 0 48 48">
+                      <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+                      <path d="M6.3 14.7l6.6 4.8C14.7 16 19.1 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 16.3 4 9.6 8.4 6.3 14.7z" fill="#FF3D00"/>
+                      <path d="M24 44c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8L6 33.1C9.2 39.5 16.1 44 24 44z" fill="#4CAF50"/>
+                      <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.2C36.9 36.2 44 31 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style="font-size:14px; font-weight:600; color:var(--ink);">Google Calendar</div>
+                    <div style="font-size:11px; color:var(--muted); margin-top:2px;">olivia@gmail.com</div>
+                  </div>
+                </div>
+                <span class="chip green" style="font-size:11px; padding:5px 10px; gap:4px;">
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#276749" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l2.5 2.5L10 3"/></svg>
+                  Connected
+                </span>
+              </div>
+              <div style="background:var(--lavender-25); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--plum-light)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3M16 3v3M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+                <span style="font-size:12px; color:var(--plum); font-weight:500;">Syncing appointments both ways</span>
+              </div>
+            </div>
+
+            <!-- Apple Calendar card -->
+            <div class="card" style="padding:18px 20px; margin-bottom:12px;">
+              <div class="row-flex" style="justify-content:space-between; margin-bottom:14px;">
+                <div class="row-flex" style="gap:12px;">
+                  <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(160deg,#E8E8EA,#C8C8CA); border:1px solid #D0D0D2; display:grid; place-items:center; flex-shrink:0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M8 14h2M12 14h2M16 14h2M8 18h2M12 18h2"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-size:14px; font-weight:600; color:var(--ink);">Apple Calendar</div>
+                    <div style="font-size:11px; color:var(--muted); margin-top:2px;">iCloud · olivia@icloud.com</div>
+                  </div>
+                </div>
+                <button style="background:var(--plum); color:#fff; border:none; border-radius:99px; padding:6px 14px; font-size:11px; font-weight:600; font-family:'DM Sans'; cursor:pointer;">Connect</button>
+              </div>
+            </div>
+
+            <!-- Privacy note -->
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:14px 16px; background:rgba(255,255,255,0.6); border-radius:16px; border:1px solid var(--hair);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><path d="M12 22s-8-4-8-10V5l8-3 8 3v7c0 6-8 10-8 10z"/></svg>
+              <span style="font-size:12px; color:var(--muted); line-height:1.5;">Only appointment titles sync — never health data, notes, or location details.</span>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · More tab</span>
+        <h2>Calendar Sync Setup</h2>
+        <p>Google Calendar connected and syncing. Apple Calendar available to connect. Privacy boundary is stated plainly — titles only, never health data.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 2: GOOGLE CALENDAR OAUTH                                -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos calm"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content" style="padding-bottom:80px;">
+            <!-- Back -->
+            <div class="row-flex" style="gap:6px; padding:2px 0 18px; color:var(--plum-light);">
+              <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L3 5l4 4"/></svg>
+              <span style="font-size:13px; font-weight:600;">Back</span>
+            </div>
+
+            <!-- Logos -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin:8px 0 28px;">
+              <!-- Blueberry dot mark -->
+              <div style="width:54px; height:54px; border-radius:18px; background:linear-gradient(160deg,#C4B5E8,#3D2B6B); display:grid; place-items:center; box-shadow:0 8px 24px -6px rgba(61,43,107,0.35);">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="10" fill="white" opacity="0.9"/>
+                  <circle cx="16" cy="15" r="6" fill="#3D2B6B"/>
+                  <circle cx="13" cy="12" r="2" fill="white" opacity="0.6"/>
+                </svg>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              <!-- Google logo -->
+              <div style="width:54px; height:54px; border-radius:18px; background:#fff; border:1px solid #E0E0E0; display:grid; place-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                <svg width="28" height="28" viewBox="0 0 48 48">
+                  <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+                  <path d="M6.3 14.7l6.6 4.8C14.7 16 19.1 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 16.3 4 9.6 8.4 6.3 14.7z" fill="#FF3D00"/>
+                  <path d="M24 44c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8L6 33.1C9.2 39.5 16.1 44 24 44z" fill="#4CAF50"/>
+                  <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.2C36.9 36.2 44 31 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+                </svg>
+              </div>
+            </div>
+
+            <h2 style="font-family:'Playfair Display'; font-size:24px; font-weight:500; color:var(--plum); letter-spacing:-0.01em; line-height:1.2; margin-bottom:8px; text-align:center;">Sign in with Google<br>to sync appointments</h2>
+            <p style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:28px; line-height:1.5;">You'll be taken to Google to grant permission.<br>You can disconnect at any time.</p>
+
+            <!-- Permissions list -->
+            <div class="card" style="padding:6px 16px; margin-bottom:20px;">
+              <div style="padding:12px 4px 4px; font-size:10px; font-weight:700; letter-spacing:0.14em; color:var(--muted); text-transform:uppercase;">What Blueberry will access</div>
+              <div class="list-row">
+                <div style="width:32px; height:32px; border-radius:10px; background:#EDF7ED; display:grid; place-items:center; flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div class="text">
+                  <div class="t">Create appointments</div>
+                  <div class="s">Add your Blueberry appointments to your calendar</div>
+                </div>
+              </div>
+              <div class="list-row">
+                <div style="width:32px; height:32px; border-radius:10px; background:#EDF7ED; display:grid; place-items:center; flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="text">
+                  <div class="t">Read appointment titles</div>
+                  <div class="s">To surface upcoming events in the To Do view</div>
+                </div>
+              </div>
+              <div class="list-row">
+                <div style="width:32px; height:32px; border-radius:10px; background:#FFF3F3; display:grid; place-items:center; flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C53030" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <div class="text">
+                  <div class="t" style="color:var(--muted);">No access to health data</div>
+                  <div class="s">Notes, descriptions, and contacts are never read</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <button style="width:100%; padding:16px; background:var(--plum); color:#fff; border:none; border-radius:18px; font-family:'DM Sans'; font-weight:600; font-size:14px; letter-spacing:0.02em; display:flex; align-items:center; justify-content:center; gap:10px;">
+              <svg width="18" height="18" viewBox="0 0 48 48">
+                <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+                <path d="M6.3 14.7l6.6 4.8C14.7 16 19.1 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.5 29.4 4 24 4 16.3 4 9.6 8.4 6.3 14.7z" fill="#FF3D00"/>
+                <path d="M24 44c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8L6 33.1C9.2 39.5 16.1 44 24 44z" fill="#4CAF50"/>
+                <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.2C36.9 36.2 44 31 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+              </svg>
+              Continue to Google
+            </button>
+            <p style="text-align:center; margin-top:16px; font-size:13px; color:var(--plum-light); font-weight:600;">Not now</p>
+          </div>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · OAuth flow</span>
+        <h2>Google Calendar OAuth</h2>
+        <p>Pre-handoff screen. Human-readable permission list — no API scope strings. Privacy exclusion (no health data) is explicit before the user taps through to Google.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 3: NOTIFICATION PREFERENCES                             -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos more"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+            <!-- Back -->
+            <div class="row-flex" style="gap:6px; padding:2px 0 16px; color:var(--plum-light);">
+              <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L3 5l4 4"/></svg>
+              <span style="font-size:13px; font-weight:600;">More</span>
+            </div>
+            <div class="topbar" style="padding-top:0; padding-bottom:20px;">
+              <h1 class="section">Notifications</h1>
+            </div>
+
+            <!-- Quiet hours -->
+            <div class="card" style="margin-bottom:12px;">
+              <div class="row-flex" style="justify-content:space-between; margin-bottom:14px;">
+                <div>
+                  <div style="font-size:14px; font-weight:600; color:var(--ink);">Quiet hours</div>
+                  <div style="font-size:11px; color:var(--muted); margin-top:2px;">No notifications during this window</div>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+              <div style="background:var(--lavender-25); border-radius:14px; padding:12px 14px;">
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--plum-light); margin-bottom:8px;">TIME RANGE</div>
+                <div class="row-flex" style="gap:8px;">
+                  <div style="flex:1; background:#fff; border-radius:10px; padding:10px 12px; text-align:center; border:1.5px solid var(--plum);">
+                    <div style="font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">Starts</div>
+                    <div style="font-family:'Playfair Display'; font-size:20px; color:var(--plum); line-height:1.1; margin-top:2px;">9<span style="font-size:14px;">pm</span></div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                  <div style="flex:1; background:#fff; border-radius:10px; padding:10px 12px; text-align:center; border:1px solid var(--hair);">
+                    <div style="font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">Ends</div>
+                    <div style="font-family:'Playfair Display'; font-size:20px; color:var(--ink); line-height:1.1; margin-top:2px;">7<span style="font-size:14px;">am</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category toggles -->
+            <div class="label" style="padding-left:4px; margin:16px 0 8px;">CATEGORIES</div>
+            <div class="card" style="padding:6px 16px;">
+
+              <div class="list-row">
+                <div style="font-size:20px; flex-shrink:0;">🗓</div>
+                <div class="text">
+                  <div class="t">Appointment reminders</div>
+                  <div class="s">24 hours before</div>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <div class="list-row">
+                <div style="font-size:20px; flex-shrink:0;">💙</div>
+                <div class="text">
+                  <div class="t">Partner check-ins</div>
+                  <div class="s">When she shares a moment</div>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <div class="list-row">
+                <div style="font-size:20px; flex-shrink:0;">✅</div>
+                <div class="text">
+                  <div class="t">Todo updates</div>
+                  <div class="s">New items added for you</div>
+                </div>
+                <div class="toggle-on"></div>
+              </div>
+
+              <div class="list-row">
+                <div style="font-size:20px; flex-shrink:0;">👟</div>
+                <div class="text">
+                  <div class="t">Kick reminders</div>
+                  <div class="s">Daily prompt while pregnant</div>
+                </div>
+                <div class="toggle-off"></div>
+              </div>
+
+            </div>
+
+            <!-- Footer note -->
+            <div style="display:flex; align-items:flex-start; gap:8px; padding:12px 14px; background:rgba(255,255,255,0.5); border-radius:14px; border:1px solid var(--hair);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span style="font-size:11.5px; color:var(--muted); line-height:1.5;">Quiet hours apply to all categories except active labor alerts.</span>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · More tab</span>
+        <h2>Notification Preferences</h2>
+        <p>Quiet hours window with editable time chips. Four category toggles, each with a plain-language sublabel. Quiet-hours exception for active labor is noted at the bottom.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 4: FAMILY MODE HOME — MOM (POSTPARTUM)                  -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen dark">
+          <div class="atmos night"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>2:14</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+            <div class="topbar">
+              <div class="hello"><span>Thursday, Jun 26</span><strong>Good night, Olivia</strong></div>
+              <div class="right">
+                <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+                <div class="topbar avatar">OW</div>
+              </div>
+            </div>
+
+            <!-- Postpartum hero -->
+            <div class="hero" style="padding:20px 22px 22px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <span class="label">Postpartum · Family Mode</span>
+                  <div style="font-family:'Playfair Display'; font-size:28px; font-weight:400; color:var(--plum); line-height:1.1; margin-top:6px;">Week <em style="font-style:italic;">3</em></div>
+                  <div style="font-size:12px; color:var(--muted); margin-top:4px;">You're doing the work that matters.</div>
+                </div>
+                <!-- Arc progress -->
+                <svg width="64" height="64" viewBox="0 0 64 64" style="flex-shrink:0; margin-top:2px;">
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="#ECE6F8" stroke-width="5"/>
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="#C4B5E8" stroke-width="5" stroke-dasharray="163" stroke-dashoffset="114" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+                  <text x="32" y="37" text-anchor="middle" font-family="DM Sans" font-size="12" font-weight="600" fill="rgba(196,181,232,0.85)">3/12</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Mood check-in -->
+            <div class="card" style="margin-bottom:12px;">
+              <div class="h"><h3>How are you feeling today?</h3></div>
+              <div style="display:flex; justify-content:space-between; padding:4px 0;">
+                <!-- 5 mood orbs -->
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(160deg,#F5E8DE,#E8C5B5); border:2px solid transparent; display:grid; place-items:center; font-size:22px;">😔</div>
+                  <span style="font-size:9px; color:var(--muted);">Low</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(160deg,#F5E8DE,#E2C8DE); border:2px solid transparent; display:grid; place-items:center; font-size:22px;">😐</div>
+                  <span style="font-size:9px; color:var(--muted);">Okay</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(160deg,#DCCDF2,#C4B5E8); border:2.5px solid var(--plum); box-shadow:0 4px 12px rgba(61,43,107,0.25); display:grid; place-items:center; font-size:22px;">🙂</div>
+                  <span style="font-size:9px; color:var(--plum); font-weight:700;">Good</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(160deg,#E4ECDC,#C8DFC0); border:2px solid transparent; display:grid; place-items:center; font-size:22px;">😊</div>
+                  <span style="font-size:9px; color:var(--muted);">Great</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(160deg,#FFF3CD,#FFD966); border:2px solid transparent; display:grid; place-items:center; font-size:22px;">😄</div>
+                  <span style="font-size:9px; color:var(--muted);">Wonderful</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Baby status strip -->
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;">
+              <div style="background:#fff; border-radius:16px; padding:12px 10px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:18px; margin-bottom:4px;">🍼</div>
+                <div style="font-size:12px; font-weight:600; color:var(--ink);">1h ago</div>
+                <div style="font-size:10px; color:var(--muted);">Last fed</div>
+              </div>
+              <div style="background:#fff; border-radius:16px; padding:12px 10px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:18px; margin-bottom:4px;">🌙</div>
+                <div style="font-size:12px; font-weight:600; color:var(--plum);">Sleeping</div>
+                <div style="font-size:10px; color:var(--muted);">Right now</div>
+              </div>
+              <div style="background:#fff; border-radius:16px; padding:12px 10px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:18px; margin-bottom:4px;">🚿</div>
+                <div style="font-size:12px; font-weight:600; color:var(--ink);">45m ago</div>
+                <div style="font-size:10px; color:var(--muted);">Last diaper</div>
+              </div>
+            </div>
+
+            <!-- Log actions -->
+            <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:10px; margin-bottom:14px;">
+              <button style="padding:14px 16px; background:var(--plum); color:#fff; border:none; border-radius:18px; font-family:'DM Sans'; font-weight:600; font-size:13px; text-align:left; display:flex; align-items:center; gap:10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                Log a moment
+              </button>
+              <button style="padding:14px 16px; background:rgba(255,255,255,0.7); color:var(--plum); border:1px solid var(--hair); border-radius:18px; font-family:'DM Sans'; font-weight:600; font-size:13px;">
+                🌙 Night log
+              </button>
+            </div>
+
+            <!-- Your body this week -->
+            <div class="card" style="padding:16px 18px;">
+              <div class="h">
+                <h3>Your body this week</h3>
+                <svg width="16" height="16" viewBox="0 0 10 10" fill="none" stroke="var(--plum-light)" stroke-width="1.6" stroke-linecap="round"><path d="M1 3l4 4 4-4"/></svg>
+              </div>
+              <p style="font-size:13px; color:var(--ink); line-height:1.5;">Lochia is tapering off. Your uterus is contracting back — it's normal to feel cramping especially while nursing. Sleep when the baby sleeps is real advice, not a cliche.</p>
+              <div style="margin-top:12px; display:flex; gap:6px; flex-wrap:wrap;">
+                <span class="chip lavender">Hormone shift</span>
+                <span class="chip lavender">Rest &amp; recovery</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar-dark">
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role">Mom · Family Mode</span>
+        <h2>Postpartum Home — Night</h2>
+        <p>Dark mode activates automatically during nighttime hours (9 pm – 7 am) for both roles. Week 3 arc, mood check-in, baby status strip, and body-this-week card — all in the night palette.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 5: FAMILY MODE HOME — PARTNER (POSTPARTUM)              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos night"></div>
+          <div class="island"></div>
+          <div class="status-bar" style="color:#fff;">
+            <span>2:14</span>
+            <span class="icons" style="color:#fff;">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="14" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div style="position:relative; z-index:2; flex:1; overflow:hidden; padding:6px 20px 110px; display:flex; flex-direction:column;">
+            <!-- Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 4px 16px;">
+              <div>
+                <span style="font-size:13px; color:rgba(255,255,255,0.45); font-weight:500;">Thursday · 2:14 am</span>
+                <div style="font-family:'Playfair Display'; font-size:22px; color:#fff; font-weight:500; margin-top:2px; letter-spacing:-0.01em;">Night shift</div>
+              </div>
+              <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#E8D6C4,#B8855E); border:1.5px solid rgba(255,255,255,0.2); display:grid; place-items:center; color:#fff; font-weight:600; font-size:14px;">JW</div>
+            </div>
+
+            <!-- Night shift hero -->
+            <div style="border-radius:28px; padding:22px; background:linear-gradient(160deg,rgba(61,43,107,0.7) 0%,rgba(29,19,56,0.9) 100%); border:1px solid rgba(196,181,232,0.15); margin-bottom:14px; position:relative; overflow:hidden;">
+              <div style="position:absolute; top:0; right:0; bottom:0; width:180px; background:radial-gradient(circle at 80% 30%, rgba(196,181,232,0.12) 0%, transparent 65%);"></div>
+              <div style="font-size:11px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(196,181,232,0.7); margin-bottom:8px;">SHIFT STATUS</div>
+              <div style="font-family:'Playfair Display'; font-size:36px; color:#fff; line-height:1; margin-bottom:6px;">Your turn</div>
+              <div style="font-size:13px; color:rgba(255,255,255,0.55); margin-bottom:16px;">She fed at 2:14 am · 22 min · now resting</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <button style="flex:1; padding:12px; background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:14px; font-family:'DM Sans'; font-weight:600; font-size:13px;">I've got this</button>
+                <button style="padding:12px 16px; background:rgba(196,181,232,0.15); color:var(--lavender); border:1px solid rgba(196,181,232,0.2); border-radius:14px; font-family:'DM Sans'; font-weight:600; font-size:13px;">Swap</button>
+              </div>
+            </div>
+
+            <!-- Baby status strip -->
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;">
+              <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:12px 10px; text-align:center; border:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:18px; margin-bottom:4px;">🍼</div>
+                <div style="font-size:12px; font-weight:600; color:#fff;">Just fed</div>
+                <div style="font-size:10px; color:rgba(255,255,255,0.4);">2:14 am</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:12px 10px; text-align:center; border:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:18px; margin-bottom:4px;">🌙</div>
+                <div style="font-size:12px; font-weight:600; color:var(--lavender);">Sleeping</div>
+                <div style="font-size:10px; color:rgba(255,255,255,0.4);">Right now</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:12px 10px; text-align:center; border:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:18px; margin-bottom:4px;">🚿</div>
+                <div style="font-size:12px; font-weight:600; color:#fff;">1h 12m</div>
+                <div style="font-size:10px; color:rgba(255,255,255,0.4);">Last diaper</div>
+              </div>
+            </div>
+
+            <!-- Quick log row -->
+            <div style="font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:10px; padding-left:4px;">QUICK LOG</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;">
+              <button style="padding:12px 8px; background:rgba(255,255,255,0.07); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <span style="font-size:18px;">🍼</span>Log feed
+              </button>
+              <button style="padding:12px 8px; background:rgba(255,255,255,0.07); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <span style="font-size:18px;">🚿</span>Log diaper
+              </button>
+              <button style="padding:12px 8px; background:rgba(255,255,255,0.07); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <span style="font-size:18px;">🌙</span>Log sleep
+              </button>
+            </div>
+
+            <!-- Upcoming appointment -->
+            <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:14px 16px; display:flex; align-items:center; gap:14px;">
+              <div style="background:rgba(196,181,232,0.15); border-radius:12px; width:48px; padding:6px 0; text-align:center; flex-shrink:0;">
+                <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; color:var(--lavender); text-transform:uppercase;">Jul</div>
+                <div style="font-family:'Playfair Display'; font-size:20px; color:#fff; line-height:1; margin-top:2px;">17</div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600; color:#fff;">2-week checkup · Olivia + baby</div>
+                <div style="font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px;">In 3 days · Dr. Chen</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1l4 4-4 4"/></svg>
+            </div>
+          </div>
+
+          <nav class="tabbar-dark">
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="15.5" cy="9" r="3"/><path d="M3 20c.8-3 3-5 5.5-5s4.7 2 5.5 5M11 20c.8-3 3-5 5.5-5s4.7 2 5.5 5"/></svg></div>Together</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 17h6"/></svg></div>To Do</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role partner">Partner · Family Mode</span>
+        <h2>Postpartum Home — Night</h2>
+        <p>Both roles share the same night palette — dark mode is automatic, not a setting. Shift status, last action log, baby strip, and quick-log row. Same 2:14 am context as Mom's screen.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 6: BABY TRACKING DASHBOARD                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos baby"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content">
+            <div class="topbar">
+              <div>
+                <h1 class="section">Baby Maeve</h1>
+                <div style="font-size:12px; color:var(--muted); margin-top:1px;">3 weeks, 2 days old</div>
+              </div>
+              <div class="right">
+                <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#3D2B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+                <div class="topbar avatar">OW</div>
+              </div>
+            </div>
+
+            <!-- Today's summary strip -->
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px;">
+              <div style="background:linear-gradient(160deg,#fff 0%,#F5F1FB 100%); border-radius:18px; padding:14px 12px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:22px; margin-bottom:4px;">🍼</div>
+                <div style="font-family:'Playfair Display'; font-size:22px; color:var(--plum); line-height:1;">4</div>
+                <div style="font-size:10px; color:var(--muted); margin-top:2px;">feeds today</div>
+              </div>
+              <div style="background:linear-gradient(160deg,#fff 0%,#F5F1FB 100%); border-radius:18px; padding:14px 12px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:22px; margin-bottom:4px;">🚿</div>
+                <div style="font-family:'Playfair Display'; font-size:22px; color:var(--plum); line-height:1;">6</div>
+                <div style="font-size:10px; color:var(--muted); margin-top:2px;">diapers today</div>
+              </div>
+              <div style="background:linear-gradient(160deg,#fff 0%,#F5F1FB 100%); border-radius:18px; padding:14px 12px; text-align:center; border:1px solid var(--hair); box-shadow:var(--shadow-card);">
+                <div style="font-size:22px; margin-bottom:4px;">🌙</div>
+                <div style="font-family:'Playfair Display'; font-size:22px; color:var(--plum); line-height:1;">14h</div>
+                <div style="font-size:10px; color:var(--muted); margin-top:2px;">sleep today</div>
+              </div>
+            </div>
+
+            <!-- Activity feed -->
+            <div class="card" style="padding:14px 16px;">
+              <div class="h"><h3>Today's activity</h3><span class="more">All days</span></div>
+              <!-- Timeline entries -->
+              <div style="display:flex; flex-direction:column; gap:0;">
+
+                <div style="display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--hair); align-items:center;">
+                  <span style="font-size:10px; color:var(--muted); font-weight:600; width:38px; flex-shrink:0; text-align:right;">9:12</span>
+                  <div style="width:28px; height:28px; border-radius:8px; background:var(--lavender-50); display:grid; place-items:center; flex-shrink:0; font-size:14px;">🍼</div>
+                  <div style="flex:1;">
+                    <div style="font-size:12px; font-weight:600; color:var(--ink);">Fed · 18 min</div>
+                    <div style="font-size:10.5px; color:var(--muted);">Logged by Olivia</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--hair); align-items:center;">
+                  <span style="font-size:10px; color:var(--muted); font-weight:600; width:38px; flex-shrink:0; text-align:right;">8:44</span>
+                  <div style="width:28px; height:28px; border-radius:8px; background:#E4ECDC; display:grid; place-items:center; flex-shrink:0; font-size:14px;">🚿</div>
+                  <div style="flex:1;">
+                    <div style="font-size:12px; font-weight:600; color:var(--ink);">Diaper · wet + soiled</div>
+                    <div style="font-size:10.5px; color:var(--muted);">Logged by James</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--hair); align-items:center;">
+                  <span style="font-size:10px; color:var(--muted); font-weight:600; width:38px; flex-shrink:0; text-align:right;">7:50</span>
+                  <div style="width:28px; height:28px; border-radius:8px; background:#E8EDF5; display:grid; place-items:center; flex-shrink:0; font-size:14px;">🌙</div>
+                  <div style="flex:1;">
+                    <div style="font-size:12px; font-weight:600; color:var(--ink);">Woke up · slept 2h 10m</div>
+                    <div style="font-size:10.5px; color:var(--muted);">Auto-detected</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:12px; padding:9px 0; align-items:center;">
+                  <span style="font-size:10px; color:var(--muted); font-weight:600; width:38px; flex-shrink:0; text-align:right;">5:38</span>
+                  <div style="width:28px; height:28px; border-radius:8px; background:var(--lavender-50); display:grid; place-items:center; flex-shrink:0; font-size:14px;">🍼</div>
+                  <div style="flex:1;">
+                    <div style="font-size:12px; font-weight:600; color:var(--ink);">Fed · 22 min</div>
+                    <div style="font-size:10.5px; color:var(--muted);">Logged by James</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Quick-log row -->
+            <div style="font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--plum-light); margin-bottom:10px; padding-left:4px;">QUICK LOG</div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+              <button style="padding:12px 4px; background:#fff; border:1px solid var(--hair); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:11px; color:var(--plum); display:flex; flex-direction:column; align-items:center; gap:5px; box-shadow:var(--shadow-card);">
+                <span style="font-size:18px;">🍼</span>Feed
+              </button>
+              <button style="padding:12px 4px; background:#fff; border:1px solid var(--hair); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:11px; color:var(--plum); display:flex; flex-direction:column; align-items:center; gap:5px; box-shadow:var(--shadow-card);">
+                <span style="font-size:18px;">🚿</span>Diaper
+              </button>
+              <button style="padding:12px 4px; background:#fff; border:1px solid var(--hair); border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:11px; color:var(--plum); display:flex; flex-direction:column; align-items:center; gap:5px; box-shadow:var(--shadow-card);">
+                <span style="font-size:18px;">🌙</span>Sleep
+              </button>
+              <button style="padding:12px 4px; background:var(--lavender-50); border:1px solid transparent; border-radius:16px; font-family:'DM Sans'; font-weight:600; font-size:11px; color:var(--plum); display:flex; flex-direction:column; align-items:center; gap:5px; box-shadow:var(--shadow-card);">
+                <span style="font-size:18px;">⭐</span>Milestone
+              </button>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></div>Home</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9.5C1 6 6 2 9.5 5.2 11 6.5 12 8 12 8s1-1.5 2.5-2.8C18 2 23 6 21 11.5 19 16.5 12 21 12 21z"/></svg></div>Health</div>
+            <div class="tab active"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>Baby</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 10l4-4h8l4 4"/><circle cx="12" cy="14" r="2.4"/></svg></div>Memories</div>
+            <div class="tab"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg></div>More</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · Baby tab</span>
+        <h2>Baby Tracking Dashboard</h2>
+        <p>Baby's name and age as the heading. Three daily summary stats. Chronological activity feed with logger attribution. One-tap quick-log row for feed, diaper, sleep, and milestone.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 7: BABY ARRIVED SETUP FLOW                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="stage">
+      <div class="iphone">
+        <span class="side-btn silent"></span><span class="side-btn up"></span><span class="side-btn down"></span><span class="side-btn power"></span>
+        <div class="screen">
+          <div class="atmos setup"></div>
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><path d="M1 8h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-3h2v9h-2z" fill="currentColor"/></svg>
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 1C4.5 1 1.9 2 0 3.5l1.5 1.8C3.1 4 5.2 3.3 7.5 3.3s4.4.7 6 2L15 3.5C13.1 2 10.5 1 7.5 1zm0 3.4c-1.9 0-3.6.5-5 1.5L4 7.7c1-.7 2.2-1 3.5-1s2.5.3 3.5 1L12.5 6c-1.4-1-3.1-1.5-5-1.5zm0 3.3c-.9 0-1.8.3-2.5.8L7.5 11l2.5-2.5c-.7-.5-1.6-.8-2.5-.8z" fill="currentColor"/></svg>
+              <svg width="26" height="11" viewBox="0 0 26 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <div class="content" style="padding-bottom:90px; display:flex; flex-direction:column;">
+            <!-- Soft illustration area -->
+            <div style="text-align:center; padding:16px 0 20px;">
+              <svg width="88" height="88" viewBox="0 0 88 88">
+                <circle cx="44" cy="44" r="40" fill="url(#babyGrad)" opacity="0.9"/>
+                <circle cx="44" cy="44" r="40" fill="none" stroke="rgba(196,181,232,0.35)" stroke-width="1.5"/>
+                <!-- simple baby face -->
+                <circle cx="38" cy="42" r="3" fill="white" opacity="0.8"/>
+                <circle cx="50" cy="42" r="3" fill="white" opacity="0.8"/>
+                <path d="M37 52 Q44 58 51 52" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+                <!-- small star -->
+                <path d="M44 20 l2 5 l5 0 l-4 3 l1.5 5 l-4.5-3 l-4.5 3 l1.5-5 l-4-3 l5 0 z" fill="rgba(255,255,255,0.5)"/>
+              </svg>
+              <defs>
+                <radialGradient id="babyGrad" cx="40%" cy="38%" r="65%">
+                  <stop offset="0" stop-color="#E8DFF8"/>
+                  <stop offset="1" stop-color="#C4B5E8"/>
+                </radialGradient>
+              </defs>
+            </div>
+
+            <h1 style="font-family:'Playfair Display'; font-size:28px; font-weight:500; color:var(--plum); letter-spacing:-0.02em; line-height:1.15; text-align:center; margin-bottom:6px;">Welcome to the<br>next chapter.</h1>
+            <p style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:28px; line-height:1.55; padding:0 8px;">Fill in a few details to transition Blueberry to Family Mode. You can update any of these later.</p>
+
+            <!-- Form fields -->
+            <div style="display:flex; flex-direction:column; gap:12px; flex:1;">
+              <div>
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--plum-light); margin-bottom:6px; padding-left:2px;">BIRTH DATE</div>
+                <div style="background:#fff; border:1.5px solid var(--plum); border-radius:16px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 0 0 4px rgba(61,43,107,0.06);">
+                  <span style="font-size:15px; font-weight:600; color:var(--plum);">June 26, 2026</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--plum-light)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--plum-light); margin-bottom:6px; padding-left:2px;">NAME</div>
+                <div style="background:#fff; border:1px solid var(--hair); border-radius:16px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:15px; color:var(--ink);">Maeve</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--plum-light); margin-bottom:6px; padding-left:2px;">ASSIGNED SEX</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                  <button style="padding:12px 8px; background:#fff; border:1.5px solid var(--plum); border-radius:14px; font-family:'DM Sans'; font-weight:600; font-size:13px; color:var(--plum);">Girl</button>
+                  <button style="padding:12px 8px; background:var(--ivory); border:1px solid var(--hair); border-radius:14px; font-family:'DM Sans'; font-weight:500; font-size:13px; color:var(--muted);">Boy</button>
+                  <button style="padding:12px 8px; background:var(--ivory); border:1px solid var(--hair); border-radius:14px; font-family:'DM Sans'; font-weight:500; font-size:13px; color:var(--muted);">Other</button>
+                </div>
+              </div>
+
+              <!-- Transition note -->
+              <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--lavender-25); border-radius:14px; border:1px solid rgba(196,181,232,0.3); margin-top:4px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--plum-light)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                <span style="font-size:12px; color:var(--plum); line-height:1.5;">This transitions your app to Family Mode. Your pregnancy memories and health logs stay in the app.</span>
+              </div>
+            </div>
+
+            <!-- Save button -->
+            <div style="padding-top:20px;">
+              <button style="width:100%; padding:16px; background:var(--plum); color:#fff; border:none; border-radius:18px; font-family:'DM Sans'; font-weight:600; font-size:15px; letter-spacing:0.02em; box-shadow:0 10px 28px -8px rgba(61,43,107,0.45);">
+                Save and continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">
+        <span class="role both">Both · Setup flow</span>
+        <h2>Baby Arrived</h2>
+        <p>Triggered when setting baby_dob. Warm but not celebratory — no confetti. Birth date (active focus state), name confirm, sex selection, and a plain-language transition note before saving.</p>
+      </div>
+    </div>
+
+  </div><!-- /gallery -->
+
+  <footer class="footer-note">
+    <span>Blueberry · Feature Screens · v1 · calendar sync · notifications · postpartum · baby tracking</span>
+    <span>Open: <code>docs/feature-mockups.html</code></span>
+  </footer>
+
+</div>
+</body>
+</html>
