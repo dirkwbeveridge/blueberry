@@ -1,7 +1,8 @@
 # Requirements: Blueberry
 
 **Defined:** 2026-05-15  
-**Status:** Draft for Codex-owned clean start
+**Updated:** 2026-06-09 — INTG-01 through INTG-04 and POST-01 promoted to v1 scope.  
+**Status:** Active
 
 ## Phase 0: Planning
 
@@ -52,13 +53,26 @@
 - [ ] **APPT-01:** Users can create and view household appointments.
 - [ ] **APPT-02:** Upcoming appointments are visible from home or a dedicated appointments flow.
 
-## Candidate v1.5 / v2
+### Calendar Sync
 
-- [ ] **INTG-01:** Google Calendar sync for household appointments.
-- [ ] **INTG-02:** Push notifications for partner-added todos and appointments.
-- [ ] **INTG-03:** AI-generated weekly content or suggested todos.
-- [ ] **INTG-04:** Wearable integrations such as Oura or Apple Watch.
-- [ ] **POST-01:** Postpartum feeding, sleep, diaper, pediatrician, and baby milestone tracking.
+- [ ] **INTG-01:** Google Calendar two-way sync for household appointments via OAuth PKCE. New appointments created in-app appear on Google Calendar; updates and deletes propagate both directions. `appointments.google_event_id` stores the bound event reference.
+- [ ] **INTG-01b:** Apple Calendar (EventKit) two-way sync for household appointments. iOS permission requested at first appointment screen. `appointments.apple_event_id` stores the EventKit identifier.
+
+### Push Notifications
+
+- [ ] **INTG-02:** Push notifications for shared household events: appointment reminders (24h before), partner check-in shared (opt-in, shared sentence only — no raw health data), todo assigned, and kick session reminder. Dispatched via native APNs (iOS) and FCM (Android) from Supabase Edge Functions. No Expo push service. User-configurable categories and quiet hours.
+
+### AI Content
+
+- [ ] **INTG-03:** AI-generated weekly content and suggested todos, stage-aware for both pregnancy and postpartum. Surfaces in Mom's week detail, Partner's support suggestions, and the conversation prompt. Implementation follows Phase 7a/7b/7c verification on real devices.
+
+### Wearables
+
+- [ ] **INTG-04:** Wearable integrations (Oura, Apple Watch) for passive health data enrichment.
+
+### Family Mode (Postpartum)
+
+- [ ] **POST-01:** When `households.baby_dob` is set, the app transitions to Family Mode. Feeding (breast L/R/bottle/formula, timer-based duration), sleep, diaper, pediatric visits, and baby milestone tracking for both parents. Night-shift swap log visible to both partners in real time. Recovery check-in for Mom. Triggered by "Begin Family Mode" in the More tab.
 
 ## Explicitly Out of Scope for Initial Build
 
