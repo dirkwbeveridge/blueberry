@@ -1,14 +1,19 @@
 export const colors = {
-  primary:    '#3D2B6B',
-  accent:     '#C4B5E8',
-  background: '#FAF8F5',
-  surface:    '#FFFFFF',
-  text:       '#1A1A2E',
-  textMuted:  '#7B6F8A',
-  success:    '#6DBF82',
-  warning:    '#F4A261',
-  error:      '#E76F51',
-  border:     '#EDE8F5',
+  primary:      '#3D2B6B',
+  accent:       '#C4B5E8',
+  background:   '#FAF8F5',
+  surface:      '#FFFFFF',
+  text:         '#1A1A2E',
+  textMuted:    '#7B6F8A',
+  success:      '#6DBF82',
+  warning:      '#F4A261',
+  error:        '#E76F51',
+  border:       '#EDE8F5',
+  primaryTint:  '#F5F0FF',
+  successTint:  '#E8F8ED',
+  warningTint:  '#FEF3E8',
+  errorTint:    '#FEF0ED',
+  shadow:       '#1A0F3A',
 };
 
 export const fonts = {
@@ -37,6 +42,16 @@ export const radii = {
   md:   12,
   lg:   24,
   full: 9999,
+};
+
+export const typography = {
+  display:    { fontSize: 56, lineHeight: 60, fontFamily: fonts.heading.bold      },
+  title:      { fontSize: 26, lineHeight: 32, fontFamily: fonts.heading.bold      },
+  heading:    { fontSize: 20, lineHeight: 28, fontFamily: fonts.heading.bold      },
+  subheading: { fontSize: 17, lineHeight: 24, fontFamily: fonts.heading.semibold  },
+  body:       { fontSize: 15, lineHeight: 24, fontFamily: fonts.body.regular      },
+  label:      { fontSize: 13, lineHeight: 20, fontFamily: fonts.body.medium       },
+  caption:    { fontSize: 11, lineHeight: 16, fontFamily: fonts.body.regular      },
 };
 
 export const cardStyle = {
