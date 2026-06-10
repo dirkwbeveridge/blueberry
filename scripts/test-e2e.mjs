@@ -102,17 +102,15 @@ async function runTests() {
   }
 
   // ── SUITE: Household ──────────────────────────────────────────────────────
-  suite('Household — create');
+  suite('Household — create (via create_household RPC)');
 
   const generatedCode = Math.random().toString(36).toUpperCase().slice(2, 8);
   {
+    // Atomic create: household + creator's users row in one transaction.
     const { data, error } = await motherClient
-      .from('households')
-      .insert({ invite_code: generatedCode, stage: 'pregnant' })
-      .select()
-      .single();
-    if (error) { fail('INSERT households', error); }
-    else       { householdId = data.id; inviteCode = data.invite_code; pass('INSERT households'); }
+      .rpc('create_household', { p_role: 'mother', p_invite_code: generatedCode });
+    if (error) { fail('RPC create_household', error); }
+    else       { householdId = data.id; inviteCode = data.invite_code; pass('RPC create_household'); }
   }
 
   if (!householdId) {
@@ -121,15 +119,15 @@ async function runTests() {
     return;
   }
 
-  // ── SUITE: Users - Mother ─────────────────────────────────────────────────
-  suite('Users — insert mother row');
+  // ── SUITE: Mother reads ───────────────────────────────────────────────────
+  suite('Users — mother row created + readable');
 
   {
-    const { error } = await motherClient
-      .from('users')
-      .insert({ id: motherUserId, household_id: householdId, role: 'mother' });
-    if (error) fail('INSERT users (mother)', error);
-    else       pass('INSERT users (mother)');
+    const { data, error } = await motherClient
+      .from('users').select('*').eq('id', motherUserId).maybeSingle();
+    if (error)       fail('SELECT own users row (mother)', error);
+    else if (!data)  fail('mother users row exists', 'RPC should have created it');
+    else             pass('mother users row created by RPC');
   }
 
   {

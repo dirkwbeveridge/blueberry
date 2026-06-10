@@ -97,26 +97,30 @@ export default function LoginScreen() {
           return;
         }
         const householdId = hhId as string;
-        const { data: user, error: uErr } = await supabase.from('users').insert({
+        // Insert the users row without RETURNING — a post-insert select on the
+        // brand-new row can trip the SELECT policy before membership resolves.
+        const { error: uErr } = await supabase.from('users').insert({
           id: userId, household_id: householdId, role,
-        }).select().single();
+        });
         if (uErr) throw uErr;
+        // The users row now exists, so get_my_household_id() resolves and these reads pass RLS.
+        const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
+        if (user) setCurrentUser(user);
         const { data: hh } = await supabase.from('households').select('*').eq('id', householdId).single();
         if (hh) setHousehold(hh);
-        setCurrentUser(user);
         const { data: partner } = await supabase.from('users').select('*').eq('household_id', householdId).neq('id', userId).maybeSingle();
         if (partner) setPartnerUser(partner);
       } else {
         const invite_code = generateInviteCode();
-        const { data: hh, error: hhErr } = await supabase.from('households').insert({
-          invite_code, stage: 'pregnant',
-        }).select().single();
+        // Atomic create via security-definer RPC: makes the household AND the
+        // creator's users row in one transaction, sidestepping the SELECT-policy
+        // chicken-and-egg that breaks a direct insert ... returning.
+        const { data: hh, error: hhErr } = await supabase.rpc('create_household', {
+          p_role: role, p_invite_code: invite_code,
+        });
         if (hhErr || !hh) throw hhErr ?? new Error('Failed to create household');
-        const { data: user, error: uErr } = await supabase.from('users').insert({
-          id: userId, household_id: hh.id, role,
-        }).select().single();
-        if (uErr) throw uErr;
-        setCurrentUser(user);
+        const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
+        if (user) setCurrentUser(user);
         setHousehold(hh);
         Alert.alert('Your invite code', `Share this with your partner:\n\n${invite_code}`, [{ text: 'Got it' }]);
         setStep('setup');

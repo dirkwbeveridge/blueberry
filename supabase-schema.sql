@@ -205,6 +205,48 @@ $$;
 
 grant execute on function public.join_household_by_code(text) to authenticated;
 
+-- Household creation.
+--
+-- The "household members read" SELECT policy keys on get_my_household_id(),
+-- which returns null until the creator has a users row. A direct
+-- `insert ... returning *` therefore fails the SELECT policy on the brand-new
+-- row (the row is invisible because the creator isn't a member yet). This RPC
+-- bypasses that chicken-and-egg via security definer: it creates the household
+-- and the creator's users row atomically in one transaction, then returns the
+-- household. Mirrors join_household_by_code on the partner side.
+create or replace function public.create_household(p_role text, p_invite_code text)
+returns households
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_hh  households;
+begin
+  if v_uid is null then
+    raise exception 'not_authenticated';
+  end if;
+  if p_role not in ('mother','partner') then
+    raise exception 'invalid_role';
+  end if;
+  if exists (select 1 from public.users where id = v_uid) then
+    raise exception 'already_in_household';
+  end if;
+
+  insert into public.households (invite_code, stage)
+  values (upper(p_invite_code), 'pregnant')
+  returning * into v_hh;
+
+  insert into public.users (id, household_id, role)
+  values (v_uid, v_hh.id, p_role);
+
+  return v_hh;
+end;
+$$;
+
+grant execute on function public.create_household(text, text) to authenticated;
+
 
 -- ╭─── row level security ──────────────────────────────────────────────────╮
 alter table households           enable row level security;
