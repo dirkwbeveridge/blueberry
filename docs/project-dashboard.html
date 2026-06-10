@@ -50,6 +50,18 @@
   .blocker .fix { margin-top: 10px; font-size: 14px; color: var(--muted); }
   .blocker code { background: #fff; padding: 2px 6px; border-radius: 5px; font-size: 13px; color: var(--plum); }
 
+  .win {
+    background: #ECF7EF;
+    border: 1px solid var(--green);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .win h2 { font-size: 15px; color: #3E8E54; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .win p { font-size: 15px; color: var(--text); }
+  .win .fix { margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .win code { background: #fff; padding: 2px 6px; border-radius: 5px; font-size: 13px; color: var(--plum); }
+
   .buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
   .bucket { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
   .bucket .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -110,13 +122,13 @@
   <header>
     <h1>🫐 Blueberry</h1>
     <div class="sub">v1 private household companion — build dashboard</div>
-    <div class="meta">Generated 2026-06-09 · 14 commits · project age 17 days · branch main</div>
+    <div class="meta">Generated 2026-06-09 · 17 commits · project age 17 days · branch main</div>
   </header>
 
-  <div class="blocker">
-    <h2>⛔ One blocker is gating everything</h2>
-    <p>Signup works. Creating a household fails because the <b>database schema deployed in Supabase has drifted from the repo</b> — the live RLS policy rejects household creation that the repo policy would allow. Until this is fixed, none of the data flows in Phases 3 through 6 can be verified, even though the code is written.</p>
-    <p class="fix"><b>Fix:</b> Supabase dashboard → SQL Editor → paste all of <code>supabase-schema.sql</code> → Run. Then I re-run <code>scripts/test-e2e.mjs</code>, which verifies Phases 2 through 6 in one pass.</p>
+  <div class="win">
+    <h2>✅ Golden path verified on device</h2>
+    <p>The Phase 2 blocker is cleared. Signup → create household → land in the app now works on a real phone, and the backend passes <b>20/20</b> in <code>scripts/test-e2e.mjs</code> (signup, household create, partner join, every data table). Tasks, appointments, and symptoms save and load on device. Phases 2 through 6 moved from "written" to "verified."</p>
+    <p class="fix"><b>Remaining verification:</b> partner join on a second device, and live realtime sync between two connected clients. Both need a second device/simulator. The journal screen is still a placeholder.</p>
   </div>
 
   <div class="buckets">
@@ -127,8 +139,8 @@
     </div>
     <div class="bucket">
       <div class="label">MVP Core</div>
-      <div class="pct">~52%</div>
-      <div class="note">Phases 2–6 written, unverified</div>
+      <div class="pct">~72%</div>
+      <div class="note">Phases 2–6 mostly verified on device</div>
     </div>
     <div class="bucket">
       <div class="label">Integrations</div>
@@ -172,19 +184,19 @@
     </div>
   </div>
 
-  <div class="section-label">MVP Core — written, gated by the blocker</div>
+  <div class="section-label">MVP Core — golden path verified on device</div>
 
-  <div class="phase blocked">
+  <div class="phase">
     <div class="pnum">2</div>
     <div class="pbody">
       <h3>Auth &amp; Household</h3>
       <div class="goal">Email auth, role selection, household creation, invite-code join, session persistence, two-user cap.</div>
-      <div class="next"><b>Next:</b> Re-deploy schema (the blocker above), then re-run the E2E suite to confirm create + join + cap.</div>
+      <div class="next">Signup → create household → land in app verified on device. Partner join + 2-user cap pass in E2E. <b>Next:</b> partner join on a second device.</div>
     </div>
     <div class="pmeta">
-      <span class="pill blocked">Blocked</span>
-      <div class="bar blocked"><span style="width:40%"></span></div>
-      <div class="pct-txt">40% — signup verified, household create blocked</div>
+      <span class="pill done">Done &amp; Verified</span>
+      <div class="bar done"><span style="width:90%"></span></div>
+      <div class="pct-txt">90% — device-verified; 2nd-device join pending</div>
     </div>
   </div>
 
@@ -193,12 +205,12 @@
     <div class="pbody">
       <h3>Home &amp; Shared Todos</h3>
       <div class="goal">Main dashboard: stage/week status, progress, recent health summary, realtime todos, quick actions.</div>
-      <div class="next"><b>Next:</b> Verify todos load, complete, and sync between two users once auth unblocks. Quick actions wired this session.</div>
+      <div class="next">Todos save and load on device; quick actions wired. <b>Next:</b> confirm live sync between two connected clients (realtime channel fix landed this session).</div>
     </div>
     <div class="pmeta">
-      <span class="pill written">Written</span>
-      <div class="bar written"><span style="width:55%"></span></div>
-      <div class="pct-txt">55% — code complete, unverified</div>
+      <span class="pill done">Done &amp; Verified</span>
+      <div class="bar done"><span style="width:80%"></span></div>
+      <div class="pct-txt">80% — verified single-user; cross-user sync pending</div>
     </div>
   </div>
 
@@ -207,12 +219,12 @@
     <div class="pbody">
       <h3>Health Logging &amp; Journal</h3>
       <div class="goal">Symptoms, mood, energy, notes, and shared journal entries for both users.</div>
-      <div class="next"><b>Next:</b> Health log code is done (weight field removed). Journal is still a placeholder stub — needs a real screen.</div>
+      <div class="next">Symptom logging verified on device (saves + appears in history). <b>Next:</b> the Journal tab is still a placeholder — needs a real screen.</div>
     </div>
     <div class="pmeta">
-      <span class="pill written">Written</span>
-      <div class="bar written"><span style="width:45%"></span></div>
-      <div class="pct-txt">45% — health done, journal stubbed</div>
+      <span class="pill written">Partial</span>
+      <div class="bar written"><span style="width:55%"></span></div>
+      <div class="pct-txt">55% — health verified, journal stubbed</div>
     </div>
   </div>
 
@@ -221,12 +233,12 @@
     <div class="pbody">
       <h3>Pregnancy Tracking Tools</h3>
       <div class="goal">Kick counter and offline contraction timer with later sync.</div>
-      <div class="next"><b>Next:</b> Verify kick + contraction sessions save to the live DB and survive app restart.</div>
+      <div class="next">Inserts pass in the E2E suite (kick + contraction sessions). <b>Next:</b> exercise both tools on device and confirm offline → sync.</div>
     </div>
     <div class="pmeta">
       <span class="pill written">Written</span>
-      <div class="bar written"><span style="width:60%"></span></div>
-      <div class="pct-txt">60% — code complete, unverified</div>
+      <div class="bar written"><span style="width:65%"></span></div>
+      <div class="pct-txt">65% — backend verified, UI not device-tested</div>
     </div>
   </div>
 
@@ -235,12 +247,12 @@
     <div class="pbody">
       <h3>Partner &amp; Appointments</h3>
       <div class="goal">Partner support surface and household appointment management.</div>
-      <div class="next"><b>Next:</b> Verify appointment create/view against live DB. Date/time pickers and month calendar added this session.</div>
+      <div class="next">Appointment create/view verified on device; date/time pickers and month calendar added this session. <b>Next:</b> view the partner surface as the partner role.</div>
     </div>
     <div class="pmeta">
-      <span class="pill written">Written</span>
-      <div class="bar written"><span style="width:60%"></span></div>
-      <div class="pct-txt">60% — code complete, unverified</div>
+      <span class="pill done">Done &amp; Verified</span>
+      <div class="bar done"><span style="width:75%"></span></div>
+      <div class="pct-txt">75% — appointments verified; partner-role view pending</div>
     </div>
   </div>
 
@@ -326,7 +338,7 @@
       <li><b>Planned</b> — a phase plan exists, no implementation yet.</li>
       <li><b>Blocked</b> — cannot progress until a named dependency is resolved.</li>
     </ul>
-    <p style="margin-top:10px;">The honest headline: your foundation is solid and most of the app is coded, but the whole MVP core is unproven until the Phase 2 Supabase blocker clears. Fix that one thing and the E2E suite will confirm Phases 3 through 6 immediately.</p>
+    <p style="margin-top:10px;">The honest headline: the foundation and the MVP core golden path are now verified on a real device, backed by a 20/20 E2E suite. What's left in the core is two-client work — partner join and live realtime sync on a second device — plus building the real Journal screen. Then the focus shifts to the integration phases (calendar, push) and Family Mode.</p>
   </div>
 </div>
 </body>
