@@ -7,7 +7,8 @@ import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Chip }   from '../../components/ui/Chip';
+import { Input }  from '../../components/ui/Input';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 
 const SYMPTOMS = [
@@ -63,6 +64,8 @@ export default function LogSymptomModal() {
     }
   }
 
+  const canSave = !!mood || selectedSymptoms.length > 0 || !!energy || notes.trim().length > 0;
+
   return (
     <KeyboardAvoidingView
       style={styles.screen}
@@ -88,17 +91,13 @@ export default function LogSymptomModal() {
         <Text style={styles.sectionLabel}>Mood</Text>
         <View style={styles.moodGrid}>
           {MOODS.map(m => (
-            <TouchableOpacity
+            <Chip
               key={m.value}
-              style={[styles.moodChip, mood === m.value && styles.moodChipSelected]}
+              label={m.label}
+              emoji={m.emoji}
+              selected={mood === m.value}
               onPress={() => setMood(mood === m.value ? null : m.value)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.moodEmoji}>{m.emoji}</Text>
-              <Text style={[styles.moodLabel, mood === m.value && styles.moodLabelSelected]}>
-                {m.label}
-              </Text>
-            </TouchableOpacity>
+            />
           ))}
         </View>
 
@@ -124,16 +123,12 @@ export default function LogSymptomModal() {
         <Text style={styles.sectionLabel}>Symptoms</Text>
         <View style={styles.symptomGrid}>
           {SYMPTOMS.map(s => (
-            <TouchableOpacity
+            <Chip
               key={s}
-              style={[styles.symptomChip, selectedSymptoms.includes(s) && styles.symptomChipSelected]}
+              label={s}
+              selected={selectedSymptoms.includes(s)}
               onPress={() => toggleSymptom(s)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.symptomLabel, selectedSymptoms.includes(s) && styles.symptomLabelSelected]}>
-                {s}
-              </Text>
-            </TouchableOpacity>
+            />
           ))}
         </View>
 
@@ -151,7 +146,7 @@ export default function LogSymptomModal() {
           label="Save log"
           onPress={handleSave}
           loading={loading}
-          disabled={!mood && selectedSymptoms.length === 0 && !energy}
+          disabled={!canSave}
         />
       </ScrollView>
     </KeyboardAvoidingView>
@@ -159,29 +154,20 @@ export default function LogSymptomModal() {
 }
 
 const styles = StyleSheet.create({
-  screen:   { flex: 1, backgroundColor: colors.background },
-  topBar:   { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:   { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:    { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn:{ fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
-  scroll:   { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
+  screen:    { flex: 1, backgroundColor: colors.background },
+  topBar:    { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
+  handle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title:     { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
+  cancelBtn: { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
+  scroll:    { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
-  moodGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  moodChip: { alignItems: 'center', width: 72, paddingVertical: spacing.sm, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, gap: 4 },
-  moodChipSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },
-  moodEmoji:{ fontSize: 22 },
-  moodLabel:{ fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
-  moodLabelSelected: { color: colors.primary },
-  energyRow:{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  energyBtn:{ width: 44, height: 44, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  moodGrid:  { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  energyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  energyBtn: { width: 44, height: 44, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   energyBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
-  energyNum:{ fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
+  energyNum: { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
   energyNumSelected: { color: '#FFFFFF' },
   energyHint:{ fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginLeft: 4 },
   symptomGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  symptomChip: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: radii.full, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
-  symptomChipSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },
-  symptomLabel: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
-  symptomLabelSelected: { color: colors.primary },
 });

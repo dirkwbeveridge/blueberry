@@ -3,29 +3,29 @@ import {
   View, Text, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button } from '../../components/ui/Button';
-import { Input }  from '../../components/ui/Input';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { Button }    from '../../components/ui/Button';
+import { Input }     from '../../components/ui/Input';
+import { Chip }      from '../../components/ui/Chip';
+import { DateField } from '../../components/ui/DateField';
+import { colors, fonts, spacing } from '../../constants/theme';
 import type { Priority } from '../../types';
 
 const PRIORITIES: { value: Priority; label: string; color: string; bg: string }[] = [
-  { value: 'high',   label: '🔴 High',   color: colors.error,   bg: '#FEF0ED' },
-  { value: 'medium', label: '🟡 Medium', color: colors.warning, bg: '#FEF3E8' },
-  { value: 'low',    label: '🟢 Low',    color: colors.success, bg: '#E8F8ED' },
+  { value: 'high',   label: '🔴 High',   color: colors.error,   bg: colors.errorTint   },
+  { value: 'medium', label: '🟡 Medium', color: colors.warning, bg: colors.warningTint },
+  { value: 'low',    label: '🟢 Low',    color: colors.success, bg: colors.successTint },
 ];
 
 export default function AddTodoModal() {
   const { household, currentUser } = useHousehold();
-  const [title,      setTitle]      = useState('');
-  const [priority,   setPriority]   = useState<Priority>('medium');
-  const [dueDate,    setDueDate]    = useState<Date | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState('');
+  const [title,    setTitle]    = useState('');
+  const [priority, setPriority] = useState<Priority>('medium');
+  const [dueDate,  setDueDate]  = useState<Date | null>(null);
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
 
   async function handleSave() {
     if (!title.trim()) { setError('Please enter a task.'); return; }
@@ -82,59 +82,24 @@ export default function AddTodoModal() {
         <Text style={styles.sectionLabel}>Priority</Text>
         <View style={styles.priorityRow}>
           {PRIORITIES.map(p => (
-            <TouchableOpacity
+            <Chip
               key={p.value}
-              style={[
-                styles.priorityChip,
-                { borderColor: priority === p.value ? p.color : colors.border,
-                  backgroundColor: priority === p.value ? p.bg : colors.surface },
-              ]}
+              label={p.label}
+              selected={priority === p.value}
               onPress={() => setPriority(p.value)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.priorityLabel, { color: priority === p.value ? p.color : colors.textMuted }]}>
-                {p.label}
-              </Text>
-            </TouchableOpacity>
+              selectedColor={p.color}
+              selectedBg={p.bg}
+              style={styles.priorityChip}
+            />
           ))}
         </View>
 
-        <Text style={styles.sectionLabel}>Due date (optional)</Text>
-        <TouchableOpacity
-          style={styles.dateTrigger}
-          onPress={() => setShowPicker(s => !s)}
-          activeOpacity={0.7}
-        >
-          <Text style={dueDate ? styles.dateValue : styles.datePlaceholder}>
-            {dueDate
-              ? dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })
-              : 'Select a date'}
-          </Text>
-          {dueDate ? (
-            <TouchableOpacity
-              onPress={() => { setDueDate(null); setShowPicker(false); }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text style={styles.clearBtn}>✕</Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={styles.chevron}>{showPicker ? '▲' : '▽'}</Text>
-          )}
-        </TouchableOpacity>
-
-        {showPicker && (
-          <DateTimePicker
-            value={dueDate ?? new Date()}
-            mode="date"
-            display="inline"
-            minimumDate={new Date()}
-            onChange={(_, selected) => {
-              if (selected) { setDueDate(selected); setShowPicker(false); }
-            }}
-            accentColor={colors.primary}
-            style={styles.picker}
-          />
-        )}
+        <DateField
+          label="Due date (optional)"
+          value={dueDate}
+          onChange={setDueDate}
+          minimumDate={new Date()}
+        />
 
         <Button label="Add task" onPress={handleSave} loading={loading} disabled={!title.trim()} />
       </ScrollView>
@@ -152,12 +117,5 @@ const styles = StyleSheet.create({
   scroll:       { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
   priorityRow:  { flexDirection: 'row', gap: spacing.sm },
-  priorityChip: { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, alignItems: 'center' },
-  priorityLabel:{ fontFamily: fonts.body.semibold, fontSize: 13 },
-  dateTrigger:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, paddingHorizontal: spacing.md, paddingVertical: 14 },
-  dateValue:    { fontFamily: fonts.body.medium, fontSize: 15, color: colors.text },
-  datePlaceholder: { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted },
-  clearBtn:     { fontFamily: fonts.body.medium, fontSize: 14, color: colors.textMuted },
-  chevron:      { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  picker:       { backgroundColor: colors.surface, borderRadius: radii.lg, overflow: 'hidden' },
+  priorityChip: { flex: 1, justifyContent: 'center' },
 });
