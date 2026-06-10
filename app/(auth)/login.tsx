@@ -122,7 +122,8 @@ export default function LoginScreen() {
         setStep('setup');
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      const msg = e instanceof Error ? e.message : (e as { message?: string })?.message ?? 'Something went wrong.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
