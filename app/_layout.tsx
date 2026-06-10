@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SplashScreen, Stack, router } from 'expo-router';
+import { SplashScreen, Stack, router, useSegments } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import { useFonts } from 'expo-font';
 import {
@@ -74,18 +74,26 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, [clearAll, loadHousehold]);
 
-  // Navigate to the correct root whenever auth state settles.
-  const didNavigate = useRef(false);
+  // Auth gate. Only navigate when we must CHANGE groups — never re-navigate to
+  // /(auth)/login while already inside the (auth) group, or we'd reset the
+  // multi-step signup flow (role → household) every time signUp sets a session
+  // before the users row exists.
+  const segments = useSegments();
   useEffect(() => {
     if (loading || !fontsLoaded) return;
-    const dest = !session || !hasUserRow ? '/(auth)/login' : '/(tabs)/home';
-    if (!didNavigate.current) {
-      didNavigate.current = true;
-      router.replace(dest);
-    } else {
-      router.replace(dest);
+    const group   = segments[0]; // '(auth)' | '(tabs)' | '(modals)' | undefined (index)
+    const authed  = !!session && hasUserRow;
+    // Authed users belong in (tabs). Send them there unless they're already in
+    // tabs or have a modal open (a modal must not bounce closed). This also
+    // covers the initial `index` route (group === undefined).
+    if (authed && group !== '(tabs)' && group !== '(modals)') {
+      router.replace('/(tabs)/home');
+    // Unauthed users belong in (auth). Don't re-navigate while already there,
+    // or the multi-step signup flow (role → household) resets.
+    } else if (!authed && group !== '(auth)') {
+      router.replace('/(auth)/login');
     }
-  }, [loading, fontsLoaded, session, hasUserRow]);
+  }, [loading, fontsLoaded, session, hasUserRow, segments]);
 
   if (loading || !fontsLoaded) return <LoadingScreen />;
 
