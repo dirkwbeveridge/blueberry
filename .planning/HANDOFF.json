@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-06-11T06:49:16.017Z",
+  "phase": "design-system-foundation",
+  "phase_name": "Design System Foundation (pre-phase consolidation)",
+  "phase_dir": "(not a formal GSD phase — work lives on git branch design-system-foundation)",
+  "branch": "design-system-foundation",
+  "plan": 1,
+  "task": 3,
+  "total_tasks": 4,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "theme.ts tokens: 7-step typography scale + tint colors (primaryTint/successTint/warningTint/errorTint/shadow); Badge consumes them", "status": "done", "commit": "cb5bdaf"},
+    {"id": 2, "name": "Extract DateField, TimeField, Chip primitives; refactor add-todo/add-appointment/log-symptom; fix PS-41 (save enabled with notes)", "status": "done", "commit": "7bd944c"}
+  ],
+  "remaining_tasks": [
+    {"id": 3, "name": "Extract layout primitives: ModalSheet (all modals), ScreenHeader (all tabs), EmptyState (todo/health/calendar), SegmentedControl (todo tabs + calendar toggle + login toggles)", "status": "not_started"},
+    {"id": 4, "name": "Token sweep: replace hardcoded hex/#FFFFFF/fontSize literals app-wide with tokens + typography scale; reconcile week-detail.tsx off-brand palette (SYS-04); fix PS-53 (contraction timer corrupt mid-contraction save) and PS-01 (login due-date should use DateField)", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Tasks 1-2 are automated-verified (typecheck clean, E2E 20/20) but NOT visually verified on device. The mood selector changed from emoji-forward tiles to horizontal Chip pills (PS-60) — needs the user's eyes / a decision on whether Chip needs a vertical variant.", "type": "human_action", "workaround": "Run `npx expo start --port 8081` on the branch (Expo Go works here; native-build switch was committed to main only) and check the 3 refactored modals."}
+  ],
+  "human_actions_pending": [
+    {"action": "Visually verify the 3 refactored modals on device (add-todo, add-appointment, log-symptom), especially mood-chip layout", "context": "typecheck/E2E cannot see layout", "blocking": true},
+    {"action": "Decide: accept horizontal mood chips (PS-60) or have Chip support a vertical layout variant before continuing Task 3", "context": "open design question from Task 2", "blocking": false}
+  ],
+  "decisions": [
+    {"decision": "Foundation-first sequencing: consolidate design system on this branch before building feature phases in parallel", "rationale": "parallel phase builders would each hardcode against drifting tokens and collide on shared files; user chose this option", "phase": "design-system-foundation"},
+    {"decision": "Foundation tasks run sequentially, not parallel", "rationale": "all touch shared files (theme.ts, components/ui); skill red-flag forbids parallel implementers", "phase": "design-system-foundation"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Get the user's call on the mood-chip layout (PS-60), then dispatch the Task 3 implementer (layout primitives) via subagent-driven-development with spec + quality review gates.",
+  "context_notes": "Branch is 3 commits ahead of main and tree is clean (no WIP). IMPORTANT divergence: main's docs/ui-backlog.md was independently expanded (PS-60..PS-85, three P1s incl. setup-step-unreachable PS-61, contraction-timer invisible-Stop, journal-tab unreachable) while this branch's ui-backlog has a DIFFERENT PS-60 (mood-chip note). ui-backlog.md WILL merge-conflict — reconcile numbering when merging. The 3 P1s on main are real functional bugs worth folding into Task 4 or a separate pass. .planning/STATE.md and ROADMAP.md are stale (dated 2026-05-23) and predate all auth/foundation work."
+}
