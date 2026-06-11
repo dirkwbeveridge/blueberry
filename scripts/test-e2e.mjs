@@ -276,6 +276,96 @@ async function runTests() {
     else       pass('INSERT contraction_sessions');
   }
 
+  // ── SUITE: SELECT verification for tracking tables ────────────────────────
+  suite('Tracking tables — SELECT after INSERT');
+
+  {
+    const { data, error } = await motherClient
+      .from('kick_sessions').select('*').eq('household_id', householdId);
+    if (error)           fail('SELECT kick_sessions', error);
+    else if (!data.length) fail('SELECT kick_sessions — count', 'Expected ≥1');
+    else                   pass('SELECT kick_sessions');
+  }
+
+  {
+    const { data, error } = await motherClient
+      .from('contraction_sessions').select('*').eq('household_id', householdId);
+    if (error)           fail('SELECT contraction_sessions', error);
+    else if (!data.length) fail('SELECT contraction_sessions — count', 'Expected ≥1');
+    else                   pass('SELECT contraction_sessions');
+  }
+
+  // ── SUITE: Journal entries ─────────────────────────────────────────────────
+  suite('Journal entries');
+
+  {
+    const { error } = await motherClient
+      .from('journal_entries')
+      .insert({ household_id: householdId, author_id: motherUserId, week_number: 12, content: 'E2E journal entry' });
+    if (error) fail('INSERT journal_entries', error);
+    else       pass('INSERT journal_entries');
+  }
+
+  {
+    const { data, error } = await motherClient
+      .from('journal_entries').select('*').eq('household_id', householdId);
+    if (error)           fail('SELECT journal_entries', error);
+    else if (!data.length) fail('SELECT journal_entries — count', 'Expected ≥1');
+    else                   pass('SELECT journal_entries');
+  }
+
+  // ── SUITE: Partner cross-reads ────────────────────────────────────────────
+  suite('Partner cross-reads (partner sees mother\'s data)');
+
+  if (!partnerUserId) {
+    skip('All partner cross-reads', 'Partner auth failed earlier');
+  } else {
+    const tables = ['todos', 'appointments', 'health_logs', 'kick_sessions', 'journal_entries'];
+    for (const table of tables) {
+      const { data, error } = await partnerClient
+        .from(table).select('*').eq('household_id', householdId);
+      if (error)           fail(`partner SELECT ${table}`, error);
+      else if (!data.length) fail(`partner SELECT ${table} — count`, 'Expected ≥1 (mother created records)');
+      else                   pass(`partner SELECT ${table}`);
+    }
+
+    // Partner can insert todos into the shared household
+    {
+      const { error } = await partnerClient
+        .from('todos')
+        .insert({ household_id: householdId, created_by: partnerUserId, title: 'Partner E2E task', priority: 'low', source: 'manual', is_done: false });
+      if (error) fail('partner INSERT todos', error);
+      else       pass('partner INSERT todos');
+    }
+  }
+
+  // ── SUITE: RLS isolation (outsider cannot read) ───────────────────────────
+  suite('RLS isolation — outsider cannot read household data');
+
+  {
+    const outsiderClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const outsiderEmail = `test-outsider-${RUN}@blueberry.dev`;
+    const { data: authData, error: authErr } = await outsiderClient.auth.signUp({ email: outsiderEmail, password: PASSWORD });
+    if (authErr || !authData.session) {
+      skip('RLS isolation checks', 'Could not create outsider account');
+    } else {
+      // Outsider has no users row in any household — all household-scoped tables should return empty
+      const tables = ['todos', 'appointments', 'health_logs', 'kick_sessions', 'journal_entries'];
+      for (const table of tables) {
+        const { data, error } = await outsiderClient
+          .from(table).select('*').eq('household_id', householdId);
+        if (error) {
+          // Some RLS configs return an error instead of empty — both are acceptable
+          pass(`RLS blocks outsider ${table} (error response)`);
+        } else if (data.length > 0) {
+          fail(`RLS isolation ${table}`, `Outsider received ${data.length} rows — RLS is not blocking`);
+        } else {
+          pass(`RLS blocks outsider ${table} (empty response)`);
+        }
+      }
+    }
+  }
+
   // ── SUITE: Cleanup ────────────────────────────────────────────────────────
   suite('Cleanup');
 
