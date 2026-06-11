@@ -115,9 +115,56 @@ dedicated UI phase (`gsd-ui-phase` / `gsd-ui-review`).
 
 ---
 
+## Second audit — 2026-06-10 (full source review)
+
+Deep read of every screen and component file. Issues below are net-new from the first audit.
+
+### P1 — broken or blocking
+
+| ID | Screen | Issue | Sev | Status |
+|----|--------|-------|-----|--------|
+| PS-60 | `(modals)/contraction-timer.tsx` | **"Stop" text invisible when active.** `mainBtnLabel` always uses `color: colors.primary` (#3D2B6B). When `isActive = true`, the button background flips to `colors.primary` too — identical foreground and background color. "Stop" is unreadable. Only the elapsed time (`mainBtnElapsed`, `color: '#FFF'`) is visible. Fix: add an active variant style that sets `mainBtnLabel` to `colors.surface` when `isActive`. | P1 | open |
+| PS-61 | `(auth)/login.tsx` → `app/_layout.tsx` | **Setup step unreachable.** In the create-household flow, `handleHousehold` calls `setCurrentUser(user)` before calling `setStep('setup')`. As soon as `currentUser` is non-null, the root layout's auth gate detects `authed = true` and immediately `router.replace('/(tabs)/home')`. The setup step renders for at most one frame and the user cannot interact with it. Due date, baby name, and stage are **never written to the database** for new households. Result: all new users land on Home with `currentWeek = 0`, no WeekHeroCard, no TrimesterProgress. Fix: move setup data collection to a separate onboarding screen inside `(tabs)`, or collect due date inline during the household creation step before `setCurrentUser` is called. | P1 | open |
+| PS-62 | `(tabs)/journal.tsx` | **Journal screen unreachable.** The file exists at `app/(tabs)/journal.tsx` but no `<Tabs.Screen name="journal">` entry exists in `app/(tabs)/_layout.tsx`. It is not linked from More, QuickActions, or any other screen. Users have no navigation path to the Journal tab. | P1 | open |
+
+### P2 — clearly wrong
+
+| ID | Screen | Issue | Sev | Status |
+|----|--------|-------|-----|--------|
+| PS-63 | `app/(tabs)/_layout.tsx` | **Tab bar ignores safe-area bottom inset.** `tabBarStyle` hardcodes `height: 80, paddingBottom: 16`. On iPhone 16e (home-indicator device), the system safe-area bottom is ~34 pt. The tab bar does not use `useSafeAreaInsets()` or a `SafeAreaView` wrapper — tab icons will sit higher than intended and the bar may underlap the home indicator on different device sizes. | P2 | open |
+| PS-64 | `app/(tabs)/_layout.tsx` | **Health↔Together tab flicker on load.** `isPartnerRole` is derived from Zustand; on first render it is `false` (store is hydrating). For partner users, the Health tab briefly appears before the store loads and `href` flips to `null`. This causes a visible tab bar reflow on every cold start for partners. Fix: render tabs only after `currentUser` is non-null, or show a loading state until the store is hydrated. | P2 | open |
+| PS-65 | `(tabs)/home.tsx` | **Partner sees Mom's health logs.** The "Latest log" card renders `latestLog.mood`, `latestLog.symptoms`, and `latestLog.notes` for both roles. Health logs contain personal body data (symptoms, mood, weight) that Mom may not intend to surface automatically. Either hide this card for partners, or add a partner-specific summary that only shows a shared signal (e.g., "Feeling good today"). | P2 | open |
+| PS-66 | `(tabs)/home.tsx` | **Todo toggle has no rollback on failure.** `toggleTodo` removes the todo from local state optimistically (`setTodos(prev => prev.filter(...))`), then calls Supabase. If the update fails, the todo disappears permanently for the session. Add a try/catch that restores the todo on failure. | P2 | open |
+| PS-67 | `(tabs)/memories.tsx` | **Milestone cards not interactive.** Milestone chips in the horizontal strip have no `onPress` handler despite their card appearance implying tappability. Tapping does nothing. Either link to the full journal entry or remove the tappable affordance (flatten the card to a plain text chip). | P2 | open |
+| PS-68 | `(tabs)/more.tsx` | **"Other views" exposes partner to health data.** The "Other views" section provides a direct navigation path for partners to `(tabs)/health`, which shows all of Mom's logged health data (mood, energy, symptoms, notes). The tab bar visibility guard (`href: null`) does not protect the route — it only hides the tab. `health.tsx` has no role-based access guard. | P2 | open |
+| PS-69 | `(tabs)/more.tsx` | **Tools section shows pregnancy content post-partum.** The `tools` array conditionally includes kick counter and contraction timer when `isPregnant`. But "Week by week" is always included. Post-partum users see a "Week by week" reference entry that has no relevance to their current stage. Filter all pregnancy-specific tools by stage. | P2 | open |
+| PS-70 | `components/home/TodoList.tsx` | **Checkbox has no pending state.** The `checkbox` View is always empty (no checkmark, no fill). When the user taps a todo, the item disappears after the Supabase round-trip completes, with no intermediate visual state. There is no way to tell if the tap registered. Add a checked state (filled checkbox or strikethrough title) while the update is in flight. | P2 | open |
+| PS-71 | `components/home/TrimesterProgress.tsx` | **Progress bar overflows above 1.0.** `progress = week / 40` is unclamped. If `week > 40` (overdue), `ProgressBar` receives a value above 1.0. Depending on `ProgressBar`'s implementation, this may render the fill beyond the bar container. Clamp: `Math.min(week / 40, 1)`. | P2 | open |
+| PS-72 | `(auth)/login.tsx` | **No password visibility toggle.** The password `Input` uses `secureTextEntry` with no show/hide toggle. Users cannot verify what they typed, leading to avoidable auth failures — especially on the signup path where they set the password for the first time. | P2 | open |
+| PS-73 | `(auth)/login.tsx` | **Setup step collects due date as free-text ISO string.** The setup step (even though it currently cannot be reached — PS-61) uses a plain `Input` with `keyboardType="numbers-and-punctuation"` and `placeholder="YYYY-MM-DD"` for due date. This duplicates the PS-01 issue from the credential step. When the setup flow is fixed, it must use `DateTimePicker`. | P2 | open |
+| PS-74 | `(modals)/add-appointment.tsx` | **Date and time pickers use different `display` modes.** Date uses `display="inline"` (calendar grid); time uses `display="spinner"` (scroll wheel). The inconsistency within the same form is jarring. Both should use the same interaction pattern — prefer `inline` for both, or provide a unified `compact` mode. | P2 | open |
+| PS-75 | `(modals)/add-appointment.tsx` | **No `created_by` stored on appointments.** The INSERT does not include a `created_by` field. When two partners each create appointments, there is no attribution in the data or UI. If one partner wants to cancel "their" appointment they cannot distinguish it from the other's. Add `created_by: currentUser.id` to the insert. | P2 | open |
+| PS-76 | `(modals)/kick-counter.tsx` | **"Finish session" button does not reflect disabled state.** `Button` visually disables only when its `disabled` prop is `true`. `finish()` returns early when `start === null`, but the button renders as fully enabled. Before a session starts, "Finish session" and action buttons are not shown at all (correct), but there is no guard preventing a user from somehow triggering `finish()` when `start === null` via edge cases. Pass `disabled={start === null}` to be explicit. | P2 | open |
+
+### P3 — polish
+
+| ID | Screen | Issue | Sev | Status |
+|----|--------|-------|-----|--------|
+| PS-77 | `components/home/TodoList.tsx` | **Priority shown twice per row.** Each todo row shows both a colored `dot` (right edge, `priorityColors`) and a `Badge` label below the title. Two indicators for the same attribute. Remove the dot and keep the Badge, or vice versa. | P3 | open |
+| PS-78 | `components/home/TrimesterProgress.tsx` | **Tick labels lack context.** The tick marks below the progress bar show bare numbers `'1', '13', '26', '40'` with no unit. A new user may not know these are week numbers. Label as `w1 / w13 / w26 / w40` or add a "weeks" axis label. | P3 | open |
+| PS-79 | `components/home/WeekHeroCard.tsx` | **No tap affordance on hero card.** The card is a `TouchableOpacity` routing to week-detail, but there is no chevron, subtitle like "Tap for more", or any visual cue indicating it is interactive. Most users will not discover the week detail screen. | P3 | open |
+| PS-80 | `(tabs)/home.tsx` | **No guidance when week is unknown.** When `currentWeek = 0` (no due date set, or stage is TTC), the WeekHeroCard and TrimesterProgress sections are hidden. The Home screen shows only the health log, todos, and quick actions with no explanation. Add an inline prompt to complete household setup / enter a due date. | P3 | open |
+| PS-81 | `(tabs)/home.tsx` | **`addBtnText` literal white.** `memories.tsx` `addBtnText` uses `color: '#FFFFFF'` — should be `colors.surface`. Same pattern as SYS-02 but in the Memories screen specifically. | P3 | open |
+| PS-82 | `(modals)/contraction-timer.tsx` | **Contraction history uses array index as React key.** `[...contractions].reverse().map((c, i) => <View key={i}>)` — key is the reversed index, not a stable ID. When a new contraction is added, all existing keys shift. React will re-render the entire list. Assign a stable `id` (e.g., `startedAt`) to each `Contraction` entry. | P3 | open |
+| PS-83 | `(auth)/login.tsx` | **Role step offers no description of each role's experience.** "The mother" and "The partner" are the only labels. New users unfamiliar with the app don't know what capabilities each role unlocks (health logging vs. together view). A one-line description under each role card would reduce hesitation. | P3 | open |
+| PS-84 | `app/(tabs)/_layout.tsx` | **`⋯` More tab icon inconsistent with emoji sibling tabs.** All other tabs use themed emoji (🏠 💜 ✅ 📓). The More tab uses `⋯` (U+22EF), a math ellipsis — a different visual weight and style than the emoji icons. Replace with `•••` rendered as text or use an emoji alternative. | P3 | open |
+| PS-85 | `(modals)/log-symptom.tsx` | **Save button disabled when only notes are entered.** Condition: `!mood && selectedSymptoms.length === 0 && !energy`. A user who only types notes and does not tap mood/energy/symptoms cannot save — despite the notes field being present and accepting input. Flagged as P1 in PS-41; re-noting here as confirmed by direct code read. | P1 | open |
+
+---
+
 ## Audit notes — 2026-06-10
 
-Method: grep for hardcoded hex / rgba / fontSize literals across `app/` and
+**First audit method:** grep for hardcoded hex / rgba / fontSize literals across `app/` and
 `components/`, compared against `constants/theme.ts`.
 
 - Color literals outside the token file appear in ~13 screen/component files.
@@ -132,3 +179,10 @@ Method: grep for hardcoded hex / rgba / fontSize literals across `app/` and
 Recommended order: SYS-05 (type scale) and SYS-02/03 (color tokens) first since
 the most files depend on them, then SYS-08 (extract primitives), then build the
 remaining phases on the consolidated foundation, then run the per-screen review.
+
+**Second audit method (2026-06-10):** Full source read of every screen and component
+file — `_layout.tsx`, all 6 tabs, all 6 modals, all 5 UI primitives, 4 home
+components, auth gate. Native simulator build not completed (no `ios/` folder);
+audit is code-based. New findings in PS-60 through PS-85 (26 issues, 3 P1, 11 P2, 12 P3).
+Three P1s found: contraction timer "Stop" text invisible (CT), setup step unreachable
+due to premature auth gate (critical UX), journal screen has no navigation path.
