@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { useHouseholdStore } from '../../store/household';
 import { Button } from '../../components/ui/Button';
 import { Input }  from '../../components/ui/Input';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 import type { BabyGender, Stage, UserRole } from '../../types';
 
@@ -203,20 +204,14 @@ export default function LoginScreen() {
         {step === 'household' && (
           <View style={styles.form}>
             <Text style={styles.stepTitle}>Your household</Text>
-            <View style={styles.toggleRow}>
-              {['create', 'join'].map(m => (
-                <TouchableOpacity
-                  key={m}
-                  style={[styles.toggleBtn, !isJoining && m === 'create' && styles.toggleBtnActive, isJoining && m === 'join' && styles.toggleBtnActive]}
-                  onPress={() => setIsJoining(m === 'join')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.toggleLabel, (!isJoining && m === 'create') || (isJoining && m === 'join') ? styles.toggleLabelActive : null]}>
-                    {m === 'create' ? '+ Create new' : 'Join with code'}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <SegmentedControl
+              options={[
+                { value: 'create', label: '+ Create new'  },
+                { value: 'join',   label: 'Join with code' },
+              ]}
+              value={isJoining ? 'join' : 'create'}
+              onChange={(v) => setIsJoining(v === 'join')}
+            />
             {isJoining && (
               <Input label="Invite code" value={joinCode} onChangeText={setJoinCode} autoCapitalize="characters" placeholder="BLU3RY" autoCorrect={false} error={error} />
             )}
@@ -277,11 +272,6 @@ const styles = StyleSheet.create({
   roleEmoji:   { fontSize: 28 },
   roleLabel:   { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
   roleLabelSelected: { color: colors.primary },
-  toggleRow:   { flexDirection: 'row', backgroundColor: colors.border, borderRadius: radii.md, padding: 3 },
-  toggleBtn:   { flex: 1, paddingVertical: spacing.sm, borderRadius: radii.sm, alignItems: 'center' },
-  toggleBtnActive: { backgroundColor: colors.surface },
-  toggleLabel: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
-  toggleLabelActive: { color: colors.primary, fontFamily: fonts.body.semibold },
   stageRow:    { flexDirection: 'row', gap: spacing.sm },
   stageBtn:    { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center' },
   stageBtnSelected: { borderColor: colors.primary, backgroundColor: '#F5F0FF' },

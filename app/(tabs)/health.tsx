@@ -9,6 +9,8 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 import type { HealthLog } from '../../types';
 
@@ -61,19 +63,20 @@ export default function HealthScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Health</Text>
-          <Text style={styles.headerSub}>Body, energy, mindfulness, sleep</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.logBtn}
-          onPress={() => router.push('/(modals)/log-symptom')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logBtnText}>+ Log</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title="Health"
+        subtitle="Body, energy, mindfulness, sleep"
+        action={
+          <TouchableOpacity
+            style={styles.logBtn}
+            onPress={() => router.push('/(modals)/log-symptom')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+          >
+            <Text style={styles.logBtnText}>+ Log</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Apple Health placeholder */}
       <Card style={styles.appleHealthCard}>
@@ -93,13 +96,11 @@ export default function HealthScreen() {
         {loading ? (
           <Text style={styles.loadingText}>Loading…</Text>
         ) : logs.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>💜</Text>
-            <Text style={styles.emptyText}>No logs yet.</Text>
-            <TouchableOpacity onPress={() => router.push('/(modals)/log-symptom')}>
-              <Text style={styles.emptyLink}>Log how you are feeling →</Text>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            emoji="💜"
+            title="No logs yet."
+            action={{ label: 'Log how you are feeling →', onPress: () => router.push('/(modals)/log-symptom') }}
+          />
         ) : (
           <View style={styles.logList}>
             {logs.map((log, i) => (
@@ -168,11 +169,8 @@ export default function HealthScreen() {
 const styles = StyleSheet.create({
   screen:   { flex: 1, backgroundColor: colors.background },
   scroll:   { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
-  header:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.xs },
-  headerTitle: { fontFamily: fonts.heading.bold, fontSize: 26, color: colors.text },
-  headerSub:   { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, marginTop: 2 },
-  logBtn:   { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8 },
-  logBtnText:{ fontFamily: fonts.body.semibold, fontSize: 14, color: '#FFFFFF' },
+  logBtn:   { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8, minHeight: 44, justifyContent: 'center' },
+  logBtnText:{ fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
 
   sectionTitle: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text, marginBottom: spacing.md },
 
@@ -186,10 +184,6 @@ const styles = StyleSheet.create({
 
   // Logs
   loadingText: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
-  empty:    { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
-  emptyEmoji: { fontSize: 28 },
-  emptyText:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
-  emptyLink:  { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.primary },
   logList:    { gap: 0 },
   logItem:    { paddingVertical: spacing.md },
   logItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },

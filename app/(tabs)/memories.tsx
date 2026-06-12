@@ -8,6 +8,8 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 import type { JournalEntry } from '../../types';
 
@@ -53,19 +55,20 @@ export default function MemoriesScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Memories</Text>
-          <Text style={styles.headerSub}>Notes, photos, and milestones</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => Alert.alert('Coming soon', 'Compose a journal entry — landing in the next phase.')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.addBtnText}>+ Add</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title="Memories"
+        subtitle="Notes, photos, and milestones"
+        action={
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => Alert.alert('Coming soon', 'Compose a journal entry — landing in the next phase.')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+          >
+            <Text style={styles.addBtnText}>+ Add</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Milestone strip */}
       {milestones.length > 0 && (
@@ -88,20 +91,12 @@ export default function MemoriesScreen() {
         <Text style={styles.muted}>Loading…</Text>
       ) : entries.length === 0 ? (
         <Card>
-          <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>📓</Text>
-            <Text style={styles.emptyTitle}>No memories yet</Text>
-            <Text style={styles.emptyBody}>
-              Capture little moments as they happen.{currentWeek > 0 ? ` Week ${currentWeek} is a good place to start.` : ''}
-            </Text>
-            <TouchableOpacity
-              style={styles.emptyAction}
-              onPress={() => Alert.alert('Coming soon', 'Journal compose lands in the next phase.')}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.emptyActionText}>Write your first note</Text>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            emoji="📓"
+            title="No memories yet"
+            body={`Capture little moments as they happen.${currentWeek > 0 ? ` Week ${currentWeek} is a good place to start.` : ''}`}
+            action={{ label: 'Write your first note', onPress: () => Alert.alert('Coming soon', 'Journal compose lands in the next phase.') }}
+          />
         </Card>
       ) : (
         <View style={styles.entriesList}>
@@ -126,11 +121,8 @@ export default function MemoriesScreen() {
 const styles = StyleSheet.create({
   screen:       { flex: 1, backgroundColor: colors.background },
   scroll:       { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
-  header:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  headerTitle:  { fontFamily: fonts.heading.bold, fontSize: 26, color: colors.text },
-  headerSub:    { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, marginTop: 2 },
-  addBtn:       { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8 },
-  addBtnText:   { fontFamily: fonts.body.semibold, fontSize: 14, color: '#FFFFFF' },
+  addBtn:       { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8, minHeight: 44, justifyContent: 'center' },
+  addBtnText:   { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
   muted:        { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
 
@@ -146,10 +138,5 @@ const styles = StyleSheet.create({
   entryMilestone:{ fontFamily: fonts.heading.semibold, fontSize: 15, color: colors.primary, marginBottom: spacing.xs },
   entryContent:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.text, lineHeight: 22 },
 
-  empty:        { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
-  emptyEmoji:   { fontSize: 36 },
-  emptyTitle:   { fontFamily: fonts.heading.semibold, fontSize: 18, color: colors.text },
-  emptyBody:    { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, textAlign: 'center', lineHeight: 20 },
-  emptyAction:  { marginTop: spacing.xs, backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 20, paddingVertical: 10 },
-  emptyActionText: { fontFamily: fonts.body.semibold, fontSize: 14, color: '#FFFFFF' },
 });
+
