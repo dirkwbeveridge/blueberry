@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button } from '../../components/ui/Button';
+import { Button }     from '../../components/ui/Button';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
 
 const STORAGE_KEY = 'blueberry-contractions';
@@ -134,17 +135,7 @@ export default function ContractionTimerModal() {
   const lastContraction = contractions[contractions.length - 1];
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.topBar}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>Contraction Timer</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.cancelBtn}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <ModalSheet title="Contraction Timer" onClose={() => router.back()} scroll={false}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Main button */}
         <TouchableOpacity
@@ -206,17 +197,11 @@ export default function ContractionTimerModal() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </ModalSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  screen:      { flex: 1, backgroundColor: colors.background },
-  topBar:      { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:      { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:       { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn:   { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
   scroll:      { padding: spacing.lg, gap: spacing.lg, paddingBottom: 80, alignItems: 'center' },
   mainBtn:     {
     width: 160, height: 160, borderRadius: 80,

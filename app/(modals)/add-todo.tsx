@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, Alert,
+  View, Text, StyleSheet, Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button }    from '../../components/ui/Button';
-import { Input }     from '../../components/ui/Input';
-import { Chip }      from '../../components/ui/Chip';
-import { DateField } from '../../components/ui/DateField';
+import { Button }      from '../../components/ui/Button';
+import { Input }       from '../../components/ui/Input';
+import { Chip }        from '../../components/ui/Chip';
+import { DateField }   from '../../components/ui/DateField';
+import { ModalSheet }  from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
 import type { Priority } from '../../types';
 
@@ -55,66 +55,44 @@ export default function AddTodoModal() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.topBar}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>Add a task</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.cancelBtn}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+    <ModalSheet title="Add a task" onClose={() => router.back()}>
+      <Input
+        label="What needs to be done?"
+        value={title}
+        onChangeText={t => { setTitle(t); setError(''); }}
+        placeholder="e.g. Book anatomy scan appointment"
+        error={error}
+        autoCapitalize="sentences"
+      />
+
+      <Text style={styles.sectionLabel}>Priority</Text>
+      <View style={styles.priorityRow}>
+        {PRIORITIES.map(p => (
+          <Chip
+            key={p.value}
+            label={p.label}
+            selected={priority === p.value}
+            onPress={() => setPriority(p.value)}
+            selectedColor={p.color}
+            selectedBg={p.bg}
+            style={styles.priorityChip}
+          />
+        ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Input
-          label="What needs to be done?"
-          value={title}
-          onChangeText={t => { setTitle(t); setError(''); }}
-          placeholder="e.g. Book anatomy scan appointment"
-          error={error}
-          autoCapitalize="sentences"
-        />
+      <DateField
+        label="Due date (optional)"
+        value={dueDate}
+        onChange={setDueDate}
+        minimumDate={new Date()}
+      />
 
-        <Text style={styles.sectionLabel}>Priority</Text>
-        <View style={styles.priorityRow}>
-          {PRIORITIES.map(p => (
-            <Chip
-              key={p.value}
-              label={p.label}
-              selected={priority === p.value}
-              onPress={() => setPriority(p.value)}
-              selectedColor={p.color}
-              selectedBg={p.bg}
-              style={styles.priorityChip}
-            />
-          ))}
-        </View>
-
-        <DateField
-          label="Due date (optional)"
-          value={dueDate}
-          onChange={setDueDate}
-          minimumDate={new Date()}
-        />
-
-        <Button label="Add task" onPress={handleSave} loading={loading} disabled={!title.trim()} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+      <Button label="Add task" onPress={handleSave} loading={loading} disabled={!title.trim()} />
+    </ModalSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  screen:       { flex: 1, backgroundColor: colors.background },
-  topBar:       { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:       { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:        { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn:    { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
-  scroll:       { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
   priorityRow:  { flexDirection: 'row', gap: spacing.sm },
   priorityChip: { flex: 1, justifyContent: 'center' },

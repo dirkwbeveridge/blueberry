@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, KeyboardAvoidingView, Platform, Alert,
+  StyleSheet, Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button } from '../../components/ui/Button';
-import { Chip }   from '../../components/ui/Chip';
-import { Input }  from '../../components/ui/Input';
+import { Button }     from '../../components/ui/Button';
+import { Chip }       from '../../components/ui/Chip';
+import { Input }      from '../../components/ui/Input';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 
 const SYMPTOMS = [
@@ -67,21 +68,7 @@ export default function LogSymptomModal() {
   const canSave = !!mood || selectedSymptoms.length > 0 || !!energy || notes.trim().length > 0;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      {/* Handle + Header */}
-      <View style={styles.topBar}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>How are you feeling?</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.cancelBtn}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <ModalSheet title="How are you feeling?" onClose={() => router.back()} scroll={false}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
@@ -149,17 +136,11 @@ export default function LogSymptomModal() {
           disabled={!canSave}
         />
       </ScrollView>
-    </KeyboardAvoidingView>
+    </ModalSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  screen:    { flex: 1, backgroundColor: colors.background },
-  topBar:    { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:     { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn: { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
   scroll:    { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
   moodGrid:  { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },

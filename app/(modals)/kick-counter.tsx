@@ -7,8 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button }     from '../../components/ui/Button';
+import { Card }       from '../../components/ui/Card';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
 
 const STORAGE_KEY = 'blueberry-kick-session';
@@ -101,17 +102,7 @@ export default function KickCounterModal() {
   const isActive = start !== null;
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.topBar}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>Kick Counter</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.cancelBtn}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <ModalSheet title="Kick Counter" onClose={() => router.back()} scroll={false}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={[styles.kickBtn, isActive && styles.kickBtnActive]}
@@ -155,17 +146,11 @@ export default function KickCounterModal() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </ModalSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  screen:    { flex: 1, backgroundColor: colors.background },
-  topBar:    { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:     { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn: { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
   scroll:    { padding: spacing.lg, gap: spacing.lg, paddingBottom: 80, alignItems: 'center' },
   kickBtn:   {
     width: 200, height: 200, borderRadius: 100,
