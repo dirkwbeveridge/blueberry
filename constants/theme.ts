@@ -4,7 +4,7 @@ export const colors = {
   background:   '#FAF8F5',
   surface:      '#FFFFFF',
   text:         '#1A1A2E',
-  textMuted:    '#7B6F8A',
+  textMuted:    '#675B78',
   success:      '#6DBF82',
   warning:      '#F4A261',
   error:        '#E76F51',
