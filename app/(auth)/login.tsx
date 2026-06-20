@@ -112,18 +112,9 @@ export default function LoginScreen() {
         const { data: partner } = await supabase.from('users').select('*').eq('household_id', householdId).neq('id', userId).maybeSingle();
         if (partner) setPartnerUser(partner);
       } else {
-        const invite_code = generateInviteCode();
-        // Atomic create via security-definer RPC: makes the household AND the
-        // creator's users row in one transaction, sidestepping the SELECT-policy
-        // chicken-and-egg that breaks a direct insert ... returning.
-        const { data: hh, error: hhErr } = await supabase.rpc('create_household', {
-          p_role: role, p_invite_code: invite_code,
-        });
-        if (hhErr || !hh) throw hhErr ?? new Error('Failed to create household');
-        const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
-        if (user) setCurrentUser(user);
-        setHousehold(hh);
-        Alert.alert('Your invite code', `Share this with your partner:\n\n${invite_code}`, [{ text: 'Got it' }]);
+        // PS-61: Do NOT create anything yet — just advance to setup.
+        // All DB writes happen in handleSetup BEFORE setCurrentUser, so the
+        // auth gate in _layout.tsx only fires once the household is fully populated.
         setStep('setup');
       }
     } catch (e: unknown) {
@@ -138,18 +129,44 @@ export default function LoginScreen() {
     setError('');
     setLoading(true);
     try {
+      // PS-61: All household creation happens here, AFTER the setup UI collects
+      // stage/due_date/baby info. setCurrentUser is called LAST so the auth gate
+      // in _layout.tsx only fires once the household is fully created and populated.
+
+      // Step a: generate invite code
+      const invite_code = generateInviteCode();
+
+      // Step b: create_household RPC — creates household + creator's users row atomically
+      const { data: hh, error: hhErr } = await supabase.rpc('create_household', {
+        p_role: role, p_invite_code: invite_code,
+      });
+      if (hhErr || !hh) throw hhErr ?? new Error('Failed to create household');
+
+      // Step c: update household with stage/due_date/baby details
+      // RLS now resolves because the users row exists after the RPC above.
       const updates: Record<string, unknown> = { stage };
-      if (dueDate) updates.due_date = dueDate;
+      if (stage === 'pregnant' && dueDate) updates.due_date = dueDate;
       if (babyName.trim()) updates.baby_name = babyName.trim();
       updates.baby_gender = babyGender;
 
-      const { data: hh, error: err } = await supabase
+      const { data: updatedHh, error: updateErr } = await supabase
         .from('households')
         .update(updates)
-        .eq('id', useHouseholdStore.getState().household?.id ?? '')
-        .select().single();
-      if (err) throw err;
-      if (hh) setHousehold(hh);
+        .eq('id', hh.id)
+        .select()
+        .single();
+      if (updateErr) throw updateErr;
+
+      // Step d: read the users row back
+      const { data: user } = await supabase
+        .from('users').select('*').eq('id', userId).single();
+
+      // Step e: setHousehold first, setCurrentUser LAST — this flips the auth gate
+      setHousehold(updatedHh ?? hh);
+      if (user) setCurrentUser(user);
+
+      // Step f: show the invite code
+      Alert.alert('Your invite code', `Share this with your partner:\n\n${invite_code}`, [{ text: 'Got it' }]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Could not save setup.');
     } finally {
