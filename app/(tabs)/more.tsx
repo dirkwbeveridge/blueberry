@@ -9,6 +9,7 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { useHouseholdStore } from '../../store/household';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { colors, fonts, spacing } from '../../constants/theme';
 
 interface Row {
@@ -85,9 +86,7 @@ export default function MoreScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>More</Text>
-      </View>
+      <ScreenHeader title="More" />
 
       {/* Profile card */}
       <Card style={styles.profileCard}>
@@ -147,13 +146,11 @@ export default function MoreScreen() {
 const styles = StyleSheet.create({
   screen:      { flex: 1, backgroundColor: colors.background },
   scroll:      { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
-  header:      { marginBottom: spacing.xs },
-  headerTitle: { fontFamily: fonts.heading.bold, fontSize: 26, color: colors.text },
 
   profileCard: { marginBottom: spacing.xs },
   profileRow:  { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
   avatar:      { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  avatarText:  { fontFamily: fonts.heading.bold, fontSize: 22, color: '#FFFFFF' },
+  avatarText:  { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.surface },
   profileBody: { flex: 1, gap: 2 },
   profileName: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text },
   profileRole: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },

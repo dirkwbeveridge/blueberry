@@ -16,7 +16,7 @@ Generated from a static audit of `constants/theme.ts` and all screens (2026-06-1
 | `colors.background` | `#FAF8F5` | Ivory. Screen background. |
 | `colors.surface` | `#FFFFFF` | Card and input background. |
 | `colors.text` | `#1A1A2E` | Body copy, headings on light backgrounds. |
-| `colors.textMuted` | `#7B6F8A` | Secondary labels, captions, placeholders. |
+| `colors.textMuted` | `#675B78` | Secondary labels, captions, placeholders. Darkened from `#7B6F8A` (2026-06-12 audit: prior value was 4.49:1 on ivory, below AA; new value is 5.92:1). |
 | `colors.success` | `#6DBF82` | Positive states, low-priority badge. |
 | `colors.warning` | `#F4A261` | Caution states, medium-priority badge. |
 | `colors.error` | `#E76F51` | Destructive states, high-priority badge, validation errors. |

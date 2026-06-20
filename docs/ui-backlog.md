@@ -112,6 +112,7 @@ dedicated UI phase (`gsd-ui-phase` / `gsd-ui-review`).
 | PS-57 | `components/home/WeekHeroCard.tsx` | `FRUIT_EMOJIS` map is duplicated here and in `week-detail.tsx` (see PS-47). | P2 | open |
 | PS-58 | `components/home/QuickActions.tsx` | "Contractions" action is always shown regardless of stage. A postpartum user or TTC user sees a Contraction Timer quick action that is not relevant. Actions should be filtered by `household.stage`. | P2 | open |
 | PS-59 | `components/shared/PlaceholderScreen.tsx` | Uses `@/` path alias (`import { Card } from '@/components/ui/Card'`) but `CLAUDE.md` states no `@/` alias is configured. Inconsistent with the rest of the codebase which uses relative imports. | P2 | open |
+| PS-60 | `(modals)/log-symptom.tsx` | Foundation refactor (Task 2) changed the mood selector from emoji-forward tiles (emoji stacked above label, fixed 72-wide) to horizontal `Chip` pills (emoji left of label). Functionally fine; revisit during UI review whether the tile treatment should be restored for the mood grid, or `Chip` should support a vertical layout variant. | P3 | open |
 
 ---
 

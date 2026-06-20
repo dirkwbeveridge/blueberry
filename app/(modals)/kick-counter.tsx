@@ -7,8 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useHousehold } from '../../hooks/useHousehold';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button }     from '../../components/ui/Button';
+import { Card }       from '../../components/ui/Card';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
 
 const STORAGE_KEY = 'blueberry-kick-session';
@@ -101,17 +102,7 @@ export default function KickCounterModal() {
   const isActive = start !== null;
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.topBar}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>Kick Counter</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.cancelBtn}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <ModalSheet title="Kick Counter" onClose={() => router.back()} scroll={false}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={[styles.kickBtn, isActive && styles.kickBtnActive]}
@@ -155,17 +146,11 @@ export default function KickCounterModal() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </ModalSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  screen:    { flex: 1, backgroundColor: colors.background },
-  topBar:    { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
-  handle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginTop: 12, marginBottom: spacing.md },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title:     { fontFamily: fonts.heading.bold, fontSize: 20, color: colors.text },
-  cancelBtn: { fontFamily: fonts.body.medium, fontSize: 15, color: colors.textMuted },
   scroll:    { padding: spacing.lg, gap: spacing.lg, paddingBottom: 80, alignItems: 'center' },
   kickBtn:   {
     width: 200, height: 200, borderRadius: 100,
@@ -175,14 +160,14 @@ const styles = StyleSheet.create({
   kickBtnActive: { backgroundColor: colors.primary },
   kickEmoji:    { fontSize: 32 },
   kickCount:    { fontFamily: fonts.heading.bold, fontSize: 48, color: colors.primary },
-  kickCountActive: { color: '#FFFFFF' },
+  kickCountActive: { color: colors.surface },
   kickLabel:    { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
   kickLabelActive: { color: 'rgba(255,255,255,0.85)' },
   statsRow:  { flexDirection: 'row', gap: spacing.xl, justifyContent: 'center' },
   stat:      { alignItems: 'center', gap: 2 },
   statVal:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.primary },
   statLabel: { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
-  goal:      { backgroundColor: '#E8F8ED', borderColor: colors.success, borderWidth: 1, alignSelf: 'stretch' },
+  goal:      { backgroundColor: colors.successTint, borderColor: colors.success, borderWidth: 1, alignSelf: 'stretch' },
   goalText:  { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.success, textAlign: 'center' },
   hint:      { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20, maxWidth: 280 },
   actions:   { width: '100%', gap: spacing.sm },

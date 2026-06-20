@@ -9,6 +9,9 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { colors, fonts, radii, spacing, priorityColors } from '../../constants/theme';
 import type { Appointment, Priority, Todo } from '../../types';
 
@@ -106,33 +109,33 @@ export default function PlanScreen() {
   return (
     <View style={styles.screen}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>To Do</Text>
-        <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => router.push(activeTab === 'appointments' ? '/(modals)/add-appointment' : '/(modals)/add-todo')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.addBtnText}>+ Add</Text>
-        </TouchableOpacity>
+      <View style={styles.headerWrap}>
+        <ScreenHeader
+          title="To Do"
+          action={
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => router.push(activeTab === 'appointments' ? '/(modals)/add-appointment' : '/(modals)/add-todo')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+            >
+              <Text style={styles.addBtnText}>+ Add</Text>
+            </TouchableOpacity>
+          }
+        />
       </View>
 
       {/* Segment control */}
-      <View style={styles.segmentBar}>
-        {(['todos', 'appointments', 'calendar'] as PlanTab[]).map(tab => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.segment, activeTab === tab && styles.segmentActive]}
-            onPress={() => setActiveTab(tab)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.segmentLabel, activeTab === tab && styles.segmentLabelActive]}>
-              {tab === 'todos'        ? `✅  Todos${activeTodos.length > 0 ? ` (${activeTodos.length})` : ''}` :
-               tab === 'appointments' ? `📅  Appts` :
-                                        `🗓  Calendar`}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.segmentWrap}>
+        <SegmentedControl
+          options={[
+            { value: 'todos',        label: `✅  Todos${activeTodos.length > 0 ? ` (${activeTodos.length})` : ''}` },
+            { value: 'appointments', label: '📅  Appointments' },
+            { value: 'calendar',     label: '🗓  Calendar' },
+          ]}
+          value={activeTab}
+          onChange={(v) => setActiveTab(v as PlanTab)}
+        />
       </View>
 
       <ScrollView
@@ -148,14 +151,12 @@ export default function PlanScreen() {
               <Text style={styles.loadingText}>Loading…</Text>
             ) : activeTodos.length === 0 && doneTodos.length === 0 ? (
               <Card>
-                <View style={styles.empty}>
-                  <Text style={styles.emptyEmoji}>✅</Text>
-                  <Text style={styles.emptyTitle}>No tasks yet</Text>
-                  <Text style={styles.emptyBody}>Add tasks to keep track of everything you need to do before baby arrives.</Text>
-                  <TouchableOpacity style={styles.emptyAction} onPress={() => router.push('/(modals)/add-todo')}>
-                    <Text style={styles.emptyActionText}>Add your first task</Text>
-                  </TouchableOpacity>
-                </View>
+                <EmptyState
+                  emoji="✅"
+                  title="No tasks yet"
+                  body="Add tasks to keep track of everything you need to do before baby arrives."
+                  action={{ label: 'Add your first task', onPress: () => router.push('/(modals)/add-todo') }}
+                />
               </Card>
             ) : (
               <>
@@ -227,14 +228,12 @@ export default function PlanScreen() {
               <Text style={styles.loadingText}>Loading…</Text>
             ) : upcoming.length === 0 && past.length === 0 ? (
               <Card>
-                <View style={styles.empty}>
-                  <Text style={styles.emptyEmoji}>📅</Text>
-                  <Text style={styles.emptyTitle}>No appointments yet</Text>
-                  <Text style={styles.emptyBody}>Log your prenatal appointments so you both always know what is coming up.</Text>
-                  <TouchableOpacity style={styles.emptyAction} onPress={() => router.push('/(modals)/add-appointment')}>
-                    <Text style={styles.emptyActionText}>Add first appointment</Text>
-                  </TouchableOpacity>
-                </View>
+                <EmptyState
+                  emoji="📅"
+                  title="No appointments yet"
+                  body="Log your prenatal appointments so you both always know what is coming up."
+                  action={{ label: 'Add first appointment', onPress: () => router.push('/(modals)/add-appointment') }}
+                />
               </Card>
             ) : (
               <>
@@ -381,20 +380,14 @@ function CalendarPane({
   return (
     <>
       {/* View toggle */}
-      <View style={calStyles.viewToggle}>
-        {(['week', 'month'] as const).map(m => (
-          <TouchableOpacity
-            key={m}
-            style={[calStyles.viewToggleBtn, viewMode === m && calStyles.viewToggleBtnActive]}
-            onPress={() => setViewMode(m)}
-            activeOpacity={0.7}
-          >
-            <Text style={[calStyles.viewToggleLabel, viewMode === m && calStyles.viewToggleLabelActive]}>
-              {m === 'week' ? '14-Day' : 'Month'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <SegmentedControl
+        options={[
+          { value: 'week',  label: '14-Day' },
+          { value: 'month', label: 'Month'  },
+        ]}
+        value={viewMode}
+        onChange={(v) => setViewMode(v as 'week' | 'month')}
+      />
 
       {/* ── WEEK STRIP ── */}
       {viewMode === 'week' && (
@@ -491,10 +484,7 @@ function CalendarPane({
       {/* Items for selected day */}
       {isEmpty ? (
         <Card>
-          <View style={calStyles.empty}>
-            <Text style={calStyles.emptyEmoji}>🗓</Text>
-            <Text style={calStyles.emptyText}>Nothing scheduled.</Text>
-          </View>
+          <EmptyState emoji="🗓" title="Nothing scheduled." />
         </Card>
       ) : (
         <>
@@ -534,13 +524,6 @@ function CalendarPane({
 }
 
 const calStyles = StyleSheet.create({
-  // View toggle
-  viewToggle:            { flexDirection: 'row', backgroundColor: colors.border, borderRadius: radii.md, padding: 3, marginBottom: spacing.sm },
-  viewToggleBtn:         { flex: 1, paddingVertical: spacing.xs, borderRadius: radii.sm, alignItems: 'center' },
-  viewToggleBtnActive:   { backgroundColor: colors.surface },
-  viewToggleLabel:       { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
-  viewToggleLabelActive: { color: colors.primary, fontFamily: fonts.body.semibold },
-
   // 14-day strip
   strip:           { gap: 6, paddingVertical: spacing.xs },
   day:             { width: 52, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radii.md, backgroundColor: colors.surface, gap: 2 },
@@ -548,9 +531,9 @@ const calStyles = StyleSheet.create({
   dayWeek:         { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 0.5 },
   dayWeekSelected: { color: 'rgba(255,255,255,0.75)' },
   dayNum:          { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.text },
-  dayNumSelected:  { color: '#FFFFFF' },
+  dayNumSelected:  { color: colors.surface },
   dot:             { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  dotSelected:     { backgroundColor: '#FFFFFF' },
+  dotSelected:     { backgroundColor: colors.surface },
   todayUnderline:  { width: 16, height: 2, borderRadius: 1, backgroundColor: colors.primary, marginTop: 2 },
 
   // Month grid
@@ -567,7 +550,7 @@ const calStyles = StyleSheet.create({
   monthCellSelected:   { backgroundColor: colors.primary },
   monthDayNum:         { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text },
   monthDayNumToday:    { color: colors.primary, fontFamily: fonts.body.semibold },
-  monthDayNumSelected: { color: '#FFFFFF', fontFamily: fonts.body.semibold },
+  monthDayNumSelected: { color: colors.surface, fontFamily: fonts.body.semibold },
   monthDot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
   monthDotSelected:    { backgroundColor: 'rgba(255,255,255,0.8)' },
 
@@ -582,72 +565,57 @@ const calStyles = StyleSheet.create({
   todoItem:        { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
   checkbox:        { width: 20, height: 20, borderRadius: 5, borderWidth: 2, borderColor: colors.accent },
   todoTitle:       { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text, flex: 1 },
-  empty:           { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
-  emptyEmoji:      { fontSize: 32 },
-  emptyText:       { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
 });
 
 const styles = StyleSheet.create({
-  screen:   { flex: 1, backgroundColor: colors.background },
-  header:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md },
-  headerTitle: { fontFamily: fonts.heading.bold, fontSize: 26, color: colors.text },
-  addBtn:   { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8 },
-  addBtnText:{ fontFamily: fonts.body.semibold, fontSize: 14, color: '#FFFFFF' },
-  segmentBar:{ flexDirection: 'row', marginHorizontal: spacing.lg, backgroundColor: colors.border, borderRadius: radii.md, padding: 3, marginBottom: spacing.md },
-  segment:  { flex: 1, paddingVertical: spacing.sm, borderRadius: radii.sm, alignItems: 'center' },
-  segmentActive: { backgroundColor: colors.surface, shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
-  segmentLabel: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
-  segmentLabelActive: { color: colors.primary, fontFamily: fonts.body.semibold },
-  scroll:   { flex: 1 },
-  scrollContent: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl, gap: spacing.md },
-  loadingText: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, marginTop: spacing.md },
+  screen:       { flex: 1, backgroundColor: colors.background },
+  headerWrap:   { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md },
+  addBtn:       { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8, minHeight: 44, justifyContent: 'center' },
+  addBtnText:   { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
+  segmentWrap:  { marginHorizontal: spacing.lg, marginBottom: spacing.md },
+  scroll:       { flex: 1 },
+  scrollContent:{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl, gap: spacing.md },
+  loadingText:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, marginTop: spacing.md },
   subSectionLabel: { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase', marginBottom: spacing.md },
   // Todos
-  todoRow:  { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: spacing.md, gap: spacing.md },
-  todoRowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.accent, marginTop: 2 },
+  todoRow:      { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: spacing.md, gap: spacing.md },
+  todoRowBorder:{ borderBottomWidth: 1, borderBottomColor: colors.border },
+  checkbox:     { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.accent, marginTop: 2 },
   checkboxDone: { width: 22, height: 22, borderRadius: 6, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
-  checkmark:{ color: '#FFF', fontSize: 13, fontFamily: fonts.body.semibold },
-  todoBody: { flex: 1, gap: 4 },
-  todoTitle:{ fontFamily: fonts.body.medium, fontSize: 15, color: colors.text, lineHeight: 22 },
-  todoTitleDone: { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted, textDecorationLine: 'line-through', flex: 1 },
-  todoMeta: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap', alignItems: 'center' },
-  todoDue:  { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
-  priorityDot: { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
-  doneToggle: { paddingVertical: spacing.sm },
+  checkmark:    { color: colors.surface, fontSize: 13, fontFamily: fonts.body.semibold },
+  todoBody:     { flex: 1, gap: 4 },
+  todoTitle:    { fontFamily: fonts.body.medium, fontSize: 15, color: colors.text, lineHeight: 22 },
+  todoTitleDone:{ fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted, textDecorationLine: 'line-through', flex: 1 },
+  todoMeta:     { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap', alignItems: 'center' },
+  todoDue:      { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
+  priorityDot:  { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
+  doneToggle:   { paddingVertical: spacing.sm },
   doneToggleText: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.textMuted },
-  doneCard: { opacity: 0.7 },
+  doneCard:     { opacity: 0.7 },
   // Appointments
-  apptRow:  { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, gap: spacing.md },
-  apptRowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  apptRowPast: { opacity: 0.65 },
-  apptDateBadge: { width: 48, height: 52, borderRadius: radii.md, backgroundColor: '#F5F0FF', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.accent },
+  apptRow:      { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, gap: spacing.md },
+  apptRowBorder:{ borderBottomWidth: 1, borderBottomColor: colors.border },
+  apptRowPast:  { opacity: 0.65 },
+  apptDateBadge:{ width: 48, height: 52, borderRadius: radii.md, backgroundColor: colors.primaryTint, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.accent },
   apptDateBadgeToday: { backgroundColor: colors.primary, borderColor: colors.primary },
-  apptDateNum: { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.primary },
-  apptDateNumToday: { color: '#FFF' },
-  apptDateMon: { fontFamily: fonts.body.semibold, fontSize: 9, color: colors.textMuted, letterSpacing: 0.5 },
+  apptDateNum:  { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.primary },
+  apptDateNumToday: { color: colors.surface },
+  apptDateMon:  { fontFamily: fonts.body.semibold, fontSize: 9, color: colors.textMuted, letterSpacing: 0.5 },
   apptDateMonToday: { color: 'rgba(255,255,255,0.8)' },
   apptDateBadgePast: { width: 48, height: 52, borderRadius: radii.md, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   apptDateNumPast: { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.textMuted },
   apptDateMonPast: { fontFamily: fonts.body.semibold, fontSize: 9, color: colors.textMuted, letterSpacing: 0.5 },
-  apptBody: { flex: 1, gap: 2 },
-  apptTitle: { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
-  apptTitlePast: { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.textMuted },
-  apptTime:  { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
+  apptBody:     { flex: 1, gap: 2 },
+  apptTitle:    { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
+  apptTitlePast:{ fontFamily: fonts.body.semibold, fontSize: 15, color: colors.textMuted },
+  apptTime:     { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
   apptTimePast: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
   apptLocation: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
   apptLocationPast: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  apptUrgency: { backgroundColor: '#F5F0FF', borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 4 },
+  apptUrgency:  { backgroundColor: colors.primaryTint, borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 4 },
   apptUrgencyToday: { backgroundColor: colors.primary },
   apptUrgencyText: { fontFamily: fonts.body.semibold, fontSize: 11, color: colors.primary },
-  apptUrgencyTextToday: { color: '#FFF' },
-  pastCard: {},
-  longPressHint: { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, textAlign: 'center', marginTop: -spacing.xs },
-  // Empty states
-  empty:    { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
-  emptyEmoji: { fontSize: 36 },
-  emptyTitle: { fontFamily: fonts.heading.semibold, fontSize: 18, color: colors.text },
-  emptyBody:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, textAlign: 'center', lineHeight: 20 },
-  emptyAction:{ marginTop: spacing.xs, backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 20, paddingVertical: 10 },
-  emptyActionText: { fontFamily: fonts.body.semibold, fontSize: 14, color: '#FFFFFF' },
+  apptUrgencyTextToday: { color: colors.surface },
+  pastCard:     {},
+  longPressHint:{ fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, textAlign: 'center', marginTop: -spacing.xs },
 });

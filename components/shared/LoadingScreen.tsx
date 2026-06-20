@@ -15,6 +15,6 @@ export default function LoadingScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', gap: 8 },
   logo:      { fontSize: 56 },
-  name:      { fontFamily: fonts.heading.bold, fontSize: 28, color: '#FFFFFF', letterSpacing: 1 },
+  name:      { fontFamily: fonts.heading.bold, fontSize: 28, color: colors.surface, letterSpacing: 1 },
   spinner:   { marginTop: 32 },
 });
