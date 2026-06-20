@@ -96,6 +96,7 @@ export default function ContractionTimerModal() {
 
   async function saveSession() {
     if (!household || contractions.length === 0) return;
+    if (activeStart !== null) return; // PS-53: guard against saving while contraction is in progress
     setSaving(true);
     try {
       await supabase.from('contraction_sessions').insert({
@@ -144,7 +145,7 @@ export default function ContractionTimerModal() {
           activeOpacity={0.85}
         >
           <Text style={styles.mainBtnEmoji}>{isActive ? '⏹' : '▶'}</Text>
-          <Text style={styles.mainBtnLabel}>{isActive ? 'Stop' : 'Start'}</Text>
+          <Text style={[styles.mainBtnLabel, isActive && styles.mainBtnLabelActive]}>{isActive ? 'Stop' : 'Start'}</Text>
           {isActive && <Text style={styles.mainBtnElapsed}>{formatSecs(Math.floor(elapsed / 1000))}</Text>}
         </TouchableOpacity>
 
@@ -192,7 +193,7 @@ export default function ContractionTimerModal() {
 
         {contractions.length > 0 && (
           <View style={styles.actions}>
-            <Button label={saving ? 'Saving…' : 'Save session'} onPress={saveSession} loading={saving} />
+            <Button label={saving ? 'Saving…' : 'Save session'} onPress={saveSession} loading={saving} disabled={isActive || saving} />
             <Button label="Reset" onPress={reset} variant="ghost" />
           </View>
         )}
@@ -210,7 +211,8 @@ const styles = StyleSheet.create({
   },
   mainBtnActive: { backgroundColor: colors.primary },
   mainBtnEmoji:  { fontSize: 32 },
-  mainBtnLabel:  { fontFamily: fonts.heading.semibold, fontSize: 20, color: colors.primary },
+  mainBtnLabel:        { fontFamily: fonts.heading.semibold, fontSize: 20, color: colors.primary },
+  mainBtnLabelActive:  { color: colors.surface },
   mainBtnElapsed:{ fontFamily: fonts.heading.bold, fontSize: 28, color: '#FFF' },
   statsRow:    { flexDirection: 'row', gap: spacing.lg, justifyContent: 'center' },
   stat:        { alignItems: 'center', gap: 2 },
