@@ -1,8 +1,8 @@
 # Handoff — Design System Foundation
 
-**Last updated:** 2026-06-12
-**Branch:** `design-system-foundation` (7 commits ahead of `main`, working tree clean)
-**Status:** Tasks 1–3 of 4 done. Pending verification + Task 4.
+**Last updated:** 2026-06-18
+**Branch:** `design-system-foundation` (9 commits ahead of `main`, working tree clean)
+**Status:** All 4 foundation tasks DONE (code-complete). Pending: full typecheck confirmation + device verification, then merge.
 
 ---
 
@@ -21,6 +21,8 @@ primitives extracted; every tab and modal refactored to consume them and the des
 | `4c98f87` | `docs/prototype-v2.html` (12-screen design-build prototype); fixed **textMuted contrast** `#7B6F8A → #675B78` (was 4.49:1 on ivory, now 5.92:1 — AA) |
 | `40d42b4` | Task 3a — extracted `ModalSheet`; refactored all 6 modal scaffolds (handle + title + accessible Cancel) |
 | `5c8d497` | Task 3b — extracted `ScreenHeader`, `EmptyState`, `SegmentedControl`; refactored health/memories/more/todo/partner/login; bonus: partner.tsx `@/`-alias removed |
+| `0ff1a5b` | Added this HANDOFF.md |
+| `20323ae` | Task 4 — color-token sweep: all remaining `#FFFFFF`/`#F5F0FF`/`#1A0F3A`/`#E8F8ED` literals → tokens; reconciled `week-detail.tsx` off-brand Tailwind palette (SYS-04) to brand tints. Verified: grep for the 10 target literals returns zero hits. |
 
 Primitives now in `components/ui/`: Button, Input, Card, Badge, ProgressBar (pre-existing) +
 **DateField, TimeField, Chip, ModalSheet, ScreenHeader, EmptyState, SegmentedControl** (new).
@@ -33,21 +35,21 @@ Primitives now in `components/ui/`: Button, Input, Card, Badge, ProgressBar (pre
 
 ---
 
-## RESUME HERE — do these first (in order)
+## RESUME HERE — verify, then merge
 
-1. **Verify Task 3b typecheck.** It is committed but was NOT typecheck-confirmed — `tsc` times out on the OneDrive-synced `node_modules` (same I/O issue that hung Metro). Task 3a was clean. To confirm 3b: **pause OneDrive sync**, then `npm run typecheck`. Expect green (no `error TS` lines).
-2. **Device-verify the branch.** Six refactored tabs + six modals now render through new primitives — never seen on device. `pkill -f metro` then `npx expo start --port 8081 -c`, scan with Expo Go. Confirm: all 6 tabs load; To Do segmented control + calendar 14-Day/Month toggle work; each modal opens with handle + title + Cancel (Cancel closes); log-symptom mood chips horizontal + Save-enables-on-note; date/time pickers open. Watch for blank/mis-aligned/crashing screens (where a refactor regression would show).
+All 4 foundation tasks are code-complete and committed. Two verification gates remain before merging to `main` (both blocked only by the OneDrive environment, not the code):
 
-If both pass → the foundation is sound; proceed to Task 4. If a screen looks off, report which + what you see; fix before Task 4.
+1. **Full typecheck.** Committed but never confirmed clean past Task 3a — `tsc` times out on the OneDrive-synced `node_modules` (same I/O issue that hung Metro). To confirm: **pause OneDrive sync**, then `npm run typecheck`. Expect green (no `error TS` lines). Every token referenced exists in `theme.ts`; risk is low.
+2. **Device-verify the branch.** All 6 tabs + 6 modals now render through new primitives + tokens — never seen on device. `pkill -f metro` then `npx expo start --port 8081 -c`, scan with Expo Go. Confirm: all 6 tabs load; To Do segmented control + calendar 14-Day/Month toggle work; each modal opens with handle + title + Cancel (Cancel closes); log-symptom mood chips horizontal + Save-enables-on-note; date/time pickers open; week-detail trimester colors now look plum/lavender (not blue/green). Watch for blank/mis-aligned/crashing screens.
+
+If both pass → **merge `design-system-foundation` → `main`** (reconcile the `ui-backlog.md` conflict — see Hazards), then move to the items below.
 
 ---
 
 ## Remaining work
 
-### Task 4 — finish design-system consolidation (last foundation task)
-- Sweep remaining hardcoded hex / `fontSize` literals across screens to tokens + the typography scale.
-- Reconcile `app/(modals)/week-detail.tsx`'s off-brand Tailwind palette (`#93C5FD`, `#86EFAC`, `#2563EB`, etc., per SYS-04) to brand tokens.
-- Dispatch via subagent-driven-development (implementer → review), same as 3a/3b.
+### Typography-scale adoption (the one unfinished design-system thread)
+Task 1 created the 7-step `typography` export but **nothing consumes it yet** — screens still use inline `fontSize` + `fontFamily` pairs (~23 distinct sizes). Migrating those to `typography.display/title/heading/subheading/body/label/caption` is the last design-system sweep (SYS-05). Bounded and mechanical; deferred out of Task 4 to keep that task to color only. Do as a "Task 5" via subagent-driven-development after the merge, or fold into the per-screen UI review.
 
 ### Separate functional pass (NOT design-system — do after foundation lands)
 Three real P1 bugs from the second UI audit (on `main`'s `ui-backlog.md`):
