@@ -77,5 +77,5 @@ const styles = StyleSheet.create({
   spinnerWrapper:{ backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   spinner:       { height: 160 },
   doneBtn:       { backgroundColor: colors.primary, marginHorizontal: spacing.md, marginBottom: spacing.md, borderRadius: radii.md, paddingVertical: spacing.sm, alignItems: 'center' },
-  doneBtnText:   { fontFamily: fonts.body.semibold, fontSize: 15, color: '#FFFFFF' },
+  doneBtnText:   { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.surface },
 });

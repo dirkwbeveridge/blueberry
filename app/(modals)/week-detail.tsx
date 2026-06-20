@@ -61,8 +61,8 @@ export default function WeekDetailModal() {
   const emoji   = FRUIT_EMOJIS[dev.size_fruit.toLowerCase()] ?? '🌿';
 
   const trimesterOf = (w: number) => w <= 13 ? 1 : w <= 26 ? 2 : 3;
-  const trimesterColors  = ['#F5EDFF', '#EDF5FF', '#EDFFED'];
-  const trimesterBorders = [colors.accent, '#93C5FD', '#86EFAC'];
+  const trimesterColors  = [colors.primaryTint, colors.primaryTint, colors.successTint];
+  const trimesterBorders = [colors.accent, colors.accent, colors.success];
   const tri = trimesterOf(selectedWeek) - 1;
 
   const subtitle = household?.baby_name ? `${household.baby_name}'s journey` : "Your baby's journey";
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   weekPill:     { width: 44, height: 44, borderRadius: radii.md, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   weekPillSelected: { backgroundColor: colors.primary },
   weekPillNum:  { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted },
-  weekPillNumSelected: { color: '#FFFFFF' },
+  weekPillNumSelected: { color: colors.surface },
   currentDot:   { position: 'absolute', bottom: 3, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
 
   scroll: { flex: 1 },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   heroWeekLabel: { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 2 },
   heroWeekNum:   { fontFamily: fonts.heading.bold, fontSize: 56, color: colors.primary, lineHeight: 60 },
   currentBadge:  { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start', marginTop: 4 },
-  currentBadgeText: { fontFamily: fonts.body.semibold, fontSize: 10, color: '#FFFFFF' },
+  currentBadgeText: { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.surface },
   heroRight: { alignItems: 'flex-end', gap: 4 },
   heroEmoji: { fontSize: 44 },
   heroFruit: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.text, textAlign: 'right', textTransform: 'capitalize' },
@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
 
   trimesterLabel: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: -4 },
   card:          { marginBottom: 0 },
-  partnerCard:   { backgroundColor: '#EDF5FF', shadowOpacity: 0.04 },
-  partnerLabel:  { fontFamily: fonts.body.semibold, fontSize: 13, color: '#2563EB', marginBottom: spacing.sm },
+  partnerCard:   { backgroundColor: colors.primaryTint, shadowOpacity: 0.04 },
+  partnerLabel:  { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.primary, marginBottom: spacing.sm },
   partnerText:   { fontFamily: fonts.body.regular, fontSize: 15, color: colors.text, lineHeight: 24 },
   devNote:       { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, lineHeight: 22, fontStyle: 'italic' },
 });

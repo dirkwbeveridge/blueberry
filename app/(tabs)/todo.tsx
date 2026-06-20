@@ -531,9 +531,9 @@ const calStyles = StyleSheet.create({
   dayWeek:         { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 0.5 },
   dayWeekSelected: { color: 'rgba(255,255,255,0.75)' },
   dayNum:          { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.text },
-  dayNumSelected:  { color: '#FFFFFF' },
+  dayNumSelected:  { color: colors.surface },
   dot:             { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  dotSelected:     { backgroundColor: '#FFFFFF' },
+  dotSelected:     { backgroundColor: colors.surface },
   todayUnderline:  { width: 16, height: 2, borderRadius: 1, backgroundColor: colors.primary, marginTop: 2 },
 
   // Month grid
@@ -550,7 +550,7 @@ const calStyles = StyleSheet.create({
   monthCellSelected:   { backgroundColor: colors.primary },
   monthDayNum:         { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text },
   monthDayNumToday:    { color: colors.primary, fontFamily: fonts.body.semibold },
-  monthDayNumSelected: { color: '#FFFFFF', fontFamily: fonts.body.semibold },
+  monthDayNumSelected: { color: colors.surface, fontFamily: fonts.body.semibold },
   monthDot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
   monthDotSelected:    { backgroundColor: 'rgba(255,255,255,0.8)' },
 

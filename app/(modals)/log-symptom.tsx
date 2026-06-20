@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   energyBtn: { width: 44, height: 44, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   energyBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
   energyNum: { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
-  energyNumSelected: { color: '#FFFFFF' },
+  energyNumSelected: { color: colors.surface },
   energyHint:{ fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginLeft: 4 },
   symptomGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

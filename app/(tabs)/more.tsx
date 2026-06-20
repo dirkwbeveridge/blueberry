@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   profileCard: { marginBottom: spacing.xs },
   profileRow:  { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
   avatar:      { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  avatarText:  { fontFamily: fonts.heading.bold, fontSize: 22, color: '#FFFFFF' },
+  avatarText:  { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.surface },
   profileBody: { flex: 1, gap: 2 },
   profileName: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text },
   profileRole: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },

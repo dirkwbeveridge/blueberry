@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
 
   milestoneSection: { gap: spacing.sm },
   milestoneStrip:   { gap: spacing.sm, paddingVertical: spacing.xs },
-  milestoneCard:    { backgroundColor: '#F5F0FF', borderRadius: radii.md, padding: spacing.md, minWidth: 140, borderWidth: 1, borderColor: colors.accent },
+  milestoneCard:    { backgroundColor: colors.primaryTint, borderRadius: radii.md, padding: spacing.md, minWidth: 140, borderWidth: 1, borderColor: colors.accent },
   milestoneTag:     { fontFamily: fonts.heading.semibold, fontSize: 14, color: colors.primary },
   milestoneWeek:    { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, marginTop: 2 },
 
