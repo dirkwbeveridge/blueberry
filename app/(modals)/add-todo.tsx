@@ -1,16 +1,19 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, Alert,
+    Alert,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useHousehold } from '../../hooks/useHousehold';
-import { Button }      from '../../components/ui/Button';
-import { Input }       from '../../components/ui/Input';
-import { Chip }        from '../../components/ui/Chip';
-import { DateField }   from '../../components/ui/DateField';
-import { ModalSheet }  from '../../components/ui/ModalSheet';
+import { Button } from '../../components/ui/Button';
+import { Chip } from '../../components/ui/Chip';
+import { DateField } from '../../components/ui/DateField';
+import { Input } from '../../components/ui/Input';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
+import { supabase } from '../../lib/supabase';
 import type { Priority } from '../../types';
 
 const PRIORITIES: { value: Priority; label: string; color: string; bg: string }[] = [
@@ -95,5 +98,5 @@ export default function AddTodoModal() {
 const styles = StyleSheet.create({
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
   priorityRow:  { flexDirection: 'row', gap: spacing.sm },
-  priorityChip: { flex: 1, justifyContent: 'center' },
+  priorityChip: { flex: 1, justifyContent: 'center', minHeight: 44 },
 });

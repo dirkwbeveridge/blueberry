@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   ghost: {
     backgroundColor: 'transparent',
-    borderColor: colors.border,
+    borderColor: colors.accent,
     borderWidth: 1,
   },
   disabled: {

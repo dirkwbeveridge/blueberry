@@ -1,16 +1,20 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Alert,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useHousehold } from '../../hooks/useHousehold';
-import { Button }     from '../../components/ui/Button';
-import { Chip }       from '../../components/ui/Chip';
-import { Input }      from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { Chip } from '../../components/ui/Chip';
+import { Input } from '../../components/ui/Input';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
+import { supabase } from '../../lib/supabase';
 
 const SYMPTOMS = [
   'Nausea','Fatigue','Back pain','Headache','Heartburn',
@@ -84,6 +88,7 @@ export default function LogSymptomModal() {
               emoji={m.emoji}
               selected={mood === m.value}
               onPress={() => setMood(mood === m.value ? null : m.value)}
+              accessibilityLabel={`Mood ${m.label}`}
             />
           ))}
         </View>
@@ -115,6 +120,7 @@ export default function LogSymptomModal() {
               label={s}
               selected={selectedSymptoms.includes(s)}
               onPress={() => toggleSymptom(s)}
+              accessibilityLabel={`Symptom ${s}`}
             />
           ))}
         </View>

@@ -7,10 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "blueberry",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.blueberry"
+      "deploymentTarget": "16.4",
+      "bundleIdentifier": "com.dbeveridge.blueberry",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +22,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -41,10 +43,23 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "enableBackgroundRemoteNotifications": false
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fe7445dd-d76c-478d-9118-d77ca66614c1"
+      }
+    },
+    "owner": "dirkwbeveridge"
   }
 }

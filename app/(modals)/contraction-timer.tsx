@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, Alert,
-} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useHousehold } from '../../hooks/useHousehold';
-import { Button }     from '../../components/ui/Button';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
+} from 'react-native';
+import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
+import { supabase } from '../../lib/supabase';
 
 const STORAGE_KEY = 'blueberry-contractions';
 
@@ -46,7 +49,6 @@ export default function ContractionTimerModal() {
       timer.current = setInterval(() => setElapsed(Date.now() - activeStart), 200);
     } else {
       if (timer.current) clearInterval(timer.current);
-      setElapsed(0);
     }
     return () => { if (timer.current) clearInterval(timer.current); };
   }, [activeStart]);
@@ -60,13 +62,14 @@ export default function ContractionTimerModal() {
     const start = sessionStart ?? now;
     setSessionStart(start);
     setActiveStart(now);
+    setElapsed(0);
     persist(contractions, start, now);
   }
 
   function stopContraction() {
     if (activeStart === null) return;
-    const now = Date.now();
-    const duration = Math.round((now - activeStart) / 1000);
+    const now = activeStart + elapsed;
+    const duration = Math.round(elapsed / 1000);
     const prev = contractions[contractions.length - 1];
     const gap = prev?.endedAt !== null && prev?.endedAt !== undefined
       ? Math.round((activeStart - (prev.endedAt as number)) / 1000)
@@ -181,7 +184,7 @@ export default function ContractionTimerModal() {
           <View style={styles.history}>
             <Text style={styles.historyTitle}>Session history</Text>
             {[...contractions].reverse().map((c, i) => (
-              <View key={i} style={styles.historyRow}>
+              <View key={c.startedAt} style={styles.historyRow}>
                 <Text style={styles.historyNum}>#{contractions.length - i}</Text>
                 <Text style={styles.historyDuration}>{c.duration ? formatSecs(c.duration) : '—'}</Text>
                 {c.gap !== null && <Text style={styles.historyGap}>Gap: {formatSecs(c.gap)}</Text>}
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
   mainBtnEmoji:  { fontSize: 32 },
   mainBtnLabel:        { fontFamily: fonts.heading.semibold, fontSize: 20, color: colors.primary },
   mainBtnLabelActive:  { color: colors.surface },
-  mainBtnElapsed:{ fontFamily: fonts.heading.bold, fontSize: 28, color: '#FFF' },
+  mainBtnElapsed:{ fontFamily: fonts.heading.bold, fontSize: 28, color: colors.surface },
   statsRow:    { flexDirection: 'row', gap: spacing.lg, justifyContent: 'center' },
   stat:        { alignItems: 'center', gap: 2 },
   statVal:     { fontFamily: fonts.heading.bold, fontSize: 24, color: colors.primary },
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
   hint:        { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20, maxWidth: 280 },
   history:     { width: '100%', gap: spacing.sm },
   historyTitle:{ fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
-  historyRow:  { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.border },
+  historyRow:  { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 36, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.border },
   historyNum:  { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, width: 28 },
   historyDuration: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, flex: 1 },
   historyGap:  { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, flex: 1 },

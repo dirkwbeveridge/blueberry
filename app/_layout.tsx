@@ -1,20 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { SplashScreen, Stack, router, useSegments } from 'expo-router';
+import {
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+} from '@expo-google-fonts/dm-sans';
+import {
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+} from '@expo-google-fonts/playfair-display';
 import { Session } from '@supabase/supabase-js';
 import { useFonts } from 'expo-font';
-import {
-  PlayfairDisplay_400Regular,
-  PlayfairDisplay_600SemiBold,
-  PlayfairDisplay_700Bold,
-} from '@expo-google-fonts/playfair-display';
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_600SemiBold,
-} from '@expo-google-fonts/dm-sans';
+import { SplashScreen, Stack, router, useSegments } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import LoadingScreen from '../components/shared/LoadingScreen';
+import { useAppointmentReminderSync } from '../hooks/useAppointmentReminderSync';
+import { useGoogleCalendarSync } from '../hooks/useGoogleCalendarSync';
+import '../lib/notifications';
 import { supabase } from '../lib/supabase';
 import { useHouseholdStore } from '../store/household';
-import LoadingScreen from '../components/shared/LoadingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,10 +35,15 @@ export default function RootLayout() {
   const [loading, setLoading] = useState(true);
 
   const { setHousehold, setCurrentUser, setPartnerUser, clearAll } = useHouseholdStore();
+  const household = useHouseholdStore((s) => s.household);
+  const currentUser = useHouseholdStore((s) => s.currentUser);
   // Derive the auth-gate trigger directly from the store so any path that
   // populates currentUser (root-layout hydration, signin, signup → household
   // insert in login.tsx) flips the gate without needing local state sync.
   const hasUserRow = useHouseholdStore((s) => s.currentUser !== null);
+
+  useAppointmentReminderSync(currentUser?.id ?? null, household?.id ?? null);
+  useGoogleCalendarSync(currentUser?.id ?? null, household?.id ?? null);
 
   const loadHousehold = useCallback(async (userId: string) => {
     try {

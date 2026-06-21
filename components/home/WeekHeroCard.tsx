@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { babyDevelopment } from '../../constants/babyDevelopment';
+import { getFruitEmoji } from '../../constants/fruitEmojis';
+import { colors, fonts, radii, spacing } from '../../constants/theme';
 import type { Household } from '../../types';
 
 interface WeekHeroCardProps {
@@ -12,26 +13,15 @@ interface WeekHeroCardProps {
 
 export function WeekHeroCard({ week, household }: WeekHeroCardProps) {
   const dev = babyDevelopment.find(w => w.week === week) ?? babyDevelopment[14];
-
-  const FRUIT_EMOJIS: Record<string, string> = {
-    blueberry: '🫐', grape: '🍇', lime: '🍋', lemon: '🍋', peach: '🍑',
-    avocado: '🥑', banana: '🍌', carrot: '🥕', coconut: '🥥', pineapple: '🍍',
-    cantaloupe: '🍈', 'navel orange': '🍊', pear: '🍐', grapefruit: '🍊',
-    'small watermelon': '🍉', 'mini watermelon': '🍉', 'small pumpkin': '🎃',
-    papaya: '🥭', squash: '🥦', 'butternut squash': '🥦', 'kidney bean': '🫘',
-    kumquat: '🍊', fig: '🫐', 'sweet pea': '🌱', 'apple seed': '🌱',
-    'sesame seed': '🌱', 'poppy seed': '🌱', lentil: '🌱',
-    cauliflower: '🥦', 'romaine lettuce': '🥬', 'winter melon': '🍈',
-    'honeydew melon': '🍈', 'bell pepper': '🫑', 'heirloom tomato': '🍅',
-    'ear of corn': '🌽', 'scallion bunch': '🌿', rutabaga: '🥔',
-  };
-  const emoji = FRUIT_EMOJIS[dev.size_fruit.toLowerCase()] ?? '🌿';
+  const emoji = getFruitEmoji(dev.size_fruit);
 
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => router.push('/(modals)/week-detail')}
       activeOpacity={0.9}
+      accessibilityRole="button"
+      accessibilityLabel={`Open week ${week} detail`}
     >
       <View style={styles.left}>
         <Text style={styles.weekLabel}>WEEK</Text>
@@ -46,6 +36,7 @@ export function WeekHeroCard({ week, household }: WeekHeroCardProps) {
         <Text style={styles.fruit}>{dev.size_fruit}</Text>
         <Text style={styles.stat}>{dev.size_cm} cm</Text>
         {dev.weight_g > 0 && <Text style={styles.stat}>{dev.weight_g}g</Text>}
+        <Text style={styles.hint}>Tap for details</Text>
       </View>
     </TouchableOpacity>
   );
@@ -74,4 +65,5 @@ const styles = StyleSheet.create({
   emoji:      { fontSize: 44 },
   fruit:      { fontFamily: fonts.body.medium, fontSize: 13, color: 'rgba(255,255,255,0.9)', textTransform: 'capitalize' },
   stat:       { fontFamily: fonts.body.regular, fontSize: 12, color: 'rgba(255,255,255,0.65)' },
+  hint:       { fontFamily: fonts.body.medium, fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
 });

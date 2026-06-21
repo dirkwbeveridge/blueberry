@@ -1,14 +1,17 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ScrollView, View, Text, TouchableOpacity,
-  StyleSheet, LayoutAnimation,
+    LayoutAnimation,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { useHousehold } from '../../hooks/useHousehold';
-import { weekContent } from '../../constants/weekContent';
-import { babyDevelopment } from '../../constants/babyDevelopment';
 import { Card } from '../../components/ui/Card';
+import { babyDevelopment } from '../../constants/babyDevelopment';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { weekContent } from '../../constants/weekContent';
+import { useHousehold } from '../../hooks/useHousehold';
 
 // Week-specific partner action ideas, keyed by trimester
 const TRIMESTER_ACTIONS: Record<1|2|3, string[]> = {
@@ -47,8 +50,21 @@ const CONNECTION_PROMPTS = [
   "What do you want our family to feel like?",
 ];
 
-function AccordionCard({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(true);
+const FOCUS_LABEL = 'THIS WEEK FOCUS';
+const CONVERSATION_LABEL = '💬  THIS WEEK CONVERSATION';
+
+function AccordionCard({
+  title,
+  emoji,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  emoji: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <Card style={styles.accordionCard}>
       <TouchableOpacity
@@ -89,17 +105,17 @@ export default function PartnerScreen() {
 
       {/* This week's focus */}
       <Card style={styles.focusCard}>
-        <Text style={styles.focusLabel}>THIS WEEK FOCUS</Text>
+        <Text style={styles.focusLabel}>{FOCUS_LABEL}</Text>
         <Text style={styles.focusText}>{content.partnerFocus}</Text>
       </Card>
 
-      {/* What she's experiencing */}
-      <AccordionCard title="What she is experiencing" emoji="🌿">
+      {/* What they are experiencing */}
+      <AccordionCard title="What they are experiencing" emoji="🌿" defaultOpen>
         <Text style={styles.bodyText}>{content.mindAndBody}</Text>
       </AccordionCard>
 
       {/* Baby this week */}
-      <AccordionCard title="Baby this week" emoji="👶">
+      <AccordionCard title="Baby this week" emoji="👶" defaultOpen={false}>
         <Text style={styles.bodyText}>{dev.headline}</Text>
         <View style={styles.babyStats}>
           <View style={styles.babyStat}>
@@ -120,7 +136,7 @@ export default function PartnerScreen() {
       </AccordionCard>
 
       {/* How to help */}
-      <AccordionCard title="How to help this week" emoji="💙">
+      <AccordionCard title="How to help this week" emoji="💙" defaultOpen={false}>
         <View style={styles.actionList}>
           {actions.map((action, i) => (
             <View key={i} style={styles.actionRow}>
@@ -133,9 +149,9 @@ export default function PartnerScreen() {
 
       {/* Connection prompt */}
       <Card style={styles.promptCard}>
-        <Text style={styles.promptLabel}>💬  THIS WEEK CONVERSATION</Text>
+        <Text style={styles.promptLabel}>{CONVERSATION_LABEL}</Text>
         <Text style={styles.promptQuestion}>{prompt}</Text>
-        <Text style={styles.promptHint}>Ask her tonight. Listen without immediately responding.</Text>
+        <Text style={styles.promptHint}>Ask them tonight. Listen without immediately responding.</Text>
       </Card>
 
       {/* Quick actions */}

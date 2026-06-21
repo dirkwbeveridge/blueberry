@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { ProgressBar } from '../ui/ProgressBar';
+import { StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, spacing } from '../../constants/theme';
 import { getDaysUntilDue } from '../../lib/pregnancy';
+import { ProgressBar } from '../ui/ProgressBar';
 
 interface TrimesterProgressProps {
   week:      number;
@@ -10,7 +10,7 @@ interface TrimesterProgressProps {
 }
 
 export function TrimesterProgress({ week, dueDateIso }: TrimesterProgressProps) {
-  const progress  = week / 40;
+  const progress  = Math.max(0, Math.min(week / 40, 1));
   const daysLeft  = dueDateIso ? getDaysUntilDue(dueDateIso) : null;
   const trimester = week <= 13 ? 1 : week <= 26 ? 2 : 3;
 
@@ -24,7 +24,7 @@ export function TrimesterProgress({ week, dueDateIso }: TrimesterProgressProps) 
       </View>
       <ProgressBar progress={progress} height={8} color={colors.accent} />
       <View style={styles.ticks}>
-        {['1', '13', '26', '40'].map(w => (
+        {['w1', 'w13', 'w26', 'w40'].map(w => (
           <Text key={w} style={styles.tick}>{w}</Text>
         ))}
       </View>

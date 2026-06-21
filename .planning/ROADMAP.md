@@ -20,7 +20,7 @@
 
 **Goal:** Create a running Expo TypeScript app with navigation skeleton, design tokens, shared UI primitives, Supabase schema/setup docs, typed domain model, and local household store.
 
-**Status:** Planned
+**Status:** In progress
 
 **Requirements:** INFRA-01 through INFRA-05
 
@@ -103,6 +103,8 @@
 
 ## Phase 7a: Google Calendar Sync (promoted to Phase 1, 2026-05-23)
 
+**Re-baselined 2026-06-20:** Treat current implementation as UI foundation started (connect entry points present) while OAuth token exchange and two-way appointment sync remain the execution gate.
+
 **Goal:** Two-way sync of `appointments` with the user's Google Calendar.
 
 **Success Criteria**
@@ -126,6 +128,8 @@
 
 ## Phase 7c: Push Notifications (promoted to Phase 1, 2026-05-23)
 
+**Re-baselined 2026-06-20:** Execute APNs-first iOS delivery in this phase; Android/FCM remains required future intent and moves to a follow-on phase after APNs verification closes.
+
 **Goal:** Push notifications for shared household events: appointment reminders, partner's check-in shared, todo assigned, kick session reminder.
 
 **Success Criteria**
@@ -136,6 +140,8 @@
 4. User can adjust which categories ping them from More, Notifications.
 5. Quiet hours (default 9 pm to 7 am) honored across all categories except labor-stage emergencies.
 
+**Status:** In progress. The real repo now has APNs token registration, a notifications preferences modal, local appointment reminder scheduling on-device, and a direct APNs Edge Function scaffold. Remaining work is backend deployment, orchestration, and physical-device verification.
+
 ## Phase 7d: AI Content (still deferred)
 
 **Goal:** Stage-aware AI content for Mom's week detail, Partner's support suggestions, and the conversation prompt.
@@ -143,6 +149,8 @@
 **Status:** Deferred until Phase 1 (including 7a/7b/7c) is verified on real devices and shipped to the two-person household. The `todos.source = 'ai'` enum and the UI surfaces are scaffolded; the producer is not.
 
 ## Phase 8: Family Mode (Postpartum)
+
+**Re-baselined 2026-06-20:** Keep postpartum scope intact, with explicit trigger path defined as More -> Begin Family Mode. Trigger implementation is the entry gate before feature execution.
 
 **Goal:** When `households.baby_dob` is set, the app transitions into Family Mode. Feeding, sleep, diaper logs; pediatric visits; baby milestones; postpartum check-in for Mom; honest night-shift swap for Partner.
 
@@ -152,4 +160,4 @@
 
 ## Immediate Next Step
 
-Verify the Phase 1 golden path on a real device (sign up, create household, partner-join, realtime sync), then begin parallel planning of Phases 7a, 7b, and 7c.
+Verify the current golden path and APNs flow on a real device, deploy the APNs Edge Function and secrets in Supabase, then proceed with Phase 7a and 7b planning/execution in parallel with Family Mode planning.

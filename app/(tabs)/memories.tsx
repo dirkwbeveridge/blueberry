@@ -1,16 +1,21 @@
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ScrollView, View, Text, TouchableOpacity,
-  StyleSheet, RefreshControl, Alert,
+    Alert,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { colors, fonts, radii, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { supabase } from '../../lib/supabase';
 import type { JournalEntry } from '../../types';
 
 function formatDate(iso: string) {
@@ -35,7 +40,12 @@ export default function MemoriesScreen() {
     setLoading(false);
   }, [household]);
 
-  useEffect(() => { fetchEntries(); }, [fetchEntries]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchEntries();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchEntries]);
 
   useRealtimeSync<Record<string, unknown>>({
     table: 'journal_entries', householdId: household?.id ?? null,
@@ -47,6 +57,11 @@ export default function MemoriesScreen() {
   }, [fetchEntries]);
 
   const milestones = entries.filter(e => e.milestone_tag);
+
+  function openEntry(entry: JournalEntry) {
+    const title = entry.milestone_tag ?? `Week ${entry.week_number}`;
+    Alert.alert(title, entry.content);
+  }
 
   return (
     <ScrollView
@@ -61,11 +76,12 @@ export default function MemoriesScreen() {
         action={
           <TouchableOpacity
             style={styles.addBtn}
-            onPress={() => Alert.alert('Coming soon', 'Compose a journal entry — landing in the next phase.')}
+            onPress={() => router.push('/(tabs)/journal' as never)}
             activeOpacity={0.8}
             accessibilityRole="button"
+            accessibilityLabel="Open journal"
           >
-            <Text style={styles.addBtnText}>+ Add</Text>
+            <Text style={styles.addBtnText}>Open journal</Text>
           </TouchableOpacity>
         }
       />
@@ -76,10 +92,17 @@ export default function MemoriesScreen() {
           <Text style={styles.sectionLabel}>Milestones</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.milestoneStrip}>
             {milestones.map(m => (
-              <View key={m.id} style={styles.milestoneCard}>
+              <TouchableOpacity
+                key={m.id}
+                style={styles.milestoneCard}
+                onPress={() => openEntry(m)}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel={`${m.milestone_tag ?? 'Milestone'}, week ${m.week_number}`}
+              >
                 <Text style={styles.milestoneTag} numberOfLines={1}>{m.milestone_tag}</Text>
                 <Text style={styles.milestoneWeek}>Week {m.week_number}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
@@ -95,7 +118,7 @@ export default function MemoriesScreen() {
             emoji="📓"
             title="No memories yet"
             body={`Capture little moments as they happen.${currentWeek > 0 ? ` Week ${currentWeek} is a good place to start.` : ''}`}
-            action={{ label: 'Write your first note', onPress: () => Alert.alert('Coming soon', 'Journal compose lands in the next phase.') }}
+            action={{ label: 'Open journal', onPress: () => router.push('/(tabs)/journal' as never) }}
           />
         </Card>
       ) : (
@@ -109,7 +132,7 @@ export default function MemoriesScreen() {
               {e.milestone_tag && (
                 <Text style={styles.entryMilestone}>✨ {e.milestone_tag}</Text>
               )}
-              <Text style={styles.entryContent} numberOfLines={5}>{e.content}</Text>
+              <Text style={styles.entryContent}>{e.content}</Text>
             </Card>
           ))}
         </View>

@@ -3,343 +3,453 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blueberry — Project Dashboard</title>
+<title>Blueberry Project Dashboard</title>
 <style>
   :root {
-    --plum: #3D2B6B;
-    --accent: #C4B5E8;
-    --bg: #FAF8F5;
-    --surface: #FFFFFF;
-    --text: #1A1A2E;
-    --muted: #7B6F8A;
-    --border: #EDE8F5;
-    --green: #6DBF82;
-    --amber: #F4A261;
-    --red: #E76F51;
-    --blue: #6B8FD6;
-    --grey: #B8B0C4;
+    --ink: #1f1538;
+    --plum: #4a327d;
+    --lavender: #cbbce9;
+    --paper: #faf8f5;
+    --card: #ffffff;
+    --line: #e9e1f3;
+    --muted: #6a5b81;
+    --ok-bg: #e9f7ef;
+    --ok-fg: #2f8752;
+    --run-bg: #fff3e7;
+    --run-fg: #b5661f;
+    --plan-bg: #ebf2ff;
+    --plan-fg: #325eac;
+    --defer-bg: #f0edf5;
+    --defer-fg: #756a87;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  * { box-sizing: border-box; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-    padding: 40px 24px 80px;
+    margin: 0;
+    font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 0% -10%, #efe8fb 0%, rgba(239, 232, 251, 0) 42%),
+      radial-gradient(circle at 100% 0%, #f7efdd 0%, rgba(247, 239, 221, 0) 38%),
+      var(--paper);
+    line-height: 1.45;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; }
-  header { margin-bottom: 32px; }
-  h1 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 38px;
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 20px 56px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 42px;
+    letter-spacing: -0.6px;
     color: var(--plum);
-    letter-spacing: -0.5px;
   }
-  .sub { color: var(--muted); font-size: 15px; margin-top: 4px; }
-  .meta { color: var(--muted); font-size: 13px; margin-top: 10px; }
 
-  .blocker {
-    background: #FDF0EC;
-    border: 1px solid var(--red);
+  .subtitle {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .meta {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .banner {
+    margin-top: 22px;
+    background: linear-gradient(135deg, #ffffff, #f7f3fd);
+    border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 20px 24px;
-    margin-bottom: 28px;
+    padding: 16px 18px;
+    display: grid;
+    gap: 6px;
   }
-  .blocker h2 { font-size: 15px; color: var(--red); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-  .blocker p { font-size: 15px; color: var(--text); }
-  .blocker .fix { margin-top: 10px; font-size: 14px; color: var(--muted); }
-  .blocker code { background: #fff; padding: 2px 6px; border-radius: 5px; font-size: 13px; color: var(--plum); }
 
-  .win {
-    background: #ECF7EF;
-    border: 1px solid var(--green);
-    border-radius: 14px;
-    padding: 20px 24px;
-    margin-bottom: 28px;
+  .banner strong { color: var(--plum); }
+  .banner p { margin: 0; font-size: 14px; }
+
+  .kpis {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
   }
-  .win h2 { font-size: 15px; color: #3E8E54; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-  .win p { font-size: 15px; color: var(--text); }
-  .win .fix { margin-top: 10px; font-size: 14px; color: var(--muted); }
-  .win code { background: #fff; padding: 2px 6px; border-radius: 5px; font-size: 13px; color: var(--plum); }
 
-  .buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
-  .bucket { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
-  .bucket .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .bucket .pct { font-family: Georgia, serif; font-size: 30px; color: var(--plum); margin: 6px 0; }
-  .bucket .note { font-size: 12px; color: var(--muted); }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+  }
 
-  .section-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 28px 0 14px; }
+  .kpi .label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .kpi .value {
+    margin-top: 6px;
+    font-size: 30px;
+    font-family: "Georgia", "Times New Roman", serif;
+    color: var(--plum);
+  }
+
+  .kpi .note {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  h2 {
+    margin: 28px 0 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+  }
+
+  .phase-grid {
+    display: grid;
+    gap: 10px;
+  }
 
   .phase {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 24px;
-    margin-bottom: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
     display: grid;
-    grid-template-columns: 60px 1fr 180px;
-    gap: 20px;
+    grid-template-columns: 72px 1fr 180px;
+    gap: 14px;
     align-items: center;
   }
-  .phase.blocked { border-color: var(--red); border-width: 1.5px; }
-  .pnum { font-family: Georgia, serif; font-size: 24px; color: var(--accent); font-weight: bold; }
-  .pbody h3 { font-size: 17px; color: var(--text); margin-bottom: 3px; }
-  .pbody .goal { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-  .pbody .next { font-size: 13px; color: var(--text); }
-  .pbody .next b { color: var(--plum); }
 
-  .pmeta { text-align: right; }
-  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.3px; }
-  .pill.done { background: #E8F6EC; color: #3E8E54; }
-  .pill.written { background: #FEF3E8; color: #C77A2E; }
-  .pill.planned { background: #ECF1FB; color: #4A6FB5; }
-  .pill.blocked { background: #FDECE7; color: var(--red); }
-  .pill.deferred { background: #F1EFF5; color: var(--muted); }
+  .num {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 26px;
+    color: var(--lavender);
+    text-align: center;
+  }
 
-  .bar { height: 7px; background: var(--border); border-radius: 4px; margin-top: 10px; overflow: hidden; }
-  .bar span { display: block; height: 100%; border-radius: 4px; }
-  .bar.done span { background: var(--green); }
-  .bar.written span { background: var(--amber); }
-  .bar.planned span { background: var(--blue); }
-  .bar.blocked span { background: var(--red); }
-  .bar.deferred span { background: var(--grey); }
-  .pct-txt { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .title {
+    font-size: 17px;
+    margin: 0 0 2px;
+  }
 
-  .legend { margin-top: 32px; padding: 18px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; font-size: 13px; color: var(--muted); }
-  .legend b { color: var(--text); }
-  .legend ul { margin: 8px 0 0 18px; }
-  .legend li { margin-bottom: 4px; }
+  .goal {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
 
-  @media (max-width: 720px) {
-    .buckets { grid-template-columns: repeat(2, 1fr); }
-    .phase { grid-template-columns: 1fr; gap: 12px; }
-    .pmeta { text-align: left; }
+  .next {
+    margin: 8px 0 0;
+    font-size: 13px;
+  }
+
+  .status {
+    text-align: right;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .done { background: var(--ok-bg); color: var(--ok-fg); }
+  .inprogress { background: var(--run-bg); color: var(--run-fg); }
+  .planned { background: var(--plan-bg); color: var(--plan-fg); }
+  .deferred { background: var(--defer-bg); color: var(--defer-fg); }
+
+  .bar {
+    margin-top: 10px;
+    height: 7px;
+    border-radius: 6px;
+    background: #efeaf7;
+    overflow: hidden;
+  }
+
+  .bar > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #7b60b6, #c6b8e5);
+  }
+
+  .pct {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .list-card {
+    margin-top: 20px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .list-card h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--plum);
+  }
+
+  .list-card ol {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .list-card li {
+    margin: 7px 0;
+    font-size: 14px;
+  }
+
+  @media (max-width: 860px) {
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .phase { grid-template-columns: 1fr; }
+    .num { text-align: left; }
+    .status { text-align: left; }
+  }
+
+  @media (max-width: 520px) {
+    .kpis { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>🫐 Blueberry</h1>
-    <div class="sub">v1 private household companion — build dashboard</div>
-    <div class="meta">Generated 2026-06-09 · 17 commits · project age 17 days · branch main</div>
+    <h1>Blueberry Dashboard</h1>
+    <p class="subtitle">Status by phase for v1 private household companion</p>
+    <p class="meta">Updated 2026-06-20 from .planning/STATE.md, .planning/ROADMAP.md, and workstream state files</p>
   </header>
 
-  <div class="win">
-    <h2>✅ Golden path verified on device</h2>
-    <p>The Phase 2 blocker is cleared. Signup → create household → land in the app now works on a real phone, and the backend passes <b>20/20</b> in <code>scripts/test-e2e.mjs</code> (signup, household create, partner join, every data table). Tasks, appointments, and symptoms save and load on device. Phases 2 through 6 moved from "written" to "verified."</p>
-    <p class="fix"><b>Remaining verification:</b> partner join on a second device, and live realtime sync between two connected clients. Both need a second device/simulator. The journal screen is still a placeholder.</p>
-  </div>
+  <section class="banner">
+    <p><strong>Active workstream:</strong> Push Notifications (7c)</p>
+    <p><strong>Current focus:</strong> backend deployment and physical-device APNs verification</p>
+    <p><strong>Largest risk:</strong> unresolved execution gates (calendar OAuth + two-way sync, and Family Mode trigger implementation)</p>
+  </section>
 
-  <div class="buckets">
-    <div class="bucket">
-      <div class="label">Foundation</div>
-      <div class="pct">100%</div>
-      <div class="note">Phases 0–1 done &amp; verified</div>
-    </div>
-    <div class="bucket">
-      <div class="label">MVP Core</div>
-      <div class="pct">~72%</div>
-      <div class="note">Phases 2–6 mostly verified on device</div>
-    </div>
-    <div class="bucket">
-      <div class="label">Integrations</div>
-      <div class="pct">~13%</div>
-      <div class="note">Phases 7a–7c planned only</div>
-    </div>
-    <div class="bucket">
-      <div class="label">Family Mode</div>
-      <div class="pct">~15%</div>
-      <div class="note">Phase 8 planned only</div>
-    </div>
-  </div>
+  <section class="kpis">
+    <article class="kpi">
+      <div class="label">Phases tracked</div>
+      <div class="value">12</div>
+      <div class="note">0, 1, 2, 3, 4, 5, 6, 7a, 7b, 7c, 7d, 8</div>
+    </article>
+    <article class="kpi">
+      <div class="label">Complete</div>
+      <div class="value">1</div>
+      <div class="note">Phase 0 complete</div>
+    </article>
+    <article class="kpi">
+      <div class="label">In progress</div>
+      <div class="value">3</div>
+      <div class="note">Foundation hardening + 7a foundation + 7c APNs-first</div>
+    </article>
+    <article class="kpi">
+      <div class="label">Planned/Deferred</div>
+      <div class="value">8</div>
+      <div class="note">Calendar, Family Mode, AI deferred</div>
+    </article>
+  </section>
 
-  <div class="section-label">Foundation — done</div>
+  <h2>Phase Status</h2>
+  <section class="phase-grid">
+    <article class="phase">
+      <div class="num">0</div>
+      <div>
+        <h3 class="title">Clean Planning</h3>
+        <p class="goal">Set up codex-owned planning without importing legacy implementation artifacts.</p>
+        <p class="next"><strong>Next:</strong> None.</p>
+      </div>
+      <div class="status">
+        <span class="pill done">Complete</span>
+        <div class="bar"><span style="width:100%"></span></div>
+        <div class="pct">100%</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">0</div>
-    <div class="pbody">
-      <h3>Clean Planning</h3>
-      <div class="goal">Codex-owned plan built from useful legacy context, no legacy implementation imported.</div>
-      <div class="next next-done">Complete. No further action.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill done">Done &amp; Verified</span>
-      <div class="bar done"><span style="width:100%"></span></div>
-      <div class="pct-txt">100%</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">1</div>
+      <div>
+        <h3 class="title">Foundation</h3>
+        <p class="goal">Running Expo app with schema, tokens, primitives, and persistent household state.</p>
+        <p class="next"><strong>Next:</strong> complete real-device golden-path verification against deployed Supabase.</p>
+      </div>
+      <div class="status">
+        <span class="pill inprogress">In Progress</span>
+        <div class="bar"><span style="width:85%"></span></div>
+        <div class="pct">Consolidated, verification pending</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">1</div>
-    <div class="pbody">
-      <h3>Foundation</h3>
-      <div class="goal">Running Expo app: navigation skeleton, design tokens, UI primitives, Supabase schema docs, typed model, household store.</div>
-      <div class="next">App runs on device, typecheck + lint pass, store persists. <b>Verified this session.</b></div>
-    </div>
-    <div class="pmeta">
-      <span class="pill done">Done &amp; Verified</span>
-      <div class="bar done"><span style="width:100%"></span></div>
-      <div class="pct-txt">100%</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">2</div>
+      <div>
+        <h3 class="title">Auth and Household</h3>
+        <p class="goal">Auth, role selection, household create/join, session persistence, two-user cap.</p>
+        <p class="next"><strong>Next:</strong> verify end-to-end signup/create/join in live environment.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Ported</span>
+        <div class="bar"><span style="width:70%"></span></div>
+        <div class="pct">Code ported, gate not closed</div>
+      </div>
+    </article>
 
-  <div class="section-label">MVP Core — golden path verified on device</div>
+    <article class="phase">
+      <div class="num">3</div>
+      <div>
+        <h3 class="title">Home and Shared Todos</h3>
+        <p class="goal">Household dashboard with stage/week, todos, and quick actions.</p>
+        <p class="next"><strong>Next:</strong> verify realtime sync behavior across two users.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Ported</span>
+        <div class="bar"><span style="width:68%"></span></div>
+        <div class="pct">Functional port, sync verification pending</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">2</div>
-    <div class="pbody">
-      <h3>Auth &amp; Household</h3>
-      <div class="goal">Email auth, role selection, household creation, invite-code join, session persistence, two-user cap.</div>
-      <div class="next">Signup → create household → land in app verified on device. Partner join + 2-user cap pass in E2E. <b>Next:</b> partner join on a second device.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill done">Done &amp; Verified</span>
-      <div class="bar done"><span style="width:90%"></span></div>
-      <div class="pct-txt">90% — device-verified; 2nd-device join pending</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">4</div>
+      <div>
+        <h3 class="title">Health Logging and Journal</h3>
+        <p class="goal">Symptoms, mood, energy, notes, and shared journal entries.</p>
+        <p class="next"><strong>Next:</strong> complete journal activation in current tab flow and verify history sync.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Partial</span>
+        <div class="bar"><span style="width:58%"></span></div>
+        <div class="pct">Health mostly ported, journal not fully active</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">3</div>
-    <div class="pbody">
-      <h3>Home &amp; Shared Todos</h3>
-      <div class="goal">Main dashboard: stage/week status, progress, recent health summary, realtime todos, quick actions.</div>
-      <div class="next">Todos save and load on device; quick actions wired. <b>Next:</b> confirm live sync between two connected clients (realtime channel fix landed this session).</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill done">Done &amp; Verified</span>
-      <div class="bar done"><span style="width:80%"></span></div>
-      <div class="pct-txt">80% — verified single-user; cross-user sync pending</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">5</div>
+      <div>
+        <h3 class="title">Pregnancy Tracking Tools</h3>
+        <p class="goal">Kick counter and contraction timer with resilient persistence/sync behavior.</p>
+        <p class="next"><strong>Next:</strong> verify offline-to-online flow on device.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Ported</span>
+        <div class="bar"><span style="width:65%"></span></div>
+        <div class="pct">UI shipped, workflow verification pending</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">4</div>
-    <div class="pbody">
-      <h3>Health Logging &amp; Journal</h3>
-      <div class="goal">Symptoms, mood, energy, notes, and shared journal entries for both users.</div>
-      <div class="next">Symptom logging verified on device (saves + appears in history). <b>Next:</b> the Journal tab is still a placeholder — needs a real screen.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill written">Partial</span>
-      <div class="bar written"><span style="width:55%"></span></div>
-      <div class="pct-txt">55% — health verified, journal stubbed</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">6</div>
+      <div>
+        <h3 class="title">Partner and Appointments</h3>
+        <p class="goal">Partner support surface and household appointment management.</p>
+        <p class="next"><strong>Next:</strong> verify both users can create and view shared appointments in live backend.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Ported</span>
+        <div class="bar"><span style="width:70%"></span></div>
+        <div class="pct">Ported, awaiting full partner-path test</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">5</div>
-    <div class="pbody">
-      <h3>Pregnancy Tracking Tools</h3>
-      <div class="goal">Kick counter and offline contraction timer with later sync.</div>
-      <div class="next">Inserts pass in the E2E suite (kick + contraction sessions). <b>Next:</b> exercise both tools on device and confirm offline → sync.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill written">Written</span>
-      <div class="bar written"><span style="width:65%"></span></div>
-      <div class="pct-txt">65% — backend verified, UI not device-tested</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">7a</div>
+      <div>
+        <h3 class="title">Google Calendar Sync</h3>
+        <p class="goal">Two-way sync between appointments and Google Calendar.</p>
+        <p class="next"><strong>Next:</strong> implement OAuth exchange and two-way sync; connect UI foundation is already in place.</p>
+      </div>
+      <div class="status">
+        <span class="pill inprogress">Foundation Started</span>
+        <div class="bar"><span style="width:35%"></span></div>
+        <div class="pct">UI/connect surfaces exist; sync engine not implemented</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">6</div>
-    <div class="pbody">
-      <h3>Partner &amp; Appointments</h3>
-      <div class="goal">Partner support surface and household appointment management.</div>
-      <div class="next">Appointment create/view verified on device; date/time pickers and month calendar added this session. <b>Next:</b> view the partner surface as the partner role.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill done">Done &amp; Verified</span>
-      <div class="bar done"><span style="width:75%"></span></div>
-      <div class="pct-txt">75% — appointments verified; partner-role view pending</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">7b</div>
+      <div>
+        <h3 class="title">Apple Calendar EventKit Sync</h3>
+        <p class="goal">Two-way sync between appointments and iOS EventKit.</p>
+        <p class="next"><strong>Next:</strong> execute in same calendar-sync workstream.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Planned</span>
+        <div class="bar"><span style="width:20%"></span></div>
+        <div class="pct">Plan written, no execution yet</div>
+      </div>
+    </article>
 
-  <div class="section-label">Integrations — promoted to v1, planned only</div>
+    <article class="phase">
+      <div class="num">7c</div>
+      <div>
+        <h3 class="title">Push Notifications</h3>
+        <p class="goal">APNs-first iOS notifications with preferences and privacy-safe payloads.</p>
+        <p class="next"><strong>Next:</strong> deploy schema/migration, set APNs secrets, deploy function, verify token + delivery on real iPhone.</p>
+      </div>
+      <div class="status">
+        <span class="pill inprogress">In Progress</span>
+        <div class="bar"><span style="width:75%"></span></div>
+        <div class="pct">APNs-first implementation complete locally, external deploy pending</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">7a</div>
-    <div class="pbody">
-      <h3>Google Calendar Sync</h3>
-      <div class="goal">Two-way sync of appointments with Google Calendar via OAuth.</div>
-      <div class="next"><b>Next:</b> Execute the calendar-sync plan — OAuth from More tab, event mapping to <code>google_event_id</code>.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill planned">Planned</span>
-      <div class="bar planned"><span style="width:15%"></span></div>
-      <div class="pct-txt">15% — plan written</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">7d</div>
+      <div>
+        <h3 class="title">AI Content</h3>
+        <p class="goal">Stage-aware AI-generated content for week detail and partner suggestions.</p>
+        <p class="next"><strong>Next:</strong> remains gated until 7a/7b/7c verification is complete.</p>
+      </div>
+      <div class="status">
+        <span class="pill deferred">Deferred</span>
+        <div class="bar"><span style="width:8%"></span></div>
+        <div class="pct">Scaffold-only surfaces</div>
+      </div>
+    </article>
 
-  <div class="phase">
-    <div class="pnum">7b</div>
-    <div class="pbody">
-      <h3>Apple Calendar (EventKit) Sync</h3>
-      <div class="goal">Two-way sync of appointments with iOS EventKit.</div>
-      <div class="next"><b>Next:</b> iOS permission flow at first appointment screen, add <code>apple_event_id</code> column. Covered in calendar-sync plan.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill planned">Planned</span>
-      <div class="bar planned"><span style="width:10%"></span></div>
-      <div class="pct-txt">10% — plan written</div>
-    </div>
-  </div>
+    <article class="phase">
+      <div class="num">8</div>
+      <div>
+        <h3 class="title">Family Mode Postpartum</h3>
+        <p class="goal">Postpartum workflows: feeding, sleep, diapers, milestones, and night-shift coordination.</p>
+        <p class="next"><strong>Next:</strong> implement More -&gt; Begin Family Mode trigger, then start execution after current gates are stable.</p>
+      </div>
+      <div class="status">
+        <span class="pill planned">Planned</span>
+        <div class="bar"><span style="width:22%"></span></div>
+        <div class="pct">Trigger path defined, implementation not started</div>
+      </div>
+    </article>
+  </section>
 
-  <div class="phase">
-    <div class="pnum">7c</div>
-    <div class="pbody">
-      <h3>Push Notifications</h3>
-      <div class="goal">Native APNs notifications for shared household events, voice-rule copy, privacy-safe payloads, quiet hours.</div>
-      <div class="next"><b>Next:</b> Execute the push plan — token registration against the user row, category preferences in More.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill planned">Planned</span>
-      <div class="bar planned"><span style="width:15%"></span></div>
-      <div class="pct-txt">15% — plan written (APNs-only)</div>
-    </div>
-  </div>
-
-  <div class="section-label">Later</div>
-
-  <div class="phase">
-    <div class="pnum">7d</div>
-    <div class="pbody">
-      <h3>AI Content</h3>
-      <div class="goal">Stage-aware AI copy for week detail, partner suggestions, conversation prompts.</div>
-      <div class="next"><b>Deferred</b> until 7a/7b/7c ship and verify on real devices. UI surfaces scaffolded; producer not built.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill deferred">Deferred</span>
-      <div class="bar deferred"><span style="width:5%"></span></div>
-      <div class="pct-txt">5% — scaffolding only</div>
-    </div>
-  </div>
-
-  <div class="phase">
-    <div class="pnum">8</div>
-    <div class="pbody">
-      <h3>Family Mode (Postpartum)</h3>
-      <div class="goal">When baby_dob is set: feeding/sleep/diaper logs, pediatric visits, milestones, postpartum check-in, night-shift swap.</div>
-      <div class="next"><b>Next:</b> Execute family-mode plan (4 tasks). Schema space reserved. Test household is already postpartum, so this should not lag far behind.</div>
-    </div>
-    <div class="pmeta">
-      <span class="pill planned">Planned</span>
-      <div class="bar planned"><span style="width:15%"></span></div>
-      <div class="pct-txt">15% — plan written</div>
-    </div>
-  </div>
-
-  <div class="legend">
-    <b>How to read percent complete</b>
-    <ul>
-      <li><b>Done &amp; Verified</b> — built and proven working (runs, passes checks, observed on device).</li>
-      <li><b>Written</b> — code exists and type-checks, but the behavior has not been confirmed against the live backend. Most MVP-core code is here.</li>
-      <li><b>Planned</b> — a phase plan exists, no implementation yet.</li>
-      <li><b>Blocked</b> — cannot progress until a named dependency is resolved.</li>
-    </ul>
-    <p style="margin-top:10px;">The honest headline: the foundation and the MVP core golden path are now verified on a real device, backed by a 20/20 E2E suite. What's left in the core is two-client work — partner join and live realtime sync on a second device — plus building the real Journal screen. Then the focus shifts to the integration phases (calendar, push) and Family Mode.</p>
-  </div>
+  <section class="list-card">
+    <h3>Immediate Next Steps</h3>
+    <ol>
+      <li>Deploy or confirm schema and push-token migration in the active Supabase project.</li>
+      <li>Set APNs secrets and deploy send-apns-notification.</li>
+      <li>Run physical-device validation for push registration and APNs delivery.</li>
+      <li>Close Phase 1 golden-path verification against live Supabase.</li>
+      <li>Implement Google Calendar OAuth exchange + two-way sync (7a), then EventKit two-way sync (7b).</li>
+      <li>Implement More -&gt; Begin Family Mode trigger as Phase 8 execution gate.</li>
+    </ol>
+  </section>
 </div>
 </body>
 </html>

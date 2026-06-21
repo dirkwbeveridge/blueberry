@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import DatePicker from 'react-native-date-picker';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+
+type MinuteInterval = 1 | 2 | 3 | 4 | 5 | 6 | 10 | 12 | 15 | 20 | 30;
 
 interface TimeFieldProps {
   label:        string;
   value:        Date | null;
   onChange:     (d: Date | null) => void;
   placeholder?: string;
+  minuteInterval?: MinuteInterval;
+  // Kept for backward compatibility with existing callsites.
+  display?:     'default' | 'spinner' | 'compact' | 'inline';
 }
 
 function defaultTime(): Date {
@@ -16,7 +21,7 @@ function defaultTime(): Date {
   return d;
 }
 
-export function TimeField({ label, value, onChange, placeholder = 'Select a time' }: TimeFieldProps) {
+export function TimeField({ label, value, onChange, placeholder = 'Select a time', minuteInterval = 5 }: TimeFieldProps) {
   const [showPicker, setShowPicker] = useState(false);
 
   return (
@@ -24,7 +29,7 @@ export function TimeField({ label, value, onChange, placeholder = 'Select a time
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity
         style={styles.trigger}
-        onPress={() => setShowPicker(s => !s)}
+        onPress={() => setShowPicker(true)}
         activeOpacity={0.7}
         accessibilityRole="button"
       >
@@ -41,27 +46,21 @@ export function TimeField({ label, value, onChange, placeholder = 'Select a time
             <Text style={styles.clearBtn}>✕</Text>
           </TouchableOpacity>
         ) : (
-          <Text style={styles.chevron}>{showPicker ? '▲' : '▽'}</Text>
+          <Text style={styles.chevron}>▽</Text>
         )}
       </TouchableOpacity>
-      {showPicker && (
-        <View style={styles.spinnerWrapper}>
-          <DateTimePicker
-            value={value ?? defaultTime()}
-            mode="time"
-            display="spinner"
-            onChange={(_, selected) => { if (selected) onChange(selected); }}
-            style={styles.spinner}
-          />
-          <TouchableOpacity
-            style={styles.doneBtn}
-            onPress={() => setShowPicker(false)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.doneBtnText}>Done</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      <DatePicker
+        modal
+        mode="time"
+        open={showPicker}
+        date={value ?? defaultTime()}
+        minuteInterval={minuteInterval}
+        onConfirm={(selected) => {
+          onChange(selected);
+          setShowPicker(false);
+        }}
+        onCancel={() => setShowPicker(false)}
+      />
     </View>
   );
 }
@@ -74,8 +73,4 @@ const styles = StyleSheet.create({
   placeholder:   { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted },
   clearBtn:      { fontFamily: fonts.body.medium, fontSize: 14, color: colors.textMuted },
   chevron:       { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  spinnerWrapper:{ backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-  spinner:       { height: 160 },
-  doneBtn:       { backgroundColor: colors.primary, marginHorizontal: spacing.md, marginBottom: spacing.md, borderRadius: radii.md, paddingVertical: spacing.sm, alignItems: 'center' },
-  doneBtnText:   { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.surface },
 });

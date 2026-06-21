@@ -1,30 +1,22 @@
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  ScrollView, View, Text, TouchableOpacity,
-  StyleSheet, FlatList, LayoutAnimation,
+    FlatList, LayoutAnimation,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { useHousehold } from '../../hooks/useHousehold';
-import { babyDevelopment } from '../../constants/babyDevelopment';
-import { weekContent } from '../../constants/weekContent';
-import { Card }       from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { babyDevelopment } from '../../constants/babyDevelopment';
+import { getFruitEmoji } from '../../constants/fruitEmojis';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { weekContent } from '../../constants/weekContent';
+import { useHousehold } from '../../hooks/useHousehold';
 
 const WEEKS = Array.from({ length: 40 }, (_, i) => i + 1);
-
-const FRUIT_EMOJIS: Record<string, string> = {
-  blueberry: '🫐', grape: '🍇', lime: '🍋', lemon: '🍋', peach: '🍑',
-  avocado: '🥑', banana: '🍌', carrot: '🥕', coconut: '🥥', pineapple: '🍍',
-  cantaloupe: '🍈', 'navel orange': '🍊', pear: '🍐', grapefruit: '🍊',
-  'small watermelon': '🍉', 'mini watermelon': '🍉', 'small pumpkin': '🎃',
-  papaya: '🥭', squash: '🥦', 'butternut squash': '🥦', 'kidney bean': '🫘',
-  kumquat: '🍊', fig: '🫐', 'sweet pea': '🌱', 'apple seed': '🌱',
-  'sesame seed': '🌱', 'poppy seed': '🌱', lentil: '🌱', 'poppyseed cluster': '🌱',
-  cauliflower: '🥦', 'romaine lettuce': '🥬', 'winter melon': '🍈',
-  'honeydew melon': '🍈', 'bell pepper': '🫑', 'heirloom tomato': '🍅',
-  'ear of corn': '🌽', 'scallion bunch': '🌿', rutabaga: '🥔',
-};
+const WEEK_PILL_ITEM_LENGTH = 50;
 
 function Section({ title, emoji, content }: { title: string; emoji: string; content: string }) {
   const [expanded, setExpanded] = useState(true);
@@ -58,7 +50,7 @@ export default function WeekDetailModal() {
 
   const dev     = babyDevelopment.find(w => w.week === selectedWeek) ?? babyDevelopment[14];
   const content = weekContent.find(w => w.week === selectedWeek) ?? weekContent[14];
-  const emoji   = FRUIT_EMOJIS[dev.size_fruit.toLowerCase()] ?? '🌿';
+  const emoji   = getFruitEmoji(dev.size_fruit);
 
   const trimesterOf = (w: number) => w <= 13 ? 1 : w <= 26 ? 2 : 3;
   const trimesterColors  = [colors.primaryTint, colors.primaryTint, colors.successTint];
@@ -84,7 +76,7 @@ export default function WeekDetailModal() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.selectorList}
           initialScrollIndex={Math.max(0, selectedWeek - 3)}
-          getItemLayout={(_, index) => ({ length: 52, offset: 52 * index, index })}
+          getItemLayout={(_, index) => ({ length: WEEK_PILL_ITEM_LENGTH, offset: WEEK_PILL_ITEM_LENGTH * index, index })}
           renderItem={({ item: w }) => {
             const isSelected = w === selectedWeek;
             const isCurrent  = w === currentWeek;
@@ -153,7 +145,7 @@ export default function WeekDetailModal() {
 
 const styles = StyleSheet.create({
   selectorWrapper: { borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.surface },
-  selectorList: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, gap: 6 },
+  selectorList: { paddingHorizontal: spacing.md, paddingRight: spacing.xl, paddingVertical: spacing.sm, gap: 6 },
   weekPill:     { width: 44, height: 44, borderRadius: radii.md, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   weekPillSelected: { backgroundColor: colors.primary },
   weekPillNum:  { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted },

@@ -1,16 +1,21 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Alert,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useHousehold } from '../../hooks/useHousehold';
-import { Button }     from '../../components/ui/Button';
-import { Card }       from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { colors, fonts, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
+import { supabase } from '../../lib/supabase';
 
 const STORAGE_KEY = 'blueberry-kick-session';
 
@@ -40,7 +45,6 @@ export default function KickCounterModal() {
       timer.current = setInterval(() => setElapsed(Date.now() - start), 500);
     } else {
       if (timer.current) clearInterval(timer.current);
-      setElapsed(0);
     }
     return () => { if (timer.current) clearInterval(timer.current); };
   }, [start]);
@@ -50,10 +54,14 @@ export default function KickCounterModal() {
   }
 
   function recordKick() {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const now = Date.now();
     const startedAt = start ?? now;
     const newCount = count + 1;
-    if (start === null) setStart(now);
+    if (start === null) {
+      setStart(now);
+      setElapsed(0);
+    }
     setCount(newCount);
     persist(newCount, startedAt);
   }
@@ -139,9 +147,14 @@ export default function KickCounterModal() {
           Count for 2 hours, or until you reach 10. Aim for at least 10 kicks per session.
         </Text>
 
-        {isActive && (
+        {(isActive || count > 0) && (
           <View style={styles.actions}>
-            <Button label={saving ? 'Saving…' : 'Finish session'} onPress={finish} loading={saving} />
+            <Button
+              label={saving ? 'Saving…' : 'Finish session'}
+              onPress={finish}
+              loading={saving}
+              disabled={!isActive || saving}
+            />
             <Button label="Reset" onPress={reset} variant="ghost" />
           </View>
         )}

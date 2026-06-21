@@ -1,20 +1,20 @@
 ---
 workstream: push-notifications
 created: 2026-06-09
-updated: 2026-06-09 (plan rewritten for native APNs/FCM)
+updated: 2026-06-20 (local APNs implementation hardened in real repo)
 ---
 
 # Project State
 
 ## Current Position
-**Status:** Planned
+**Status:** In progress
 **Current Phase:** 01-push-notifications
-**Last Activity:** 2026-06-09
-**Last Activity Description:** Phase plan written — 01-01-PLAN.md created, ready for execution
+**Last Activity:** 2026-06-20
+**Last Activity Description:** Local APNs token sync, notification settings UI, local appointment reminder flow, and APNs Edge Function reviewed and hardened in the real repo
 
 ## Progress
 **Phases Complete:** 0
-**Current Plan:** 01-01-PLAN.md (Wave 1, autonomous)
+**Current Plan:** 01-01-PLAN.md (execution started locally; external deployment still pending)
 
 ## Notification Events
 
@@ -54,14 +54,15 @@ updated: 2026-06-09 (plan rewritten for native APNs/FCM)
 | ~~FCM_SERVICE_ACCOUNT_JSON~~ | Not required — Android/FCM deferred |
 | ~~FCM_PROJECT_ID~~ | Not required — Android/FCM deferred |
 
-## Open Items Before Execution
+## Open Items Before Completion
 
 1. **APNs Auth Key:** Create at developer.apple.com → Keys → Add → Apple Push Notifications service. Requires Apple Developer Program. Download p8 file once and store as `APNS_AUTH_KEY` Supabase secret.
 2. ~~FCM Setup~~ — Android/FCM deferred. Not required for v1.
-3. **DB webhook configuration:** `notify-partner-checkin` and `notify-todo-assigned` require manual webhook setup in Supabase Dashboard after deployment. Document in `SUPABASE-SETUP.md`.
-4. **pg_cron jobs:** `notify-appointment-reminder` and `notify-kick-reminder` require pg_cron extension and cron job SQL. Document in `SUPABASE-SETUP.md`.
-5. **Real device for testing:** APNs tokens cannot be obtained on iOS Simulator. At least one real device needed for full end-to-end test.
+3. **Supabase deployment:** Apply `supabase-schema.sql`, the push-token migration, function secrets, and deploy `send-apns-notification`.
+4. **DB webhook configuration:** `notify-partner-checkin` and `notify-todo-assigned` require manual webhook setup in Supabase Dashboard after deployment.
+5. **pg_cron jobs:** `notify-appointment-reminder` and `notify-kick-reminder` require pg_cron extension and cron job SQL.
+6. **Real device for testing:** APNs tokens cannot be obtained on iOS Simulator. At least one real device needed for full end-to-end test.
 
 ## Session Continuity
-**Stopped At:** Planning complete — no execution started
-**Resume File:** `.planning/workstreams/push-notifications/phases/01-push-notifications/01-01-PLAN.md`
+**Stopped At:** Local implementation and build verification complete; remote delivery deployment and device verification still pending
+**Resume File:** `SUPABASE-SETUP.md`

@@ -22,6 +22,7 @@ create extension if not exists "pgcrypto";
 
 drop table if exists contraction_sessions cascade;
 drop table if exists kick_sessions         cascade;
+drop table if exists baby_logs             cascade;
 
 -- Postpartum tables from a prior migration — forward-looking, no current
 -- consumers. They'll come back in a 02-postpartum.sql when Phase 7+ needs them.
@@ -38,12 +39,15 @@ drop table if exists journal_entries       cascade;
 drop table if exists todos                 cascade;
 drop table if exists appointments          cascade;
 drop table if exists health_logs           cascade;
+drop table if exists device_push_tokens    cascade;
+drop table if exists notification_preferences cascade;
 drop table if exists users                 cascade;
 drop table if exists households            cascade;
 
 drop function if exists public.get_my_household_id()         cascade;
 drop function if exists public.household_member_count(uuid)  cascade;
 drop function if exists public.join_household_by_code(text)  cascade;
+drop function if exists public.set_updated_at()              cascade;
 
 
 -- ╭─── tables ──────────────────────────────────────────────────────────────╮
@@ -70,6 +74,31 @@ create table users (
   unique (household_id, role)
 );
 
+create table device_push_tokens (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references users(id) on delete cascade,
+  platform     text not null check (platform in ('ios')),
+  token        text not null,
+  environment  text not null check (environment in ('sandbox', 'production')),
+  bundle_id    text not null,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+  unique (platform, token)
+);
+
+create table notification_preferences (
+  user_id               uuid primary key references users(id) on delete cascade,
+  appointment_reminders boolean not null default true,
+  partner_check_ins     boolean not null default true,
+  new_todos             boolean not null default true,
+  kick_reminder         boolean not null default false,
+  quiet_hours_enabled   boolean not null default true,
+  quiet_from            time not null default '21:00:00',
+  quiet_until           time not null default '07:00:00',
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now()
+);
+
 create table health_logs (
   id            uuid primary key default gen_random_uuid(),
   household_id  uuid not null references households(id) on delete cascade,
@@ -90,6 +119,7 @@ create table appointments (
   location          text,
   notes             text,
   google_event_id   text,
+  created_by        uuid references users(id) on delete set null,
   created_at        timestamptz not null default now()
 );
 
@@ -114,6 +144,17 @@ create table journal_entries (
   milestone_tag  text,
   media_urls     text[],
   created_at     timestamptz not null default now()
+);
+
+create table baby_logs (
+  id            uuid primary key default gen_random_uuid(),
+  household_id  uuid not null references households(id) on delete cascade,
+  user_id       uuid not null references users(id) on delete cascade,
+  log_type      text not null check (log_type in ('feeding','sleep','diaper','handoff')),
+  logged_at     timestamptz not null default now(),
+  details       jsonb,
+  notes         text,
+  created_at    timestamptz not null default now()
 );
 
 create table kick_sessions (
@@ -251,10 +292,13 @@ grant execute on function public.create_household(text, text) to authenticated;
 -- ╭─── row level security ──────────────────────────────────────────────────╮
 alter table households           enable row level security;
 alter table users                enable row level security;
+alter table device_push_tokens   enable row level security;
+alter table notification_preferences enable row level security;
 alter table health_logs          enable row level security;
 alter table appointments         enable row level security;
 alter table todos                enable row level security;
 alter table journal_entries      enable row level security;
+alter table baby_logs            enable row level security;
 alter table kick_sessions        enable row level security;
 alter table contraction_sessions enable row level security;
 
@@ -279,6 +323,26 @@ create policy "user updates own row" on users
   for update using (id = auth.uid())
    with check (id = auth.uid());
 
+create policy "push token read" on device_push_tokens
+  for select using (user_id = auth.uid());
+create policy "push token insert" on device_push_tokens
+  for insert with check (user_id = auth.uid());
+create policy "push token update" on device_push_tokens
+  for update using (user_id = auth.uid())
+   with check (user_id = auth.uid());
+create policy "push token delete" on device_push_tokens
+  for delete using (user_id = auth.uid());
+
+create policy "notification preferences read" on notification_preferences
+  for select using (user_id = auth.uid());
+create policy "notification preferences insert" on notification_preferences
+  for insert with check (user_id = auth.uid());
+create policy "notification preferences update" on notification_preferences
+  for update using (user_id = auth.uid())
+   with check (user_id = auth.uid());
+create policy "notification preferences delete" on notification_preferences
+  for delete using (user_id = auth.uid());
+
 -- Data tables — household-scoped CRUD
 create policy "household select" on health_logs for select using (household_id = public.get_my_household_id());
 create policy "household insert" on health_logs for insert with check (household_id = public.get_my_household_id());
@@ -300,6 +364,10 @@ create policy "household insert" on journal_entries for insert with check (house
 create policy "household update" on journal_entries for update using (household_id = public.get_my_household_id()) with check (household_id = public.get_my_household_id());
 create policy "household delete" on journal_entries for delete using (household_id = public.get_my_household_id());
 
+create policy "household all" on baby_logs
+  for all using (household_id = public.get_my_household_id())
+       with check (household_id = public.get_my_household_id());
+
 create policy "household all" on kick_sessions
   for all using (household_id = public.get_my_household_id())
        with check (household_id = public.get_my_household_id());
@@ -316,6 +384,7 @@ alter publication supabase_realtime add table todos;
 alter publication supabase_realtime add table health_logs;
 alter publication supabase_realtime add table journal_entries;
 alter publication supabase_realtime add table appointments;
+alter publication supabase_realtime add table baby_logs;
 
 
 -- ╭─── indexes ─────────────────────────────────────────────────────────────╮
@@ -328,5 +397,31 @@ create index idx_appointments_date        on appointments(household_id, appointm
 create index idx_todos_household          on todos(household_id);
 create index idx_todos_due_date           on todos(household_id, due_date) where due_date is not null;
 create index idx_journal_household        on journal_entries(household_id);
+create index idx_baby_logs_household      on baby_logs(household_id, logged_at desc);
 create index idx_kick_sessions_household  on kick_sessions(household_id);
 create index idx_contractions_household   on contraction_sessions(household_id);
+
+
+-- ╭─── push-token helpers ────────────────────────────────────────────────╮
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists set_device_push_tokens_updated_at on device_push_tokens;
+drop trigger if exists set_notification_preferences_updated_at on notification_preferences;
+
+create trigger set_device_push_tokens_updated_at
+  before update on device_push_tokens
+  for each row
+  execute function public.set_updated_at();
+
+create trigger set_notification_preferences_updated_at
+  before update on notification_preferences
+  for each row
+  execute function public.set_updated_at();

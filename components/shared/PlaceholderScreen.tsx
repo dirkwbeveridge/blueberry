@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Card } from '@/components/ui/Card';
-import { colors, fonts, spacing } from '@/constants/theme';
+import { colors, fonts, spacing } from '../../constants/theme';
+import { Card } from '../ui/Card';
 
 interface PlaceholderScreenProps {
   title: string;

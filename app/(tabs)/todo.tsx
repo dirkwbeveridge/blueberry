@@ -1,18 +1,27 @@
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, RefreshControl, Alert,
+    Alert,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { CalendarPane } from '../../components/todo/CalendarPane';
+import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { colors, fonts, priorityColors, radii, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
-import { colors, fonts, radii, spacing, priorityColors } from '../../constants/theme';
+import { getValidAccessToken } from '../../lib/googleAuth';
+import { deleteCalendarEvent } from '../../lib/googleCalendarApi';
+import { cancelAppointmentReminderByAppointmentId } from '../../lib/notifications';
+import { supabase } from '../../lib/supabase';
 import type { Appointment, Priority, Todo } from '../../types';
 
 type PlanTab = 'todos' | 'appointments' | 'calendar';
@@ -36,8 +45,25 @@ function daysUntil(iso: string) {
   return `In ${days} days`;
 }
 
+function sortAppointments(items: Appointment[]) {
+  return [...items].sort(
+    (left, right) => new Date(left.appointment_date).getTime() - new Date(right.appointment_date).getTime()
+  );
+}
+
+function upsertAppointment(items: Appointment[], appointment: Appointment) {
+  return sortAppointments([...items.filter((item) => item.id !== appointment.id), appointment]);
+}
+
+function openEditAppointment(appointmentId: string) {
+  router.push({
+    pathname: '/(modals)/edit-appointment',
+    params: { appointmentId },
+  } as never);
+}
+
 export default function PlanScreen() {
-  const { household } = useHousehold();
+  const { household, currentUser } = useHousehold();
   const [activeTab,   setActiveTab]   = useState<PlanTab>('todos');
   const [todos,       setTodos]       = useState<Todo[]>([]);
   const [appointments,setAppointments]= useState<Appointment[]>([]);
@@ -66,11 +92,17 @@ export default function PlanScreen() {
       .from('appointments').select('*')
       .eq('household_id', household.id)
       .order('appointment_date', { ascending: true });
-    setAppointments(data ?? []);
+    setAppointments(sortAppointments(data ?? []));
     setApptsLoading(false);
   }, [household]);
 
-  useEffect(() => { fetchTodos(); fetchAppointments(); }, [fetchTodos, fetchAppointments]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchTodos();
+      void fetchAppointments();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchTodos, fetchAppointments]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -85,18 +117,50 @@ export default function PlanScreen() {
     onDelete: ({ id }) => setTodos(prev => prev.filter(t => t.id !== id)),
   });
 
+  useRealtimeSync<Record<string, unknown>>({
+    table: 'appointments',
+    householdId: household?.id ?? null,
+    onInsert: (payload) => {
+      const appointment = payload as unknown as Appointment;
+      setAppointments((prev) => upsertAppointment(prev, appointment));
+    },
+    onUpdate: (payload) => {
+      const appointment = payload as unknown as Appointment;
+      setAppointments((prev) => upsertAppointment(prev, appointment));
+    },
+    onDelete: ({ id }) => {
+      setAppointments((prev) => prev.filter((appointment) => appointment.id !== id));
+    },
+  });
+
   async function toggleTodo(todo: Todo) {
     const newDone = !todo.is_done;
     setTodos(prev => prev.map(t => t.id === todo.id ? { ...t, is_done: newDone } : t));
     await supabase.from('todos').update({ is_done: newDone }).eq('id', todo.id);
   }
 
-  async function deleteAppointment(id: string) {
+  async function deleteAppointment(appointment: Appointment) {
     Alert.alert('Delete appointment?', 'This cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
-        setAppointments(prev => prev.filter(a => a.id !== id));
-        await supabase.from('appointments').delete().eq('id', id);
+        setAppointments(prev => prev.filter(a => a.id !== appointment.id));
+        try {
+          await cancelAppointmentReminderByAppointmentId(appointment.id);
+        } catch {
+          // Reminder cancellation is best-effort. Deleting the appointment remains the source of truth.
+        }
+        await supabase.from('appointments').delete().eq('id', appointment.id);
+
+        if (appointment.google_event_id && currentUser?.id) {
+          try {
+            const accessToken = await getValidAccessToken(currentUser.id);
+            if (accessToken) {
+              await deleteCalendarEvent(accessToken, appointment.google_event_id);
+            }
+          } catch (googleDeleteError) {
+            console.warn('Google Calendar delete sync failed', googleDeleteError);
+          }
+        }
       }},
     ]);
   }
@@ -193,9 +257,11 @@ export default function PlanScreen() {
                     style={styles.doneToggle}
                     onPress={() => setShowDone(s => !s)}
                     activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={showDone ? 'Hide completed tasks' : 'Show completed tasks'}
                   >
                     <Text style={styles.doneToggleText}>
-                      {showDone ? '▲' : '▽'}  Completed ({doneTodos.length})
+                      {showDone ? 'Hide completed' : 'Show completed'} ({doneTodos.length})
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -247,7 +313,8 @@ export default function PlanScreen() {
                         <TouchableOpacity
                           key={appt.id}
                           style={[styles.apptRow, i < upcoming.length - 1 && styles.apptRowBorder]}
-                          onLongPress={() => deleteAppointment(appt.id)}
+                          onPress={() => openEditAppointment(appt.id)}
+                          onLongPress={() => deleteAppointment(appt)}
                           activeOpacity={0.85}
                         >
                           <View style={[styles.apptDateBadge, isToday && styles.apptDateBadgeToday]}>
@@ -263,8 +330,19 @@ export default function PlanScreen() {
                             <Text style={styles.apptTime}>{formatApptDate(appt.appointment_date)}</Text>
                             {appt.location && <Text style={styles.apptLocation}>📍 {appt.location}</Text>}
                           </View>
-                          <View style={[styles.apptUrgency, isToday && styles.apptUrgencyToday]}>
-                            <Text style={[styles.apptUrgencyText, isToday && styles.apptUrgencyTextToday]}>{label}</Text>
+                          <View style={styles.apptActions}>
+                            <View style={[styles.apptUrgency, isToday && styles.apptUrgencyToday]}>
+                              <Text style={[styles.apptUrgencyText, isToday && styles.apptUrgencyTextToday]}>{label}</Text>
+                            </View>
+                            <TouchableOpacity
+                              style={styles.apptDeleteBtn}
+                              onPress={() => deleteAppointment(appt)}
+                              activeOpacity={0.75}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Delete appointment ${appt.title}`}
+                            >
+                              <Text style={styles.apptDeleteText}>Delete</Text>
+                            </TouchableOpacity>
                           </View>
                         </TouchableOpacity>
                       );
@@ -278,7 +356,8 @@ export default function PlanScreen() {
                       <TouchableOpacity
                         key={appt.id}
                         style={[styles.apptRow, i < past.length - 1 && styles.apptRowBorder, styles.apptRowPast]}
-                        onLongPress={() => deleteAppointment(appt.id)}
+                        onPress={() => openEditAppointment(appt.id)}
+                        onLongPress={() => deleteAppointment(appt)}
                         activeOpacity={0.85}
                       >
                         <View style={styles.apptDateBadgePast}>
@@ -292,11 +371,20 @@ export default function PlanScreen() {
                           <Text style={styles.apptTimePast}>{formatApptDate(appt.appointment_date)}</Text>
                           {appt.location && <Text style={styles.apptLocationPast}>📍 {appt.location}</Text>}
                         </View>
+                        <TouchableOpacity
+                          style={styles.apptDeleteBtn}
+                          onPress={() => deleteAppointment(appt)}
+                          activeOpacity={0.75}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Delete appointment ${appt.title}`}
+                        >
+                          <Text style={styles.apptDeleteText}>Delete</Text>
+                        </TouchableOpacity>
                       </TouchableOpacity>
                     ))}
                   </Card>
                 )}
-                <Text style={styles.longPressHint}>Long-press an appointment to delete it</Text>
+                <Text style={styles.longPressHint}>Use Delete on each row, or long-press an appointment</Text>
               </>
             )}
           </>
@@ -314,258 +402,6 @@ export default function PlanScreen() {
     </View>
   );
 }
-
-// ───────────────────────────────────────────────────────────────────────────
-// Calendar pane — 14-day strip + full month view, toggled
-// ───────────────────────────────────────────────────────────────────────────
-
-function toDateKey(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
-
-function CalendarPane({
-  todos, appointments, onToggleTodo,
-}: {
-  todos:        Todo[];
-  appointments: Appointment[];
-  onToggleTodo: (t: Todo) => void;
-}) {
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const [selectedKey, setSelectedKey] = useState(toDateKey(today));
-  const [viewMode,    setViewMode]    = useState<'week' | 'month'>('week');
-  const [monthDate,   setMonthDate]   = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-
-  const todosByDate: Record<string, Todo[]> = {};
-  for (const t of todos) {
-    if (!t.due_date || t.is_done) continue;
-    const key = t.due_date.slice(0, 10);
-    (todosByDate[key] ??= []).push(t);
-  }
-  const apptsByDate: Record<string, Appointment[]> = {};
-  for (const a of appointments) {
-    const key = a.appointment_date.slice(0, 10);
-    (apptsByDate[key] ??= []).push(a);
-  }
-
-  const selectedTodos = todosByDate[selectedKey] ?? [];
-  const selectedAppts = apptsByDate[selectedKey] ?? [];
-  const isEmpty = selectedTodos.length === 0 && selectedAppts.length === 0;
-  const selectedDate  = new Date(selectedKey + 'T12:00:00');
-  const selectedLabel = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-  // 14-day strip
-  const stripDays = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(today); d.setDate(today.getDate() + i); return d;
-  });
-
-  // Month grid
-  const year  = monthDate.getFullYear();
-  const month = monthDate.getMonth();
-  const firstDow   = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [
-    ...Array(firstDow).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
-  while (cells.length % 7 !== 0) cells.push(null);
-  const weeks = Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
-
-  function prevMonth() {
-    setMonthDate(d => new Date(d.getFullYear(), d.getMonth() - 1, 1));
-  }
-  function nextMonth() {
-    setMonthDate(d => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-  }
-
-  return (
-    <>
-      {/* View toggle */}
-      <SegmentedControl
-        options={[
-          { value: 'week',  label: '14-Day' },
-          { value: 'month', label: 'Month'  },
-        ]}
-        value={viewMode}
-        onChange={(v) => setViewMode(v as 'week' | 'month')}
-      />
-
-      {/* ── WEEK STRIP ── */}
-      {viewMode === 'week' && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={calStyles.strip}>
-          {stripDays.map(d => {
-            const key        = toDateKey(d);
-            const isSelected = key === selectedKey;
-            const isToday    = key === toDateKey(today);
-            const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
-            return (
-              <TouchableOpacity
-                key={key}
-                style={[calStyles.day, isSelected && calStyles.daySelected]}
-                onPress={() => setSelectedKey(key)}
-                activeOpacity={0.7}
-              >
-                <Text style={[calStyles.dayWeek, isSelected && calStyles.dayWeekSelected]}>
-                  {d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3).toUpperCase()}
-                </Text>
-                <Text style={[calStyles.dayNum, isSelected && calStyles.dayNumSelected]}>{d.getDate()}</Text>
-                {count > 0 && <View style={[calStyles.dot, isSelected && calStyles.dotSelected]} />}
-                {isToday && !isSelected && <View style={calStyles.todayUnderline} />}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      )}
-
-      {/* ── MONTH GRID ── */}
-      {viewMode === 'month' && (
-        <View style={calStyles.monthContainer}>
-          {/* Month navigation */}
-          <View style={calStyles.monthHeader}>
-            <TouchableOpacity onPress={prevMonth} style={calStyles.monthNavBtn} activeOpacity={0.7}>
-              <Text style={calStyles.monthNavArrow}>‹</Text>
-            </TouchableOpacity>
-            <Text style={calStyles.monthTitle}>
-              {monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </Text>
-            <TouchableOpacity onPress={nextMonth} style={calStyles.monthNavBtn} activeOpacity={0.7}>
-              <Text style={calStyles.monthNavArrow}>›</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Day-of-week headers */}
-          <View style={calStyles.dowRow}>
-            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
-              <Text key={d} style={calStyles.dowLabel}>{d}</Text>
-            ))}
-          </View>
-
-          {/* Weeks */}
-          {weeks.map((week, wi) => (
-            <View key={wi} style={calStyles.weekRow}>
-              {week.map((dayNum, di) => {
-                if (!dayNum) return <View key={di} style={calStyles.monthCell} />;
-                const d         = new Date(year, month, dayNum);
-                const key       = toDateKey(d);
-                const isSelected = key === selectedKey;
-                const isToday    = key === toDateKey(today);
-                const count      = (todosByDate[key]?.length ?? 0) + (apptsByDate[key]?.length ?? 0);
-                return (
-                  <TouchableOpacity
-                    key={di}
-                    style={[
-                      calStyles.monthCell,
-                      isToday    && calStyles.monthCellToday,
-                      isSelected && calStyles.monthCellSelected,
-                    ]}
-                    onPress={() => setSelectedKey(key)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[
-                      calStyles.monthDayNum,
-                      isToday    && calStyles.monthDayNumToday,
-                      isSelected && calStyles.monthDayNumSelected,
-                    ]}>
-                      {dayNum}
-                    </Text>
-                    {count > 0 && (
-                      <View style={[calStyles.monthDot, isSelected && calStyles.monthDotSelected]} />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ))}
-        </View>
-      )}
-
-      {/* Selected day header */}
-      <Text style={calStyles.selectedHeader}>{selectedLabel}</Text>
-
-      {/* Items for selected day */}
-      {isEmpty ? (
-        <Card>
-          <EmptyState emoji="🗓" title="Nothing scheduled." />
-        </Card>
-      ) : (
-        <>
-          {selectedAppts.length > 0 && (
-            <Card>
-              <Text style={calStyles.groupLabel}>Appointments</Text>
-              {selectedAppts.map((appt, i) => (
-                <View key={appt.id} style={[calStyles.apptItem, i < selectedAppts.length - 1 && calStyles.itemBorder]}>
-                  <Text style={calStyles.apptTime}>{formatApptDate(appt.appointment_date)}</Text>
-                  <Text style={calStyles.apptTitle}>{appt.title}</Text>
-                  {appt.location && <Text style={calStyles.apptLoc}>📍 {appt.location}</Text>}
-                </View>
-              ))}
-            </Card>
-          )}
-          {selectedTodos.length > 0 && (
-            <Card>
-              <Text style={calStyles.groupLabel}>Todos</Text>
-              {selectedTodos.map((t, i) => (
-                <TouchableOpacity
-                  key={t.id}
-                  style={[calStyles.todoItem, i < selectedTodos.length - 1 && calStyles.itemBorder]}
-                  onPress={() => onToggleTodo(t)}
-                  activeOpacity={0.7}
-                >
-                  <View style={calStyles.checkbox} />
-                  <Text style={calStyles.todoTitle}>{t.title}</Text>
-                  <Badge label={t.priority} variant={PRIORITY_BADGE[t.priority]} />
-                </TouchableOpacity>
-              ))}
-            </Card>
-          )}
-        </>
-      )}
-    </>
-  );
-}
-
-const calStyles = StyleSheet.create({
-  // 14-day strip
-  strip:           { gap: 6, paddingVertical: spacing.xs },
-  day:             { width: 52, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radii.md, backgroundColor: colors.surface, gap: 2 },
-  daySelected:     { backgroundColor: colors.primary },
-  dayWeek:         { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 0.5 },
-  dayWeekSelected: { color: 'rgba(255,255,255,0.75)' },
-  dayNum:          { fontFamily: fonts.heading.bold, fontSize: 18, color: colors.text },
-  dayNumSelected:  { color: colors.surface },
-  dot:             { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  dotSelected:     { backgroundColor: colors.surface },
-  todayUnderline:  { width: 16, height: 2, borderRadius: 1, backgroundColor: colors.primary, marginTop: 2 },
-
-  // Month grid
-  monthContainer:      { backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
-  monthHeader:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  monthNavBtn:         { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  monthNavArrow:       { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.primary },
-  monthTitle:          { fontFamily: fonts.heading.semibold, fontSize: 16, color: colors.text },
-  dowRow:              { flexDirection: 'row', marginBottom: 4 },
-  dowLabel:            { flex: 1, textAlign: 'center', fontFamily: fonts.body.semibold, fontSize: 11, color: colors.textMuted },
-  weekRow:             { flexDirection: 'row' },
-  monthCell:           { flex: 1, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: radii.sm, gap: 2 },
-  monthCellToday:      { borderWidth: 1.5, borderColor: colors.primary },
-  monthCellSelected:   { backgroundColor: colors.primary },
-  monthDayNum:         { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text },
-  monthDayNumToday:    { color: colors.primary, fontFamily: fonts.body.semibold },
-  monthDayNumSelected: { color: colors.surface, fontFamily: fonts.body.semibold },
-  monthDot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
-  monthDotSelected:    { backgroundColor: 'rgba(255,255,255,0.8)' },
-
-  // Selected day + items
-  selectedHeader:  { fontFamily: fonts.heading.semibold, fontSize: 16, color: colors.text, marginTop: spacing.sm },
-  groupLabel:      { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase', marginBottom: spacing.sm },
-  itemBorder:      { borderBottomWidth: 1, borderBottomColor: colors.border },
-  apptItem:        { paddingVertical: spacing.md, gap: 2 },
-  apptTime:        { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
-  apptTitle:       { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
-  apptLoc:         { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  todoItem:        { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
-  checkbox:        { width: 20, height: 20, borderRadius: 5, borderWidth: 2, borderColor: colors.accent },
-  todoTitle:       { fontFamily: fonts.body.medium, fontSize: 14, color: colors.text, flex: 1 },
-});
 
 const styles = StyleSheet.create({
   screen:       { flex: 1, backgroundColor: colors.background },
@@ -616,6 +452,19 @@ const styles = StyleSheet.create({
   apptUrgencyToday: { backgroundColor: colors.primary },
   apptUrgencyText: { fontFamily: fonts.body.semibold, fontSize: 11, color: colors.primary },
   apptUrgencyTextToday: { color: colors.surface },
+  apptActions: { alignItems: 'flex-end', gap: spacing.xs },
+  apptDeleteBtn: {
+    minHeight: 44,
+    minWidth: 56,
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+  },
+  apptDeleteText: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
   pastCard:     {},
   longPressHint:{ fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, textAlign: 'center', marginTop: -spacing.xs },
 });

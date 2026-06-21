@@ -10,7 +10,7 @@ Both users see the same trusted household view from separate phones: what week o
 
 ## Current State
 
-This Codex repo is a clean start. It currently has no application code. Legacy Claude project artifacts were reviewed only for planning context and should not be copied into this workspace.
+This repo is now an active Expo Router mobile app with substantial Phase 1 implementation completed. Core tabs/modals, Supabase integration, notifications settings, and Google Calendar sync logic are implemented and passing typecheck/lint. Remaining work is primarily external deployment/verification and finishing Phase 7b + remaining Family Mode surfaces.
 
 ## Product Principles
 
@@ -37,11 +37,19 @@ This Codex repo is a clean start. It currently has no application code. Legacy C
 - Supabase RLS is the security boundary; client filtering is additional defense, not sufficient by itself.
 - Contraction timer must run without network access.
 - No legacy Firebase registry code or static HTML artifact code should enter this repo.
-- Current pregnancy due date and stage must be reconfirmed before date-based defaults are seeded.
+- Current pregnancy due date and stage must be user-entered and never hardcoded.
+
+## Implementation Snapshot
+
+- App structure: Expo SDK 54 + React Native + Expo Router + TypeScript strict.
+- Data/auth: Supabase Auth + Postgres + Realtime with household-scoped RLS.
+- Notifications: APNs token registration UI + local appointment reminders + APNs Edge Function scaffold (deployment pending).
+- Google Calendar (7a): OAuth PKCE connect modal, secure token lifecycle, two-way sync engine, conflict-policy handling, appointment create/update/delete integration.
+- Family Mode: postpartum trigger and tracker logging implemented; postpartum variants for key tabs still incomplete.
 
 ## Open Decisions
 
-- Confirm current stage and due date. The old due date was October 5, 2025, which is stale as of May 15, 2026.
-- Decide whether Google Calendar sync and push notifications are v1 or post-MVP.
-- Decide whether AI-generated content is excluded from v1 or introduced behind a later feature flag.
-- Confirm root-level Expo structure versus nested app directory. Recommendation: root-level Expo in this clean repo.
+- Confirm final default conflict policy for Google sync (`google_wins` vs `blueberry_wins`) for production behavior.
+- Confirm whether Apple Calendar/EventKit (7b) remains Phase 1 required or moves to immediate follow-on after APNs + Google real-device verification.
+- Confirm Family Mode data-model direction long term (`baby_logs` JSONB consolidated model vs dedicated normalized postpartum tables).
+- Confirm rollout order between Family Mode completion and Apple Calendar implementation based on real household urgency.

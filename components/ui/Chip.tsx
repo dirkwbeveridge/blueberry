@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 
 interface ChipProps {
@@ -7,6 +7,7 @@ interface ChipProps {
   selected:       boolean;
   onPress:        () => void;
   emoji?:         string;
+  accessibilityLabel?: string;
   /** Override the border/text color when selected. Defaults to `colors.primary`. */
   selectedColor?: string;
   /** Override the background when selected. Defaults to `colors.primaryTint`. */
@@ -20,6 +21,7 @@ export function Chip({
   selected,
   onPress,
   emoji,
+  accessibilityLabel,
   selectedColor = colors.primary,
   selectedBg    = colors.primaryTint,
   style,
@@ -35,6 +37,7 @@ export function Chip({
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityState={{ selected }}
+      accessibilityLabel={accessibilityLabel ?? label}
     >
       {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
       <Text style={[styles.label, selected && { color: selectedColor }]}>

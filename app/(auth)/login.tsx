@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet,
-  TouchableOpacity, KeyboardAvoidingView, Platform, Alert,
+    Alert,
+    KeyboardAvoidingView, Platform,
+    ScrollView, StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { supabase } from '../../lib/supabase';
-import { useHouseholdStore } from '../../store/household';
 import { Button } from '../../components/ui/Button';
-import { Input }  from '../../components/ui/Input';
+import { DateField } from '../../components/ui/DateField';
+import { Input } from '../../components/ui/Input';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { supabase } from '../../lib/supabase';
+import { useHouseholdStore } from '../../store/household';
 import type { BabyGender, Stage, UserRole } from '../../types';
 
 type Step = 'credentials' | 'role' | 'household' | 'setup';
@@ -18,11 +23,11 @@ function generateInviteCode() {
   return Math.random().toString(36).toUpperCase().slice(2, 8);
 }
 
-function defaultDueDate(): string {
-  // 40 weeks (280 days) from today — sane default the user can edit.
-  const d = new Date();
-  d.setDate(d.getDate() + 280);
-  return d.toISOString().slice(0, 10);
+function formatDateIsoLocal(date: Date): string {
+  const y = date.getFullYear();
+  const m = `${date.getMonth() + 1}`.padStart(2, '0');
+  const d = `${date.getDate()}`.padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 export default function LoginScreen() {
@@ -32,11 +37,12 @@ export default function LoginScreen() {
   const [authMode,  setAuthMode]  = useState<AuthMode>('signin');
   const [email,     setEmail]     = useState('');
   const [password,  setPassword]  = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role,      setRole]      = useState<UserRole>('mother');
   const [joinCode,  setJoinCode]  = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [stage,     setStage]     = useState<Stage>('pregnant');
-  const [dueDate,   setDueDate]   = useState(defaultDueDate());
+  const [dueDate,   setDueDate]   = useState<Date | null>(null);
   const [babyName,  setBabyName]  = useState('');
   const [babyGender,setBabyGender]= useState<BabyGender>('unknown');
   const [loading,   setLoading]   = useState(false);
@@ -127,6 +133,11 @@ export default function LoginScreen() {
 
   async function handleSetup() {
     setError('');
+    if (stage === 'pregnant' && !dueDate) {
+      setError('Due date is required for the pregnancy stage.');
+      return;
+    }
+
     setLoading(true);
     try {
       // PS-61: All household creation happens here, AFTER the setup UI collects
@@ -145,7 +156,7 @@ export default function LoginScreen() {
       // Step c: update household with stage/due_date/baby details
       // RLS now resolves because the users row exists after the RPC above.
       const updates: Record<string, unknown> = { stage };
-      if (stage === 'pregnant' && dueDate) updates.due_date = dueDate;
+      if (stage === 'pregnant' && dueDate) updates.due_date = formatDateIsoLocal(dueDate);
       if (babyName.trim()) updates.baby_name = babyName.trim();
       updates.baby_gender = babyGender;
 
@@ -186,9 +197,24 @@ export default function LoginScreen() {
           <View style={styles.form}>
             <Text style={styles.stepTitle}>{authMode === 'signup' ? 'Create your account' : 'Welcome back'}</Text>
             <Input label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} placeholder="you@email.com" />
-            <Input label="Password" value={password} onChangeText={setPassword} secureTextEntry placeholder="At least 8 characters" error={error} />
+            <Input label="Password" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} placeholder="At least 8 characters" error={error} />
+            <TouchableOpacity
+              style={styles.passwordToggleBtn}
+              onPress={() => setShowPassword(v => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.passwordToggleText}>{showPassword ? 'Hide password' : 'Show password'}</Text>
+            </TouchableOpacity>
             <Button label={authMode === 'signup' ? 'Create account' : 'Sign in'} onPress={handleCredentials} loading={loading} />
-            <TouchableOpacity onPress={() => { setAuthMode(m => m === 'signup' ? 'signin' : 'signup'); setError(''); }}>
+            <TouchableOpacity
+              style={styles.switchAuthBtn}
+              onPress={() => { setAuthMode(m => m === 'signup' ? 'signin' : 'signup'); setError(''); }}
+              accessibilityRole="button"
+              accessibilityLabel={authMode === 'signup' ? 'Switch to sign in' : 'Switch to sign up'}
+              activeOpacity={0.8}
+            >
               <Text style={styles.switchAuth}>
                 {authMode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
               </Text>
@@ -206,10 +232,15 @@ export default function LoginScreen() {
                 style={[styles.roleBtn, role === r && styles.roleBtnSelected]}
                 onPress={() => setRole(r)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={r === 'mother' ? 'Select mother role' : 'Select partner role'}
               >
                 <Text style={styles.roleEmoji}>{r === 'mother' ? '🤱' : '💙'}</Text>
                 <Text style={[styles.roleLabel, role === r && styles.roleLabelSelected]}>
                   {r === 'mother' ? 'The mother' : 'The partner'}
+                </Text>
+                <Text style={styles.roleDescription}>
+                  {r === 'mother' ? 'Logs health updates and tracks pregnancy details' : 'Gets support prompts and shared planning tools'}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -230,9 +261,9 @@ export default function LoginScreen() {
               onChange={(v) => setIsJoining(v === 'join')}
             />
             {isJoining && (
-              <Input label="Invite code" value={joinCode} onChangeText={setJoinCode} autoCapitalize="characters" placeholder="BLU3RY" autoCorrect={false} error={error} />
+              <Input label="Invite code" value={joinCode} onChangeText={setJoinCode} autoCapitalize="characters" placeholder="BLU3RY" autoCorrect={false} />
             )}
-            {!isJoining && error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <Button label={isJoining ? 'Join household' : 'Create household'} onPress={handleHousehold} loading={loading} />
           </View>
         )}
@@ -244,7 +275,14 @@ export default function LoginScreen() {
             <Text style={styles.sectionLabel}>Stage</Text>
             <View style={styles.stageRow}>
               {(['ttc', 'pregnant', 'postpartum'] as Stage[]).map(s => (
-                <TouchableOpacity key={s} style={[styles.stageBtn, stage === s && styles.stageBtnSelected]} onPress={() => setStage(s)} activeOpacity={0.7}>
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.stageBtn, stage === s && styles.stageBtnSelected]}
+                  onPress={() => setStage(s)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select ${s === 'ttc' ? 'trying to conceive' : s} stage`}
+                >
                   <Text style={[styles.stageLabel, stage === s && styles.stageLabelSelected]}>
                     {s === 'ttc' ? 'TTC' : s === 'pregnant' ? 'Pregnant' : 'Postpartum'}
                   </Text>
@@ -252,13 +290,25 @@ export default function LoginScreen() {
               ))}
             </View>
             {stage === 'pregnant' && (
-              <Input label="Due date" value={dueDate} onChangeText={setDueDate} placeholder="YYYY-MM-DD" keyboardType="numbers-and-punctuation" autoCorrect={false} />
+              <DateField
+                label="Due date"
+                value={dueDate}
+                onChange={setDueDate}
+                placeholder="Select due date"
+              />
             )}
             <Input label="Baby's name (optional)" value={babyName} onChangeText={setBabyName} placeholder="Or a nickname for now" />
             <Text style={styles.sectionLabel}>Baby gender</Text>
             <View style={styles.genderRow}>
               {(['unknown', 'male', 'female'] as BabyGender[]).map(g => (
-                <TouchableOpacity key={g} style={[styles.genderBtn, babyGender === g && styles.genderBtnSelected]} onPress={() => setBabyGender(g)} activeOpacity={0.7}>
+                <TouchableOpacity
+                  key={g}
+                  style={[styles.genderBtn, babyGender === g && styles.genderBtnSelected]}
+                  onPress={() => setBabyGender(g)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select ${g} baby gender`}
+                >
                   <Text style={[styles.genderLabel, babyGender === g && styles.genderLabelSelected]}>
                     {g === 'unknown' ? '🤫 Secret' : g === 'male' ? '💙 Boy' : '💜 Girl'}
                   </Text>
@@ -282,20 +332,24 @@ const styles = StyleSheet.create({
   tagline:     { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted, marginBottom: spacing.md },
   form:        { width: '100%', gap: spacing.md },
   stepTitle:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.text, marginBottom: spacing.xs },
+  switchAuthBtn: { minHeight: 44, justifyContent: 'center' },
   switchAuth:  { fontFamily: fonts.body.medium, fontSize: 14, color: colors.primary, textAlign: 'center', marginTop: spacing.xs },
+  passwordToggleBtn: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-end' },
+  passwordToggleText: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },
   sectionLabel:{ fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text },
-  roleBtn:     { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radii.lg, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
+  roleBtn:     { flexDirection: 'row', minHeight: 48, alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radii.lg, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
   roleBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
   roleEmoji:   { fontSize: 28 },
   roleLabel:   { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
   roleLabelSelected: { color: colors.primary },
+  roleDescription: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginTop: 2 },
   stageRow:    { flexDirection: 'row', gap: spacing.sm },
-  stageBtn:    { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center' },
+  stageBtn:    { flex: 1, minHeight: 48, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   stageBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
   stageLabel:  { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
   stageLabelSelected: { color: colors.primary },
   genderRow:   { flexDirection: 'row', gap: spacing.sm },
-  genderBtn:   { flex: 1, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center' },
+  genderBtn:   { flex: 1, minHeight: 48, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   genderBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
   genderLabel: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
   genderLabelSelected: { color: colors.primary },

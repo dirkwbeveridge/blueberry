@@ -1,17 +1,21 @@
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ScrollView, View, Text, TouchableOpacity, StyleSheet,
-  RefreshControl,
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { colors, fonts, radii, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { supabase } from '../../lib/supabase';
 import type { HealthLog } from '../../types';
 
 const MOOD_EMOJI: Record<string, string> = {
@@ -44,7 +48,12 @@ export default function HealthScreen() {
     setLoading(false);
   }, [household]);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchLogs();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchLogs]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true); await fetchLogs(); setRefreshing(false);
@@ -94,7 +103,10 @@ export default function HealthScreen() {
       <Card>
         <Text style={styles.sectionTitle}>Recent logs</Text>
         {loading ? (
-          <Text style={styles.loadingText}>Loading…</Text>
+          <View style={styles.loadingRow}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={styles.loadingText}>Loading…</Text>
+          </View>
         ) : logs.length === 0 ? (
           <EmptyState
             emoji="💜"
@@ -141,6 +153,8 @@ export default function HealthScreen() {
           style={styles.toolRow}
           onPress={() => router.push('/(modals)/kick-counter')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Open kick counter"
         >
           <Text style={styles.toolEmoji}>👟</Text>
           <View style={styles.toolBody}>
@@ -153,6 +167,8 @@ export default function HealthScreen() {
           style={[styles.toolRow, styles.toolRowBorder]}
           onPress={() => router.push('/(modals)/contraction-timer')}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Open contraction timer"
         >
           <Text style={styles.toolEmoji}>⏱️</Text>
           <View style={styles.toolBody}>
@@ -183,6 +199,7 @@ const styles = StyleSheet.create({
   appleHealthSub:  { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
 
   // Logs
+  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   loadingText: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
   logList:    { gap: 0 },
   logItem:    { paddingVertical: spacing.md },

@@ -2,6 +2,9 @@
 
 One file, one run. The consolidated `supabase-schema.sql` is destructive (drops
 the prior Blueberry tables before recreating) and idempotent (safe to re-run).
+The `supabase/migrations/` directory currently contains only targeted follow-on
+artifacts for push-token setup; the consolidated schema remains the authoritative
+database definition for a full environment bootstrap.
 
 ## Steps
 
@@ -9,13 +12,13 @@ the prior Blueberry tables before recreating) and idempotent (safe to re-run).
 2. **SQL Editor → New query.**
 3. Paste the full contents of `supabase-schema.sql`.
 4. **Run.**
-5. **Table Editor →** confirm the 8 tables exist, RLS on each:
+5. **Table Editor →** confirm the 9 tables exist, RLS on each:
    - `households`, `users`, `health_logs`, `appointments`, `todos`,
-     `journal_entries`, `kick_sessions`, `contraction_sessions`
+  `journal_entries`, `baby_logs`, `kick_sessions`, `contraction_sessions`
 6. **Database → Replication → supabase_realtime →** confirm Realtime is on for
-   exactly these 4 tables (the schema adds them via `alter publication`, but
+  exactly these 5 tables (the schema adds them via `alter publication`, but
    the dashboard toggle is what surfaces in the UI):
-   - `todos`, `health_logs`, `journal_entries`, `appointments`
+  - `todos`, `health_logs`, `journal_entries`, `appointments`, `baby_logs`
 7. **Settings → API →** copy the **Project URL** and **publishable key**
    (`sb_publishable_*` — Supabase's new client-safe key, replaces the legacy
    `anon` JWT).
@@ -27,6 +30,7 @@ Create `.env.local` at repo root from `.env.example`:
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=your-project-url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
+EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-google-oauth-ios-client-id
 ```
 
 Note: Expo only exposes env vars prefixed `EXPO_PUBLIC_*` to the client.
@@ -47,9 +51,65 @@ equivalent) in the mobile app.
   `security definer` RPC that bypasses RLS to look up the household by code
   before the joining user has a `users` row.
 
+## APNs Function
+
+Blueberry now includes a direct APNs Edge Function at
+`supabase/functions/send-apns-notification/index.ts`.
+
+Required function secrets:
+
+```bash
+APNS_TEAM_ID=your-apple-team-id
+APNS_KEY_ID=your-apns-key-id
+APNS_BUNDLE_ID=com.dbeveridge.blueberry
+APNS_ENV=sandbox
+APNS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+```
+
+Expected flow:
+
+1. Create an APNs auth key in the Apple Developer portal.
+2. Add the secrets to the Supabase project.
+3. Deploy the Edge Function.
+4. Register a real iPhone from Blueberry's `More -> Notifications` screen.
+5. Invoke the function with a stored token for end-to-end verification.
+
+Example invocation payload:
+
+```json
+{
+  "token": "device-token-from-device_push_tokens",
+  "title": "Appointment reminder",
+  "body": "20-week anatomy scan at 09:00 AM",
+  "bundleId": "com.dbeveridge.blueberry",
+  "environment": "sandbox"
+}
+```
+
+Current limits:
+
+- Cron jobs and DB-webhook orchestration for appointment reminders, partner
+  check-ins, and todo events are not wired yet.
+- Full APNs verification requires a real iPhone; the simulator cannot supply
+  a production APNs token.
+
 ## Re-running
 
 Re-running drops all Blueberry tables (cascading away policies, FKs, indexes,
 and realtime publication membership) and recreates them clean. Any test data
 in those tables is lost. `auth.users` is untouched — Supabase Auth identities
 survive a schema re-run.
+
+## Push 7c Quick Verification
+
+Use this sequence for the Phase 7c deployment gate.
+
+1. Deploy or confirm `supabase-schema.sql` and `supabase/migrations/20260620100000_create_device_push_tokens.sql` in the active project.
+2. Set APNs secrets in Supabase project settings: `APNS_AUTH_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_ENV`.
+3. Deploy the Edge Function: `supabase functions deploy send-apns-notification`.
+4. Run readiness check locally: `npm run push:readiness`.
+5. Validate on a real iPhone:
+  - Open Blueberry, go to More -> Notifications.
+  - Register or refresh token.
+  - Send a test notification through the deployed function.
+  - Confirm delivery on device.

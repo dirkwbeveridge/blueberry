@@ -2,6 +2,7 @@ export type Stage = 'ttc' | 'pregnant' | 'postpartum';
 export type BabyGender = 'male' | 'female' | 'unknown';
 export type Priority = 'low' | 'medium' | 'high';
 export type UserRole = 'mother' | 'partner';
+export type BabyLogType = 'feeding' | 'sleep' | 'diaper' | 'handoff';
 
 export interface Household {
   id: string;
@@ -50,6 +51,7 @@ export interface Todo {
 export interface Appointment {
   id: string;
   household_id: string;
+  created_by?: string | null;
   title: string;
   appointment_date: string;
   location: string | null;
@@ -66,6 +68,17 @@ export interface JournalEntry {
   content: string;
   milestone_tag: string | null;
   media_urls: string[] | null;
+  created_at: string;
+}
+
+export interface BabyLog {
+  id: string;
+  household_id: string;
+  user_id: string;
+  log_type: BabyLogType;
+  logged_at: string;
+  details: Record<string, unknown> | null;
+  notes: string | null;
   created_at: string;
 }
 

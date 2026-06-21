@@ -1,22 +1,22 @@
 ---
 workstream: family-mode
 created: 2026-06-09
-updated: 2026-06-09
+updated: 2026-06-20
 ---
 
 # Project State
 
 ## Current Position
 
-**Status:** Planned
+**Status:** In progress
 **Current Phase:** 01-family-mode
-**Last Activity:** 2026-06-09
-**Last Activity Description:** Phase 01 plan written; ready for execution
+**Last Activity:** 2026-06-20
+**Last Activity Description:** Baby-arrived trigger, postpartum tab visibility, and consolidated baby tracker logging implemented; postpartum variants for core shared tabs remain pending.
 
 ## Progress
 
 **Phases Complete:** 0
-**Current Plan:** 01-family-mode/PLAN.md (4 tasks, 1 wave, fully autonomous)
+**Current Plan:** 01-family-mode/PLAN.md (partially executed)
 
 ## Urgency Note
 
@@ -40,27 +40,28 @@ Chain:
 No app restart required. Rollback on Supabase failure: modal calls setStage()
 back to prior value.
 
-## New Tables (supabase/02-postpartum.sql)
+## Data Model Reality (Current)
 
-Additive migration — does not drop any existing table.
+Implementation currently uses a consolidated `baby_logs` table (`log_type` + JSONB `details`) for postpartum tracker entries.
 
-- baby_milestones      — milestone events with optional media_url
-- pediatrician_visits  — scheduled/completed ped appointments
-- diaper_logs          — wet/dirty/both with logged_at
-- sleep_logs           — start/end/quality 1-3
-- feeding_logs         — breast L/R/bottle/formula; timer-based duration; amount_ml
-- household_events     — generic event table; used for night-shift swaps
-                         (event_type = 'night_shift_swap', payload.handler = role)
+- Implemented tracker types: feeding, sleep, diaper, handoff
+- Milestones/pediatric flows currently route through existing app surfaces rather than dedicated tables
+- Dedicated normalized postpartum tables from original plan are not yet implemented
 
-## Night-Shift Swap Storage Decision
+## Current Gaps (Blocking Full Family Mode Usability)
 
-household_events table (not Zustand-only, not a dedicated night_shift_swaps table).
-Rationale: both users need live visibility; Zustand-only is single-device.
-A generic events table avoids schema churn as new ephemeral signals are added.
-Realtime is enabled on household_events.
-Rows older than 7 days are candidates for pruning via pg_cron (future migration).
+1. `home.tsx` postpartum hero/weekly guidance variant incomplete.
+2. `health.tsx` postpartum recovery check-in path incomplete.
+3. `together.tsx` postpartum support/night-shift surfaces incomplete.
+4. Dedicated postpartum sync abstractions (`usePostpartumSync`, stats components) not yet implemented.
 
 ## Session Continuity
 
-**Stopped At:** N/A — not yet executed
+**Stopped At:** Core trigger + logging implemented; remaining work is postpartum screen variants and shared support surfaces.
 **Resume File:** .planning/workstreams/family-mode/phases/01-family-mode/PLAN.md
+
+## Next Action
+
+1. Implement postpartum variants for `home.tsx`, `health.tsx`, and `together.tsx`.
+2. Add shared night-shift visibility surfaces (table/model finalization if needed).
+3. Reconcile plan docs with consolidated `baby_logs` architecture.

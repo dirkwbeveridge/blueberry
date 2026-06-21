@@ -1,7 +1,7 @@
 # Requirements: Blueberry
 
 **Defined:** 2026-05-15  
-**Updated:** 2026-06-09 — INTG-01 through INTG-04 and POST-01 promoted to v1 scope.  
+**Updated:** 2026-06-20 — re-baselined execution language for INTG-02 and POST-01 trigger clarity.  
 **Status:** Active
 
 ## Phase 0: Planning
@@ -60,7 +60,7 @@
 
 ### Push Notifications
 
-- [ ] **INTG-02:** Push notifications for shared household events: appointment reminders (24h before), partner check-in shared (opt-in, shared sentence only — no raw health data), todo assigned, and kick session reminder. Dispatched via native APNs (iOS) and FCM (Android) from Supabase Edge Functions. No Expo push service. User-configurable categories and quiet hours.
+- [ ] **INTG-02:** Push notifications for shared household events: appointment reminders (24h before), partner check-in shared (opt-in, shared sentence only — no raw health data), todo assigned, and kick session reminder. **This phase ships APNs-first on iOS via Supabase Edge Functions (no Expo push service). Android/FCM remains required intent and is deferred to a follow-on phase.** User-configurable categories and quiet hours remain in scope.
 
 ### AI Content
 
@@ -72,7 +72,7 @@
 
 ### Family Mode (Postpartum)
 
-- [ ] **POST-01:** When `households.baby_dob` is set, the app transitions to Family Mode. Feeding (breast L/R/bottle/formula, timer-based duration), sleep, diaper, pediatric visits, and baby milestone tracking for both parents. Night-shift swap log visible to both partners in real time. Recovery check-in for Mom. Triggered by "Begin Family Mode" in the More tab.
+- [ ] **POST-01:** When `households.baby_dob` is set, the app transitions to Family Mode. Feeding (breast L/R/bottle/formula, timer-based duration), sleep, diaper, pediatric visits, and baby milestone tracking for both parents. Night-shift swap log visible to both partners in real time. Recovery check-in for Mom. **Trigger remains explicit: More -> Begin Family Mode.**
 
 ## Explicitly Out of Scope for Initial Build
 

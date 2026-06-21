@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
 
 interface Action {
   emoji:  string;
@@ -9,17 +10,26 @@ interface Action {
   route:  string;
 }
 
-const ACTIONS: Action[] = [
+const BASE_ACTIONS: Action[] = [
   { emoji: '💜', label: 'Log symptom',      route: '/(modals)/log-symptom'      },
   { emoji: '✅', label: 'Add task',         route: '/(modals)/add-todo'          },
   { emoji: '📅', label: 'Add appointment',  route: '/(modals)/add-appointment'   },
-  { emoji: '⏱️', label: 'Contractions',    route: '/(modals)/contraction-timer' },
 ];
 
 export function QuickActions() {
+  const { isPregnant, isPostpartum } = useHousehold();
+
+  const actions: Action[] = [...BASE_ACTIONS];
+  if (isPregnant) {
+    actions.push({ emoji: '⏱️', label: 'Contractions', route: '/(modals)/contraction-timer' });
+  }
+  if (isPostpartum) {
+    actions.push({ emoji: '🍼', label: 'Baby hub', route: '/(tabs)/baby' });
+  }
+
   return (
     <View style={styles.grid}>
-      {ACTIONS.map(a => (
+      {actions.map(a => (
         <TouchableOpacity
           key={a.label}
           style={styles.btn}

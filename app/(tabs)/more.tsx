@@ -1,16 +1,20 @@
-import React from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ScrollView, View, Text, TouchableOpacity,
-  StyleSheet, Alert,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useHousehold } from '../../hooks/useHousehold';
-import { useHouseholdStore } from '../../store/household';
-import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { colors, fonts, spacing } from '../../constants/theme';
+import { useHousehold } from '../../hooks/useHousehold';
+import { loadGoogleTokens } from '../../lib/googleAuth';
+import { supabase } from '../../lib/supabase';
+import { useHouseholdStore } from '../../store/household';
 
 interface Row {
   emoji:      string;
@@ -34,6 +38,9 @@ function Section({ title, rows }: { title: string; rows: Row[] }) {
             onPress={r.onPress}
             disabled={!r.onPress || r.comingSoon}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !r.onPress || r.comingSoon }}
+            accessibilityLabel={r.sub ? `${r.label}. ${r.sub}` : r.label}
           >
             <Text style={styles.rowEmoji}>{r.emoji}</Text>
             <View style={styles.rowBody}>
@@ -55,9 +62,33 @@ function Section({ title, rows }: { title: string; rows: Row[] }) {
 }
 
 export default function MoreScreen() {
-  const { household, currentUser, partnerUser, isMotherRole, isPartnerRole, isPregnant } = useHousehold();
+  const { household, currentUser, partnerUser, isMotherRole, isPregnant } = useHousehold();
+  const [googleConnected, setGoogleConnected] = useState(false);
 
   const clearAll = useHouseholdStore((s) => s.clearAll);
+
+  const refreshGoogleConnection = useCallback(async () => {
+    if (!currentUser) {
+      setGoogleConnected(false);
+      return;
+    }
+
+    const tokens = await loadGoogleTokens(currentUser.id);
+    setGoogleConnected(Boolean(tokens));
+  }, [currentUser]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void refreshGoogleConnection();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [refreshGoogleConnection]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshGoogleConnection();
+    }, [refreshGoogleConnection]),
+  );
 
   async function signOut() {
     Alert.alert('Sign out?', 'You can sign back in any time.', [
@@ -79,8 +110,9 @@ export default function MoreScreen() {
   if (isPregnant) {
     tools.push({ emoji: '👟', label: 'Kick counter',      sub: 'Track baby movement',     onPress: () => router.push('/(modals)/kick-counter') });
     tools.push({ emoji: '⏱️', label: 'Contraction timer', sub: 'Offline, syncs later',    onPress: () => router.push('/(modals)/contraction-timer') });
+    tools.push({ emoji: '📖', label: 'Week by week', sub: 'Pregnancy reference', onPress: () => router.push('/(modals)/week-detail') });
   }
-  tools.push({ emoji: '📖', label: 'Week by week', sub: 'Pregnancy reference', onPress: () => router.push('/(modals)/week-detail') });
+  tools.push({ emoji: '📝', label: 'Journal', sub: 'Shared entries and milestones', onPress: () => router.push('/(tabs)/journal' as never) });
 
   const displayInitial = (currentUser?.display_name ?? currentUser?.role ?? '?').slice(0, 1).toUpperCase();
 
@@ -111,8 +143,9 @@ export default function MoreScreen() {
       {/* Household */}
       <Section title="Household" rows={[
         { emoji: '🔗', label: 'Invite code',  sub: 'Share to add your partner', rightLabel: household?.invite_code ?? '—', onPress: copyInviteCode },
-        { emoji: '👶', label: 'Baby details', sub: household?.baby_name ?? 'Name, gender, due date', onPress: () => Alert.alert('Coming soon', 'Edit household details — landing in the next phase.') },
-        { emoji: '⚙️', label: 'Household settings', onPress: () => Alert.alert('Coming soon', 'Settings — landing in the next phase.') },
+        { emoji: '🍼', label: 'Begin Family Mode', sub: 'Set baby\'s birthday and switch to postpartum', onPress: () => router.push('/(modals)/baby-arrived' as never) },
+        { emoji: '👶', label: 'Baby details', sub: household?.baby_name ?? 'Name, gender, due date', onPress: () => router.push('/(modals)/baby-details' as never) },
+        { emoji: '⚙️', label: 'Household settings', onPress: () => router.push('/(modals)/household-settings' as never) },
       ]} />
 
       {/* Tools */}
@@ -121,24 +154,30 @@ export default function MoreScreen() {
       {/* Connected services */}
       <Section title="Connected" rows={[
         { emoji: '❤️', label: 'Apple Health',    sub: 'Sync activity, sleep, vitals',         comingSoon: true },
-        { emoji: '📅', label: 'Google Calendar', sub: 'Sync appointments to your calendar',    comingSoon: true },
-        { emoji: '🔔', label: 'Notifications',   sub: 'Realtime updates from your partner',    comingSoon: true },
+        {
+          emoji: '📅',
+          label: 'Google Calendar',
+          sub: googleConnected ? 'Connected' : 'Tap to connect',
+          onPress: () => router.push('/(modals)/google-calendar-connect' as never),
+          rightLabel: googleConnected ? 'Connected' : undefined,
+        },
+        { emoji: '🔔', label: 'Notifications',   sub: 'Permission, categories, quiet hours',   onPress: () => router.push('/(modals)/notifications' as never) },
       ]} />
 
-      {/* Inactive role tab — symmetric peek. Mom reaches Together here, Partner reaches Health here. */}
+      {/* Role-specific quick access from More. */}
       <Section title="Other views" rows={[
         isMotherRole
           ? { emoji: '💙', label: 'Together',  sub: 'Partner support, prompts, household handoff', onPress: () => router.push('/(tabs)/together') }
-          : { emoji: '💜', label: 'Health',    sub: 'Symptoms, mood, energy, recent logs',         onPress: () => router.push('/(tabs)/health') },
+          : { emoji: '📝', label: 'Journal',   sub: 'Shared entries and milestones',               onPress: () => router.push('/(tabs)/journal' as never) },
       ]} />
 
       {/* Account */}
       <Section title="Account" rows={[
-        { emoji: '🔒', label: 'Privacy', onPress: () => Alert.alert('Coming soon') },
+        { emoji: '🔒', label: 'Privacy', onPress: () => router.push('/(modals)/privacy' as never) },
         { emoji: '👋', label: 'Sign out', onPress: signOut },
       ]} />
 
-      <Text style={styles.footer}>Blueberry · v1.0.0{isPartnerRole ? '' : ''}</Text>
+      <Text style={styles.footer}>Blueberry · v1.0.0</Text>
     </ScrollView>
   );
 }
@@ -159,7 +198,7 @@ const styles = StyleSheet.create({
 
   section:      { gap: spacing.sm },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
-  row:          { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  row:          { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, minHeight: 44 },
   rowBorder:    { borderBottomWidth: 1, borderBottomColor: colors.border },
   rowEmoji:     { fontSize: 22, width: 28, textAlign: 'center' },
   rowBody:      { flex: 1, gap: 2 },
