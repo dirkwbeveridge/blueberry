@@ -32,6 +32,12 @@ export default function BabyArrivedModal() {
       return;
     }
 
+    const now = new Date();
+    if (babyDob.getTime() > now.getTime()) {
+      Alert.alert('Invalid birthday', 'Baby\'s birthday cannot be in the future.');
+      return;
+    }
+
     const dobIso = babyDob.toISOString().slice(0, 10);
 
     setSaving(true);
@@ -74,6 +80,7 @@ export default function BabyArrivedModal() {
         onChange={setBabyDobDate}
         placeholder="Select birthday"
         minimumDate={new Date('2000-01-01')}
+        maximumDate={new Date()}
       />
 
       <Button

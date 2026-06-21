@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     RefreshControl,
@@ -135,31 +135,45 @@ export default function PlanScreen() {
 
   async function toggleTodo(todo: Todo) {
     const newDone = !todo.is_done;
-    setTodos(prev => prev.map(t => t.id === todo.id ? { ...t, is_done: newDone } : t));
-    await supabase.from('todos').update({ is_done: newDone }).eq('id', todo.id);
+    setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, is_done: newDone } : t)));
+    const { error } = await supabase.from('todos').update({ is_done: newDone }).eq('id', todo.id);
+    if (error) {
+      setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, is_done: todo.is_done } : t)));
+      Alert.alert('Could not update task', 'Please try again.');
+    }
   }
 
   async function deleteAppointment(appointment: Appointment) {
     Alert.alert('Delete appointment?', 'This cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
-        setAppointments(prev => prev.filter(a => a.id !== appointment.id));
+        const previousAppointments = appointments;
+        setAppointments((prev) => prev.filter((a) => a.id !== appointment.id));
         try {
-          await cancelAppointmentReminderByAppointmentId(appointment.id);
-        } catch {
-          // Reminder cancellation is best-effort. Deleting the appointment remains the source of truth.
-        }
-        await supabase.from('appointments').delete().eq('id', appointment.id);
-
-        if (appointment.google_event_id && currentUser?.id) {
           try {
-            const accessToken = await getValidAccessToken(currentUser.id);
-            if (accessToken) {
-              await deleteCalendarEvent(accessToken, appointment.google_event_id);
-            }
-          } catch (googleDeleteError) {
-            console.warn('Google Calendar delete sync failed', googleDeleteError);
+            await cancelAppointmentReminderByAppointmentId(appointment.id);
+          } catch {
+            // Reminder cancellation is best-effort. Deleting the appointment remains the source of truth.
           }
+
+          const { error } = await supabase.from('appointments').delete().eq('id', appointment.id);
+          if (error) {
+            throw error;
+          }
+
+          if (appointment.google_event_id && currentUser?.id) {
+            try {
+              const accessToken = await getValidAccessToken(currentUser.id);
+              if (accessToken) {
+                await deleteCalendarEvent(accessToken, appointment.google_event_id);
+              }
+            } catch (googleDeleteError) {
+              console.warn('Google Calendar delete sync failed', googleDeleteError);
+            }
+          }
+        } catch {
+          setAppointments(previousAppointments);
+          Alert.alert('Could not delete appointment', 'Please try again.');
         }
       }},
     ]);

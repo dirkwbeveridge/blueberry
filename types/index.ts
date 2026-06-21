@@ -2,7 +2,7 @@ export type Stage = 'ttc' | 'pregnant' | 'postpartum';
 export type BabyGender = 'male' | 'female' | 'unknown';
 export type Priority = 'low' | 'medium' | 'high';
 export type UserRole = 'mother' | 'partner';
-export type BabyLogType = 'feeding' | 'sleep' | 'diaper' | 'handoff';
+export type BabyLogType = 'feeding' | 'sleep' | 'diaper' | 'handoff' | 'pumping' | 'solids';
 
 export interface Household {
   id: string;

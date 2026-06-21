@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 
 import { Button } from '../../components/ui/Button';
@@ -40,6 +40,11 @@ export default function BabyDetailsModal() {
   async function handleSave() {
     if (!household) {
       Alert.alert('Not set up', 'Complete household setup first.');
+      return;
+    }
+
+    if (isPostpartum && babyDob && babyDob.getTime() > Date.now()) {
+      Alert.alert('Invalid birthday', 'Baby birthday cannot be in the future.');
       return;
     }
 
@@ -99,6 +104,7 @@ export default function BabyDetailsModal() {
           if (isPostpartum) setBabyDob(date);
           else setDueDate(date);
         }}
+        maximumDate={isPostpartum ? new Date() : undefined}
       />
 
       <Button label="Save details" onPress={handleSave} loading={loading} />

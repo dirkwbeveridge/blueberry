@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Button } from '../../components/ui/Button';
@@ -47,6 +47,18 @@ function getTrackerConfig(tracker: TrackerKey): TrackerConfig {
         subtitle: 'Family Mode tracker',
         guidance: 'Track who is on shift and keep handoff notes visible to both partners.',
       };
+    case 'pumping':
+      return {
+        title: 'Pumping',
+        subtitle: 'Family Mode tracker',
+        guidance: 'Log side, duration, and amount to keep shared feeding context clear.',
+      };
+    case 'solids':
+      return {
+        title: 'Solids',
+        subtitle: 'Family Mode tracker',
+        guidance: 'Capture food, amount, and any reaction notes in one quick log.',
+      };
     case 'milestones':
       return {
         title: 'Milestones',
@@ -67,6 +79,8 @@ function isTrackerValue(value: string | undefined): value is TrackerKey {
     || value === 'sleep'
     || value === 'diaper'
     || value === 'handoff'
+    || value === 'pumping'
+    || value === 'solids'
     || value === 'milestones'
     || value === 'pediatric';
 }
@@ -88,6 +102,14 @@ function formatLogSummary(log: BabyLog): string {
         .join(' · ');
     case 'handoff':
       return [details.shiftOwner, details.status].filter(Boolean).join(' · ');
+    case 'pumping':
+      return [details.side, details.durationMins ? `${details.durationMins}m` : null, details.amountMl ? `${details.amountMl} ml` : null]
+        .filter(Boolean)
+        .join(' · ');
+    case 'solids':
+      return [details.food, details.amountTsp ? `${details.amountTsp} tsp` : null, details.reaction]
+        .filter(Boolean)
+        .join(' · ');
     default:
       return '';
   }
@@ -113,16 +135,40 @@ export default function BabyTrackerModal() {
   const [diaperCount, setDiaperCount] = useState('1');
   const [shiftOwner, setShiftOwner] = useState('me');
   const [handoffStatus, setHandoffStatus] = useState('starting');
+  const [pumpSide, setPumpSide] = useState('both');
+  const [pumpDurationMins, setPumpDurationMins] = useState('');
+  const [pumpAmountMl, setPumpAmountMl] = useState('');
+  const [solidsFood, setSolidsFood] = useState('');
+  const [solidsAmountTsp, setSolidsAmountTsp] = useState('');
+  const [solidsReaction, setSolidsReaction] = useState('none');
 
-  const isDataTracker = trackerKey === 'feeding' || trackerKey === 'sleep' || trackerKey === 'diaper' || trackerKey === 'handoff';
+  const isDataTracker = trackerKey === 'feeding'
+    || trackerKey === 'sleep'
+    || trackerKey === 'diaper'
+    || trackerKey === 'handoff'
+    || trackerKey === 'pumping'
+    || trackerKey === 'solids';
 
   const canSave = useMemo(() => {
     if (trackerKey === 'feeding') return !!notes.trim() || !!feedAmountMl.trim() || !!feedDurationMins.trim();
     if (trackerKey === 'sleep') return !!notes.trim() || !!sleepDurationMins.trim();
     if (trackerKey === 'diaper') return !!notes.trim() || Number(diaperCount) > 0;
     if (trackerKey === 'handoff') return !!notes.trim();
+    if (trackerKey === 'pumping') return !!notes.trim() || !!pumpAmountMl.trim() || !!pumpDurationMins.trim();
+    if (trackerKey === 'solids') return !!notes.trim() || !!solidsFood.trim() || !!solidsAmountTsp.trim();
     return true;
-  }, [trackerKey, notes, feedAmountMl, feedDurationMins, sleepDurationMins, diaperCount]);
+  }, [
+    trackerKey,
+    notes,
+    feedAmountMl,
+    feedDurationMins,
+    sleepDurationMins,
+    diaperCount,
+    pumpAmountMl,
+    pumpDurationMins,
+    solidsFood,
+    solidsAmountTsp,
+  ]);
 
   const fetchLogs = useCallback(async () => {
     if (!household || !isDataTracker) return;
@@ -171,6 +217,14 @@ export default function BabyTrackerModal() {
     } else if (trackerKey === 'handoff') {
       details.shiftOwner = shiftOwner;
       details.status = handoffStatus;
+    } else if (trackerKey === 'pumping') {
+      details.side = pumpSide;
+      details.durationMins = pumpDurationMins ? Number(pumpDurationMins) : null;
+      details.amountMl = pumpAmountMl ? Number(pumpAmountMl) : null;
+    } else if (trackerKey === 'solids') {
+      details.food = solidsFood.trim() || null;
+      details.amountTsp = solidsAmountTsp ? Number(solidsAmountTsp) : null;
+      details.reaction = solidsReaction;
     }
 
     setSaving(true);
@@ -194,6 +248,14 @@ export default function BabyTrackerModal() {
       }
       if (trackerKey === 'diaper') {
         setDiaperCount('1');
+      }
+      if (trackerKey === 'pumping') {
+        setPumpDurationMins('');
+        setPumpAmountMl('');
+      }
+      if (trackerKey === 'solids') {
+        setSolidsFood('');
+        setSolidsAmountTsp('');
       }
     } catch {
       Alert.alert('Could not save', 'Please try again.');
@@ -331,6 +393,63 @@ export default function BabyTrackerModal() {
             ]}
             value={handoffStatus}
             onChange={setHandoffStatus}
+          />
+        </Card>
+      )}
+
+      {trackerKey === 'pumping' && (
+        <Card style={styles.card}>
+          <Text style={styles.section}>Details</Text>
+          <SegmentedControl
+            options={[
+              { value: 'left', label: 'Left' },
+              { value: 'right', label: 'Right' },
+              { value: 'both', label: 'Both' },
+            ]}
+            value={pumpSide}
+            onChange={setPumpSide}
+          />
+          <Input
+            label="Duration (minutes, optional)"
+            value={pumpDurationMins}
+            onChangeText={setPumpDurationMins}
+            keyboardType="number-pad"
+            placeholder="e.g. 15"
+          />
+          <Input
+            label="Amount (ml, optional)"
+            value={pumpAmountMl}
+            onChangeText={setPumpAmountMl}
+            keyboardType="number-pad"
+            placeholder="e.g. 120"
+          />
+        </Card>
+      )}
+
+      {trackerKey === 'solids' && (
+        <Card style={styles.card}>
+          <Text style={styles.section}>Details</Text>
+          <Input
+            label="Food"
+            value={solidsFood}
+            onChangeText={setSolidsFood}
+            placeholder="e.g. avocado"
+          />
+          <Input
+            label="Amount (tsp, optional)"
+            value={solidsAmountTsp}
+            onChangeText={setSolidsAmountTsp}
+            keyboardType="number-pad"
+            placeholder="e.g. 2"
+          />
+          <SegmentedControl
+            options={[
+              { value: 'none', label: 'No reaction' },
+              { value: 'mild', label: 'Mild reaction' },
+              { value: 'monitor', label: 'Needs monitoring' },
+            ]}
+            value={solidsReaction}
+            onChange={setSolidsReaction}
           />
         </Card>
       )}

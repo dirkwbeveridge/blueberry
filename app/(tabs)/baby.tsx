@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { BabyCalendarPane } from '../../components/baby/BabyCalendarPane';
 import { Card } from '../../components/ui/Card';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { getPostpartumWeekContent } from '../../constants/postpartumContent';
@@ -17,6 +18,8 @@ interface TrackerRow {
 
 const TRACKERS: TrackerRow[] = [
   { key: 'feeding', emoji: '🍼', label: 'Feeding', sub: 'Breast L/R, bottle, formula, timer support' },
+  { key: 'pumping', emoji: '🥛', label: 'Pumping', sub: 'Track side, minutes, and total expressed milk' },
+  { key: 'solids', emoji: '🥣', label: 'Solids', sub: 'Food, amount, and reaction notes in one log' },
   { key: 'sleep', emoji: '😴', label: 'Sleep', sub: 'Track naps, overnight blocks, and wake windows' },
   { key: 'diaper', emoji: '🧷', label: 'Diaper', sub: 'Wet/dirty counts and trend visibility' },
   { key: 'milestones', emoji: '📈', label: 'Milestones', sub: 'Weekly notes and developmental checkpoints' },
@@ -92,6 +95,8 @@ export default function BabyScreen() {
           </TouchableOpacity>
         ))}
       </Card>
+
+      <BabyCalendarPane householdId={household?.id ?? null} />
     </ScrollView>
   );
 }

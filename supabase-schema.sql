@@ -150,7 +150,7 @@ create table baby_logs (
   id            uuid primary key default gen_random_uuid(),
   household_id  uuid not null references households(id) on delete cascade,
   user_id       uuid not null references users(id) on delete cascade,
-  log_type      text not null check (log_type in ('feeding','sleep','diaper','handoff')),
+  log_type      text not null check (log_type in ('feeding','sleep','diaper','handoff','pumping','solids')),
   logged_at     timestamptz not null default now(),
   details       jsonb,
   notes         text,

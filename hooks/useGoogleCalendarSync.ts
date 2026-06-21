@@ -8,6 +8,7 @@ import {
     setGoogleCalendarLastSyncedAt,
     type GoogleCalendarConflictPolicy,
 } from '../lib/googleCalendarSyncPrefs';
+import { cancelAppointmentReminderByAppointmentId } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
 import type { Appointment } from '../types';
 
@@ -36,6 +37,20 @@ function localTimezone(): string {
 
 function normalizeIso(value: string): string {
   return new Date(value).toISOString();
+}
+
+function getGoogleEventStartIso(event: { start: { dateTime?: string; date?: string } }): string | null {
+  if (event.start.dateTime) {
+    const parsed = new Date(event.start.dateTime);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }
+
+  if (event.start.date) {
+    const parsed = new Date(`${event.start.date}T09:00:00.000Z`);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }
+
+  return null;
 }
 
 function buildGoogleEventFromAppointment(appointment: Pick<Appointment, 'title' | 'appointment_date' | 'location'>) {
@@ -152,6 +167,7 @@ export async function syncGoogleCalendarForUserHousehold(
           .eq('id', appointment.id)
           .eq('household_id', householdId);
         if (!deleteError) {
+          await cancelAppointmentReminderByAppointmentId(appointment.id);
           deleted += 1;
         }
       }
@@ -159,11 +175,14 @@ export async function syncGoogleCalendarForUserHousehold(
     }
 
     const googleTitle = linkedEvent.summary;
-    const googleDate = linkedEvent.start.dateTime;
+    const googleDateIso = getGoogleEventStartIso(linkedEvent);
+    if (!googleDateIso) {
+      continue;
+    }
     const googleLocation = linkedEvent.location ?? null;
 
     const titleChanged = googleTitle !== appointment.title;
-    const dateChanged = normalizeIso(googleDate) !== normalizeIso(appointment.appointment_date);
+    const dateChanged = googleDateIso !== normalizeIso(appointment.appointment_date);
     const locationChanged = googleLocation !== (appointment.location ?? null);
 
     if (!titleChanged && !dateChanged && !locationChanged) {
@@ -182,7 +201,7 @@ export async function syncGoogleCalendarForUserHousehold(
         .from('appointments')
         .update({
           title: googleTitle,
-          appointment_date: normalizeIso(googleDate),
+          appointment_date: googleDateIso,
           location: googleLocation,
         })
         .eq('id', appointment.id)
