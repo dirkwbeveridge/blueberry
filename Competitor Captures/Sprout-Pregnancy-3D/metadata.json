@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-06-21T10:19:44.034Z",
+  "appId": "441977097",
+  "appSlug": "sprout-pregnancy-3d",
+  "appName": "Pregnancy Tracker 3D by Sprout",
+  "seller": "Med ART Studios LLC",
+  "version": "18.15",
+  "averageUserRating": 4.74878,
+  "userRatingCount": 23590,
+  "formattedPrice": "Free",
+  "trackViewUrl": "https://apps.apple.com/us/app/pregnancy-tracker-3d-by-sprout/id441977097?uo=4",
+  "phoneScreenshotCount": 0,
+  "ipadScreenshotCount": 0,
+  "appletvScreenshotCount": 0,
+  "screenshotCount": 5,
+  "screenshotUrls": [
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/94/5f/78/945f789d-0165-62b1-e020-b71943aaefe7/1.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/99/b7/f4/99b7f455-15a4-815c-b77d-2c4621272af1/8.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/f2/97/02/f297020b-6ea0-b9da-c19c-203797bb078c/2.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/fc/7e/28/fc7e28e5-0337-634f-0da9-f0717985465f/4.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/71/ab/a4/71aba47d-d09a-c2a7-66f0-3c60c3262025/5.png/600x1300bb.webp"
+  ],
+  "note": "Screenshots pulled via iTunes Lookup API fields with App Store HTML fallback when API arrays are empty."
+}

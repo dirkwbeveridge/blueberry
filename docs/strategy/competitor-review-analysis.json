@@ -1,0 +1,300 @@
+{
+  "generatedAt": "2026-06-21T10:40:04.491Z",
+  "methodology": "Apple RSS customer reviews pages 1-6 sortBy=mostRecent; keyword-based theme tagging",
+  "apps": [
+    {
+      "id": "1169136078",
+      "name": "Huckleberry",
+      "reviewCountSampled": 300,
+      "positiveCount": 228,
+      "negativeCount": 47,
+      "positiveRate": 0.76,
+      "negativeRate": 0.157,
+      "themeCounts": {
+        "partner_sync": 40,
+        "paywall_pricing": 61,
+        "bugs_performance": 34,
+        "ease_ui": 37,
+        "support_quality": 10,
+        "ai_guidance": 124,
+        "postpartum_wellness": 13,
+        "pregnancy_content": 24
+      },
+      "topPositive": [
+        {
+          "rating": 5,
+          "title": "Wonderful",
+          "excerpt": "I currently have a 5 day old and it has already helped so much. I love it"
+        },
+        {
+          "rating": 5,
+          "title": "Saver",
+          "excerpt": "This app saves your sanity( or whatever is left of it) during the first weeks postpartum with tracking feeds, discharge and pumps."
+        },
+        {
+          "rating": 5,
+          "title": "Best Parenting App!",
+          "excerpt": "This app has instilled confidence in the care of our child with all the helpful tips and it's made going to the pediatrician office so much easier. We don't have to guess anymore to answer all their questions because it'"
+        },
+        {
+          "rating": 4,
+          "title": "FIX THE CLOCK",
+          "excerpt": "The last thing a tired mom wants to do is think more…the scroll clock (which is already annoying) doesn’t automatically switch to AM or PM when you scroll like it does in your calendar etc. \n\nBut why not make it easy to "
+        },
+        {
+          "rating": 5,
+          "title": "Used for both kids",
+          "excerpt": "It’s great."
+        },
+        {
+          "rating": 5,
+          "title": "The best app for sleep & baby tracking",
+          "excerpt": "I have 2 kids and this is my second time using this app. Takes away the mental load of figuring out nap schedules."
+        },
+        {
+          "rating": 5,
+          "title": "I love!",
+          "excerpt": "So easy to keep track of your babies schedule throughout the day!"
+        },
+        {
+          "rating": 5,
+          "title": "Excellent tool for new parents",
+          "excerpt": "We originally started using Huckleberry to trek breast-feeding, which was very helpful, especially in the first few weeks after giving birth. Once breast-feeding was established, we started focusing on using the app to r"
+        }
+      ],
+      "topNegative": [
+        {
+          "rating": 2,
+          "title": "Good product subpar app",
+          "excerpt": "I spent an awful lot of money for this to log me out and make me reset my password this much"
+        },
+        {
+          "rating": 1,
+          "title": "Creepy",
+          "excerpt": "I really like using the app but lately when I open the app I feel like it’s taking pictures of me and that is really disturbing. I like my privacy and I don two pictures being taken of me without my consent"
+        },
+        {
+          "rating": 2,
+          "title": "I loved this app until…",
+          "excerpt": "When my son started solids, we began logging what he ate in order to have a record of what he was allergic to and what he enjoyed. We are now several months into logging his eating history and I look back to check what f"
+        },
+        {
+          "rating": 2,
+          "title": "Date/time tracking is trash",
+          "excerpt": "Update your app. When I roll the time back from 12:01AM to 11:55PM to put a feeding in accurately, why does the date not automatically change. If I’m trying to enter a future date, maybe change the date for me? As a new "
+        },
+        {
+          "rating": 1,
+          "title": "Extremely glitchy",
+          "excerpt": "That’s all"
+        },
+        {
+          "rating": 1,
+          "title": "Pay wall - B.S.",
+          "excerpt": "Amazing and wonderful app - for anything excel could do.\nAnything else is stuck behind a ridiculous pay wall.\nSaying “hey siri” or google/alexa (pay wall)\nA widget to help add it - pay wall\n\nSeems like app is set up just"
+        },
+        {
+          "rating": 2,
+          "title": "Hucklelaggy",
+          "excerpt": "This app would be 5/5 if it wasn’t a totally laggy mess. You spend ten minutes trying to log or edit one thing while it attempts to save what you did. This only started after we declined upgrading to their premium servic"
+        },
+        {
+          "rating": 1,
+          "title": "Buggy AF",
+          "excerpt": "A nice handful of features consistently fail to the point of me being frustrated that I any any money into this app. Widgets won’t update - especially if using this with my partner, which most of us are, I can’t track my"
+        }
+      ]
+    },
+    {
+      "id": "441977097",
+      "name": "Sprout Pregnancy 3D",
+      "reviewCountSampled": 300,
+      "positiveCount": 181,
+      "negativeCount": 93,
+      "positiveRate": 0.603,
+      "negativeRate": 0.31,
+      "themeCounts": {
+        "partner_sync": 9,
+        "paywall_pricing": 51,
+        "bugs_performance": 6,
+        "ease_ui": 18,
+        "support_quality": 3,
+        "ai_guidance": 68,
+        "postpartum_wellness": 1,
+        "pregnancy_content": 115
+      },
+      "topPositive": [
+        {
+          "rating": 5,
+          "title": "Amazing",
+          "excerpt": "I just started using this app and it’s the best one yet!!! Love the detailed information about you and your baby and your journey!!!"
+        },
+        {
+          "rating": 5,
+          "title": "A great friend during our two pregnancies",
+          "excerpt": "I searched but could not find a better app to get my weekly fix during my wife’s two pregnancies."
+        },
+        {
+          "rating": 5,
+          "title": "Great resource",
+          "excerpt": "Used this app weekly while pregnant, great information and milestone tracking. 3D weekly images of baby were wonderful."
+        },
+        {
+          "rating": 5,
+          "title": "Excellent",
+          "excerpt": "Educational and I love the privacy of the app."
+        },
+        {
+          "rating": 5,
+          "title": "Love it!",
+          "excerpt": "I love all the features this app offers! Every week I can see what my baby looks like and what a heartbeat would sound like, it gives wonderful insights and information on everything! Excellent for first time moms and se"
+        },
+        {
+          "rating": 5,
+          "title": "Love this app.",
+          "excerpt": "It’s making my first journey into motherhood exciting."
+        },
+        {
+          "rating": 5,
+          "title": "Pregnant tracker",
+          "excerpt": "Me and my boyfriend are having a Baby. Girl"
+        },
+        {
+          "rating": 5,
+          "title": "Simple and helpful",
+          "excerpt": "I like the clean interface, easy journal logging and how I can print or PDF export it,  and I finally bought the premium. I also love that it was things like a place to track doctors appointments or questions. And that i"
+        }
+      ],
+      "topNegative": [
+        {
+          "rating": 1,
+          "title": "Not a free app",
+          "excerpt": "I wish apps would just tell us they’re not free from the beginning."
+        },
+        {
+          "rating": 1,
+          "title": "False advertisement",
+          "excerpt": "Downloaded the app in hopes to track my pregnancy but it is not free.  It does offer a free 3 day trial but after the 3 days you have to pay for it.  Absolutely disappointing."
+        },
+        {
+          "rating": 1,
+          "title": "Overpriced",
+          "excerpt": "For what is offers it’s too expensive. It’s my 3rd pregnancy and I live using apps to track - sprouts was the most expensive and offers the least. I think we pay for the 3D imagines but e can get those for free on YouTub"
+        },
+        {
+          "rating": 2,
+          "title": "Just ok",
+          "excerpt": "Redundant information, the paid part of this app is not worth it"
+        },
+        {
+          "rating": 2,
+          "title": "Good features, not worth the price",
+          "excerpt": "Sadly this app isn’t all I’d hoped when I spent $60 on the subscription. There are other apps that do the same things or better for less money."
+        },
+        {
+          "rating": 1,
+          "title": "Not free",
+          "excerpt": "Not free and doesn’t tell you until it has all your info. Beware"
+        },
+        {
+          "rating": 1,
+          "title": "$$$",
+          "excerpt": "I LOVED this app so much during my first pregnancy. I loved seeing how big the baby was getting, hearing the different sounds and interacting with it. I’m SO disappointed this second time around to find that it’s no long"
+        },
+        {
+          "rating": 2,
+          "title": "Ehhhh",
+          "excerpt": "I wanted more privacy and this app was recommended over the free ones. I found the daily tips to be a bit obnoxious - as in not particularly helpful. In retrospect I probabaly should have gotten an app at all"
+        }
+      ]
+    },
+    {
+      "id": "1444639029",
+      "name": "Nara Baby & Pregnancy",
+      "reviewCountSampled": 300,
+      "positiveCount": 287,
+      "negativeCount": 5,
+      "positiveRate": 0.957,
+      "negativeRate": 0.017,
+      "themeCounts": {
+        "partner_sync": 70,
+        "paywall_pricing": 69,
+        "bugs_performance": 15,
+        "ease_ui": 129,
+        "support_quality": 10,
+        "ai_guidance": 111,
+        "postpartum_wellness": 17,
+        "pregnancy_content": 18
+      },
+      "topPositive": [
+        {
+          "rating": 5,
+          "title": "The GREATEST App for Parents",
+          "excerpt": "It has NO ads, no premium subscription. Th developers genuinely care about the care of the children. It has EVERYTHING you could need. It even works with the island on iPhones when you’re currently tracking things such a"
+        },
+        {
+          "rating": 4,
+          "title": "Glitchy since update",
+          "excerpt": "Ever since a recent update, the timers are now incredibly glitchy. Please fix this."
+        },
+        {
+          "rating": 5,
+          "title": "Nearly Perfect.",
+          "excerpt": "This app should be $4.99, but it’s free! Easily one of the best apps for tracking any and all baby activities. \n\nIt has a nice roll-up summary of each day and trend comparisons, so you know you’re feeding/changing enough"
+        },
+        {
+          "rating": 5,
+          "title": "Great!",
+          "excerpt": "Amazing app for new moms!! Perfect for keeping track of your new born!"
+        },
+        {
+          "rating": 5,
+          "title": "awesome free baby tracker",
+          "excerpt": "i love the features and appreciate that its free and easy"
+        },
+        {
+          "rating": 5,
+          "title": "Love this APP",
+          "excerpt": "Love this APP"
+        },
+        {
+          "rating": 5,
+          "title": "Nara is easy to use!",
+          "excerpt": "It has been so great to have such an easy to use/navigable app as first time parents stepping into the newborn world. We are so grateful!"
+        },
+        {
+          "rating": 5,
+          "title": "Better than Huckleberry",
+          "excerpt": "I love the lock screen usage and alerts and the ability to customize the category you want. I used Huckleberry all throughout my time with my first in 2024 but it was so glitchy when I tried again in 2026. Nara is way ea"
+        }
+      ],
+      "topNegative": [
+        {
+          "rating": 2,
+          "title": "Lags and AFTER THE UPDATE",
+          "excerpt": "I have used this app, for about 2 years now and there was an update a few weeks ago. We share the app with my caregiver to share updates on naps. Well the timer won’t stop for me or my caregiver we can’t stop the timer f"
+        },
+        {
+          "rating": 1,
+          "title": "So helpful!",
+          "excerpt": "This app has u told Aefffiikjjj race been so helpful to us as new parents. Easy and user friendly way to track everything about baby and even details about yourself. It has helped me gain confidence in breastfeeding and "
+        },
+        {
+          "rating": 1,
+          "title": "App still shows baby asleep when marked awake",
+          "excerpt": "While I do enjoy the app and the features for feeding and diaper changes, Nara app consistently changes the sleeping status once my baby has been awake for a while to “sleeping” and it’s very frustrating! I have updated "
+        },
+        {
+          "rating": 1,
+          "title": "Crashes constantly, leaving my baby unmonitored",
+          "excerpt": "App was solid till about 4-6 weeks ago, when it began crashing constantly. I assume this is because my network is blocking requests out to user tracking/ad services and the app is poorly written, but I don’t know. All I "
+        },
+        {
+          "rating": 1,
+          "title": "I don’t understand why it’s almost 5 Stars",
+          "excerpt": "The app never opened no matter how many times I tried"
+        }
+      ]
+    }
+  ]
+}

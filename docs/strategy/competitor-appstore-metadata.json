@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-06-21T10:39:01.219Z",
+  "apps": [
+    {
+      "id": "1169136078",
+      "trackName": "Huckleberry: Baby & Child",
+      "sellerName": "Huckleberry Labs Inc.",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.91931,
+      "userRatingCount": 66999,
+      "formattedPrice": "Free",
+      "version": "v0.9.298",
+      "minimumOsVersion": "16.0",
+      "currentVersionReleaseDate": "2026-06-11T22:32:08Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/huckleberry-baby-child/id1169136078?uo=4",
+      "bundleId": "com.huckleberry-labs.app"
+    },
+    {
+      "id": "441977097",
+      "trackName": "Pregnancy Tracker 3D by Sprout",
+      "sellerName": "Med ART Studios LLC",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.74878,
+      "userRatingCount": 23590,
+      "formattedPrice": "Free",
+      "version": "18.15",
+      "minimumOsVersion": "18.6",
+      "currentVersionReleaseDate": "2026-06-09T16:42:20Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/pregnancy-tracker-3d-by-sprout/id441977097?uo=4",
+      "bundleId": "com.medart-studios.PregnancyLite"
+    },
+    {
+      "id": "551448817",
+      "trackName": "Baby Tracker & Newborn Log",
+      "sellerName": "Med ART Studios LLC",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.7778,
+      "userRatingCount": 31441,
+      "formattedPrice": "Free",
+      "version": "15.22",
+      "minimumOsVersion": "18.6",
+      "currentVersionReleaseDate": "2026-06-17T17:49:32Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/baby-tracker-newborn-log/id551448817?uo=4",
+      "bundleId": "com.medart-studios.Baby"
+    },
+    {
+      "id": "1444639029",
+      "trackName": "Nara Baby & Pregnancy Tracker",
+      "sellerName": "Nara Organics, Inc.",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.93863,
+      "userRatingCount": 22423,
+      "formattedPrice": "Free",
+      "version": "2.7.3",
+      "minimumOsVersion": "16.1",
+      "currentVersionReleaseDate": "2026-06-13T23:26:32Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/nara-baby-pregnancy-tracker/id1444639029?uo=4",
+      "bundleId": "com.naraorganics.nara"
+    },
+    {
+      "id": "1038369065",
+      "trackName": "Flo Cycle & Period Tracker",
+      "sellerName": "FLO HEALTH UK LIMITED",
+      "primaryGenreName": "Health & Fitness",
+      "averageUserRating": 4.75027,
+      "userRatingCount": 1898251,
+      "formattedPrice": "Free",
+      "version": "10.0.0",
+      "minimumOsVersion": "16.0",
+      "currentVersionReleaseDate": "2026-06-17T21:56:09Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/flo-cycle-period-tracker/id1038369065?uo=4",
+      "bundleId": "org.iggymedia.periodtracker"
+    },
+    {
+      "id": "719135369",
+      "name": "Ovia Pregnancy & Baby Tracker",
+      "found": false
+    },
+    {
+      "id": "505951864",
+      "name": "The Bump: Pregnancy Tracker",
+      "found": false
+    },
+    {
+      "id": "505864483",
+      "trackName": "Pregnancy + | Tracker App",
+      "sellerName": "Philips Digital UK Limited",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.84792,
+      "userRatingCount": 74244,
+      "formattedPrice": "Free",
+      "version": "7.7",
+      "minimumOsVersion": "16.4",
+      "currentVersionReleaseDate": "2026-06-17T11:26:40Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/pregnancy-tracker-app/id505864483?uo=4",
+      "bundleId": "com.HP.PregnancyiPhonelite"
+    },
+    {
+      "id": "882575916",
+      "name": "Glow Baby Tracker & Growth App",
+      "found": false
+    },
+    {
+      "id": "386022579",
+      "trackName": "BabyCenter Pregnancy Tracker",
+      "sellerName": "Everyday Health, Inc.",
+      "primaryGenreName": "Medical",
+      "averageUserRating": 4.89124,
+      "userRatingCount": 291602,
+      "formattedPrice": "Free",
+      "version": "6.10.0",
+      "minimumOsVersion": "17.0",
+      "currentVersionReleaseDate": "2026-06-16T07:04:35Z",
+      "trackViewUrl": "https://apps.apple.com/us/app/babycenter-pregnancy-tracker/id386022579?uo=4",
+      "bundleId": "com.babycenter.mypregnancytoday"
+    }
+  ]
+}

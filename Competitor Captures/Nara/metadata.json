@@ -1,0 +1,25 @@
+{
+  "capturedAt": "2026-06-21T10:19:46.890Z",
+  "appId": "1444639029",
+  "appSlug": "nara-baby-pregnancy-tracker",
+  "appName": "Nara Baby & Pregnancy Tracker",
+  "seller": "Nara Organics, Inc.",
+  "version": "2.7.3",
+  "averageUserRating": 4.93863,
+  "userRatingCount": 22423,
+  "formattedPrice": "Free",
+  "trackViewUrl": "https://apps.apple.com/us/app/nara-baby-pregnancy-tracker/id1444639029?uo=4",
+  "phoneScreenshotCount": 0,
+  "ipadScreenshotCount": 0,
+  "appletvScreenshotCount": 0,
+  "screenshotCount": 6,
+  "screenshotUrls": [
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/c9/0c/b9/c90cb98e-3124-19b4-039c-90f0c914e14b/01_intro_screen_1.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/13/48/54/13485435-fa51-af20-09be-634fa78db331/02_intro_screen.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/e8/1c/ff/e81cffd5-720c-bb24-0e2a-e93a93531453/03_grow_and_health.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/7f/ff/89/7fff89ee-dc68-9971-b7fb-e1c974613627/04_pregnancy.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/21/03/a7/2103a752-849f-f828-da9c-d5abe513b703/05_sleep.png/600x1300bb.webp",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/64/c5/39/64c5391d-6cd4-b6a0-32fe-0c53a142891f/06_postpartum.png/600x1300bb.webp"
+  ],
+  "note": "Screenshots pulled via iTunes Lookup API fields with App Store HTML fallback when API arrays are empty."
+}

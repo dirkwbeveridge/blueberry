@@ -1,0 +1,29 @@
+{
+  "capturedAt": "2026-06-21T10:19:43.479Z",
+  "appId": "1169136078",
+  "appSlug": "huckleberry-baby-child",
+  "appName": "Huckleberry: Baby & Child",
+  "seller": "Huckleberry Labs Inc.",
+  "version": "v0.9.298",
+  "averageUserRating": 4.91931,
+  "userRatingCount": 66999,
+  "formattedPrice": "Free",
+  "trackViewUrl": "https://apps.apple.com/us/app/huckleberry-baby-child/id1169136078?uo=4",
+  "phoneScreenshotCount": 10,
+  "ipadScreenshotCount": 0,
+  "appletvScreenshotCount": 0,
+  "screenshotCount": 10,
+  "screenshotUrls": [
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ed/b8/f1/edb8f1b5-b763-9a0c-d1d4-972ca4cc589f/1_iPhone_5.5_Intro_Best_Parents_Badge.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/42/f7/f8/42f7f8bd-047d-03ac-b831-1f58af098512/2_iPhone_5.5_Summary_Report.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/49/9d/ea/499deac3-cda6-2eac-fd29-648da4156c46/3_iPhone_5.5_SweetSpot.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/68/c5/7e/68c57e4b-cf9d-20f6-20fb-aadd502eed79/4_iPhone_5.5_Sleep_Reports.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/bd/af/c1/bdafc173-6325-923a-5f93-937a82341245/5_iPhone_5.5_Feeding.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/47/b3/c4/47b3c423-ff69-e5c6-fe2c-e942209329ae/6_iPhone_5.5_Pumping.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/67/85/e2/6785e231-6601-a407-6d19-6341710dfc5e/8_iPhone_5.5_Reports.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/d7/b7/86/d7b7867f-ae73-5dd0-0542-43ec9aac2ad8/10_iPhone_5.5_Dark_Mode.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/60/ee/18/60ee187b-1814-88b9-c347-7d327c0db60a/12_iPhone_5.5_Summary_Reports.jpg/392x696bb.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/14/4e/5d/144e5d6d-3d43-766a-ce25-9f58de9a566e/13_iPhone_5.5_Insights.jpg/392x696bb.jpg"
+  ],
+  "note": "Screenshots pulled via iTunes Lookup API fields with App Store HTML fallback when API arrays are empty."
+}

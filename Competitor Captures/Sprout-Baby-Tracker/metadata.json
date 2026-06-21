@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-06-21T10:19:46.471Z",
+  "appId": "551448817",
+  "appSlug": "sprout-baby-tracker",
+  "appName": "Baby Tracker & Newborn Log",
+  "seller": "Med ART Studios LLC",
+  "version": "15.22",
+  "averageUserRating": 4.7778,
+  "userRatingCount": 31441,
+  "formattedPrice": "Free",
+  "trackViewUrl": "https://apps.apple.com/us/app/baby-tracker-newborn-log/id551448817?uo=4",
+  "phoneScreenshotCount": 0,
+  "ipadScreenshotCount": 5,
+  "appletvScreenshotCount": 0,
+  "screenshotCount": 5,
+  "screenshotUrls": [
+    "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/70/fa/d6/70fad60a-4555-8255-9838-a9bc3dac1ed7/7bd21ac5-76a8-44cc-87c2-531c7b1c58f1_Simulator-Screen-Shot---iPad-Pro-_U002812.9-inch_U0029-_U00285th-generation_U0029---2022-03-29-at-17.59.42.png/576x768bb.png",
+    "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/8e/89/87/8e89873d-5447-4245-b0db-3cd30c359620/e539aa2e-3707-4a9c-b5df-358ec98a4001_Screenshot_14589406-3E46-4EE3-B686-11AAFA80407B.png/576x768bb.png",
+    "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/27/74/74/27747425-277b-fbb2-725e-3a85f37b22c8/41e0982e-285c-4b33-a71d-7be801865638_Screenshot_F8801754-A9CE-4609-BA9D-8C0F05C71B92.png/576x768bb.png",
+    "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/26/ef/fd/26effdcd-3496-560c-0aec-c01cca4cf664/c6eb0b9c-d7cc-40ab-89b0-343867630ff0_Screenshot_972FAE74-B06E-419B-AC36-8A6330E2B5F8.png/576x768bb.png",
+    "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c4/b4/dc/c4b4dc94-a47b-0fff-04a4-b565c49b5dd7/d3a0aac3-3ad8-46d2-aed5-d361313dacfc_Screenshot_2A6592D4-30FA-426F-8A8E-D53052A3A97B.png/576x768bb.png"
+  ],
+  "note": "Screenshots pulled via iTunes Lookup API fields with App Store HTML fallback when API arrays are empty."
+}

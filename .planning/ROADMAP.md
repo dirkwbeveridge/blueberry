@@ -4,6 +4,51 @@
 **Created:** 2026-05-15  
 **Workflow:** GSD, clean Codex-owned repo
 
+## Execution Milestone Rebaseline (2026-06-21)
+
+This is the active delivery schedule used for current build execution.
+
+1. Non-AI Phase 1 completion target: Friday 2026-06-26.
+2. AI scope is fully deferred to Phase 2 start: Monday 2026-06-29.
+
+### Dated Milestones
+
+- Phase 0: 2026-06-22 to 2026-06-23 (scope lock and acceptance criteria)
+- Phase 1: 2026-06-24 to 2026-06-26 (non-AI product readiness sprint)
+- Phase 2: 2026-06-29 to 2026-07-24 (AI alpha and controlled beta)
+- Phase 3: 2026-07-27 to 2026-08-21 (AI commercial readiness)
+- Phase 4: starts 2026-08-24 (differentiation expansion)
+
+### How To Read This Roadmap
+
+1. The dated milestones above are the authoritative delivery timeline.
+2. The numbered phase sections below are a capability index (what the product includes), not a strict calendar sequence.
+3. If there is any conflict, follow the dated milestones and this rebaseline block.
+
+### Delivery-To-Capability Mapping
+
+- Delivery Phase 0 to 1 (non-AI) focuses on readiness and stabilization across existing capability phases, especially partner experience, tracker quality, household sync, appointments, and notifications.
+- Delivery Phase 2 starts AI implementation (capability Phase 7d).
+- Delivery Phase 3 prepares AI commercialization and rollout controls.
+- Delivery Phase 4 continues differentiation expansion (including partner intelligence and postpartum maturity).
+
+### Phase 1 (Non-AI) Build Scope Lock
+
+- Partner-first UX completion on primary household surfaces.
+- Pregnancy-core tracker quality and reliability pass.
+- Household stability pass (invite, join, sync, and error handling).
+- Notifications and reminder hardening for current non-AI features.
+- Performance and polish pass on daily-use screens.
+- App Store positioning artifacts centered on partner-first value.
+
+### Phase 2 (AI) Start Criteria
+
+- Phase 1 exits with no unresolved P0/P1 defects in locked scope.
+- Core non-AI flows pass UAT checklist.
+- Controlled rollout candidate is ready.
+
+## Capability Phase Index (Legacy Numbering)
+
 ## Phase 0: Clean Planning
 
 **Goal:** Establish a clean Codex plan from useful legacy context without importing legacy implementation artifacts.
@@ -142,11 +187,11 @@
 
 **Status:** In progress. The real repo now has APNs token registration, a notifications preferences modal, local appointment reminder scheduling on-device, and a direct APNs Edge Function scaffold. Remaining work is backend deployment, orchestration, and physical-device verification.
 
-## Phase 7d: AI Content (still deferred)
+## Phase 7d: AI Content (Phase 2 scope)
 
 **Goal:** Stage-aware AI content for Mom's week detail, Partner's support suggestions, and the conversation prompt.
 
-**Status:** Deferred until Phase 1 (including 7a/7b/7c) is verified on real devices and shipped to the two-person household. The `todos.source = 'ai'` enum and the UI surfaces are scaffolded; the producer is not.
+**Status:** Deferred to Phase 2 starting 2026-06-29. The `todos.source = 'ai'` enum and the UI surfaces are scaffolded; the producer is not.
 
 ## Phase 8: Family Mode (Postpartum)
 
@@ -160,4 +205,4 @@
 
 ## Immediate Next Step
 
-Verify the current golden path and APNs flow on a real device, deploy the APNs Edge Function and secrets in Supabase, then proceed with Phase 7a and 7b planning/execution in parallel with Family Mode planning.
+Execute the dated Phase 0 and Phase 1 plan to close non-AI readiness by 2026-06-26, then begin AI build in Phase 2 on 2026-06-29.

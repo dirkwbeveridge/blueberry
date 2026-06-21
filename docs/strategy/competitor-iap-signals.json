@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-06-21T10:41:35.579Z",
+  "methodology": "Regex extraction from public App Store HTML In-App Purchases section (US store page)",
+  "apps": [
+    {
+      "id": "1169136078",
+      "name": "Huckleberry",
+      "hasIAPMarker": true,
+      "extractedItems": [
+        "Huckleberry Premium $14.99",
+        "Huckleberry Plus $11.99",
+        "Huckleberry Plus $68.99",
+        "Huckleberry Premium $119.99",
+        "Expedited Service $19.99",
+        "Sleep Improvement Plan $49.99",
+        "Huckleberry Plus $58.99",
+        "Learn More",
+        "© 2025 Huckleberry Labs, Inc.",
+        "Developer Website",
+        "Privacy Policy",
+        "License Agreement"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "441977097",
+      "name": "Sprout Pregnancy 3D",
+      "hasIAPMarker": true,
+      "extractedItems": [
+        "Sprout PREMIUM $7.99",
+        "Premium Subscription Weekly $3.99",
+        "Premium Subscription Yearly $49.99",
+        "Premium Weekly $3.99",
+        "PREMIUM+Unlimited Pregnancies $9.99",
+        "Premium Subscription Monthly $12.99",
+        "Premium Yearly $59.99",
+        "Premium Monthly $12.99",
+        "Unlimited Pregnancies $4.99",
+        "Premium Yearly $49.99",
+        "Learn More",
+        "© 2010 Med ART Studios",
+        "Developer Website",
+        "Privacy Policy",
+        "Family Sharing Some in-app purchases and subscriptions may be shareable with your family group when Family Sharing is enabled. Learn More"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "1444639029",
+      "name": "Nara Baby & Pregnancy",
+      "hasIAPMarker": false,
+      "extractedItems": [],
+      "confidence": "low"
+    }
+  ]
+}
