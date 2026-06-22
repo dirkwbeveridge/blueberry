@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     RefreshControl,
@@ -12,9 +12,11 @@ import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { getPostpartumWeekContent } from '../../constants/postpartumContent';
 import { colors, fonts, radii, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { getPostpartumWeek } from '../../lib/postpartumWeeks';
 import { supabase } from '../../lib/supabase';
 import type { HealthLog } from '../../types';
 
@@ -31,10 +33,13 @@ function formatDate(iso: string) {
 }
 
 export default function HealthScreen() {
-  const { household } = useHousehold();
+  const { household, isPostpartum } = useHousehold();
   const [logs,       setLogs]       = useState<HealthLog[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const postpartumWeek = getPostpartumWeek(household?.baby_dob ?? null);
+  const postpartumContent = getPostpartumWeekContent(postpartumWeek);
 
   const fetchLogs = useCallback(async () => {
     if (!household) return;
@@ -74,7 +79,7 @@ export default function HealthScreen() {
       {/* Header */}
       <ScreenHeader
         title="Health"
-        subtitle="Body, energy, mindfulness, sleep"
+        subtitle={isPostpartum ? 'Recovery, mood, sleep, and energy' : 'Body, energy, mindfulness, sleep'}
         action={
           <TouchableOpacity
             style={styles.logBtn}
@@ -86,6 +91,24 @@ export default function HealthScreen() {
           </TouchableOpacity>
         }
       />
+
+      {isPostpartum && (
+        <Card>
+          <Text style={styles.sectionTitle}>Recovery focus · week {postpartumWeek}</Text>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Mom recovery</Text>
+            <Text style={styles.focusText}>{postpartumContent.momRecovery}</Text>
+          </View>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Partner support</Text>
+            <Text style={styles.focusText}>{postpartumContent.partnerFocus}</Text>
+          </View>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Baby focus</Text>
+            <Text style={styles.focusText}>{postpartumContent.babyFocus}</Text>
+          </View>
+        </Card>
+      )}
 
       {/* Apple Health placeholder */}
       <Card style={styles.appleHealthCard}>
@@ -101,7 +124,7 @@ export default function HealthScreen() {
 
       {/* Log history */}
       <Card>
-        <Text style={styles.sectionTitle}>Recent logs</Text>
+        <Text style={styles.sectionTitle}>{isPostpartum ? 'Recent recovery logs' : 'Recent logs'}</Text>
         {loading ? (
           <View style={styles.loadingRow}>
             <ActivityIndicator size="small" color={colors.primary} />
@@ -147,7 +170,8 @@ export default function HealthScreen() {
       </Card>
 
       {/* Tools entry */}
-      <Card>
+      {!isPostpartum && (
+        <Card>
         <Text style={styles.sectionTitle}>Tools</Text>
         <TouchableOpacity
           style={styles.toolRow}
@@ -177,7 +201,42 @@ export default function HealthScreen() {
           </View>
           <Text style={styles.chev}>›</Text>
         </TouchableOpacity>
-      </Card>
+        </Card>
+      )}
+
+      {isPostpartum && (
+        <Card>
+          <Text style={styles.sectionTitle}>Postpartum tools</Text>
+          <TouchableOpacity
+            style={styles.toolRow}
+            onPress={() => router.push('/(tabs)/baby')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Open baby hub"
+          >
+            <Text style={styles.toolEmoji}>🍼</Text>
+            <View style={styles.toolBody}>
+              <Text style={styles.toolLabel}>Baby hub</Text>
+              <Text style={styles.toolSub}>Feed, sleep, diaper, and milestone tracking</Text>
+            </View>
+            <Text style={styles.chev}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toolRow, styles.toolRowBorder]}
+            onPress={() => router.push('/(modals)/add-appointment')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Add postpartum appointment"
+          >
+            <Text style={styles.toolEmoji}>🩺</Text>
+            <View style={styles.toolBody}>
+              <Text style={styles.toolLabel}>Postpartum check-in</Text>
+              <Text style={styles.toolSub}>Capture follow-ups from your next visit</Text>
+            </View>
+            <Text style={styles.chev}>›</Text>
+          </TouchableOpacity>
+        </Card>
+      )}
     </ScrollView>
   );
 }
@@ -189,6 +248,9 @@ const styles = StyleSheet.create({
   logBtnText:{ fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
 
   sectionTitle: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text, marginBottom: spacing.md },
+  focusBlock: { gap: 2, marginBottom: spacing.sm },
+  focusLabel: { fontFamily: fonts.body.semibold, fontSize: 11, color: colors.primary, letterSpacing: 0.4, textTransform: 'uppercase' },
+  focusText: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, lineHeight: 20 },
 
   // Apple Health placeholder
   appleHealthCard: { borderWidth: 1, borderColor: colors.border },

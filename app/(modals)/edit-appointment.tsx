@@ -9,6 +9,7 @@ import { ModalSheet } from '../../components/ui/ModalSheet';
 import { TimeField } from '../../components/ui/TimeField';
 import { colors, fonts, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
+import { createAppleCalendarEvent, deleteAppleCalendarEvent, updateAppleCalendarEvent } from '../../lib/appleCalendar';
 import { getValidAccessToken } from '../../lib/googleAuth';
 import { updateCalendarEvent } from '../../lib/googleCalendarApi';
 import {
@@ -40,6 +41,7 @@ export default function EditAppointmentModal() {
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [googleEventId, setGoogleEventId] = useState<string | null>(null);
+  const [appleEventId, setAppleEventId] = useState<string | null>(null);
 
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,7 +63,7 @@ export default function EditAppointmentModal() {
       setLoadingInitial(true);
       const { data, error } = await supabase
         .from('appointments')
-        .select('id, title, appointment_date, location, notes, google_event_id')
+        .select('id, title, appointment_date, location, notes, google_event_id, apple_event_id')
         .eq('id', appointmentId)
         .eq('household_id', household.id)
         .maybeSingle();
@@ -83,6 +85,7 @@ export default function EditAppointmentModal() {
       setLocation(data.location ?? '');
       setNotes(data.notes ?? '');
       setGoogleEventId(data.google_event_id ?? null);
+      setAppleEventId(data.apple_event_id ?? null);
       setLoadingInitial(false);
     }
 
@@ -151,6 +154,60 @@ export default function EditAppointmentModal() {
           }
          } catch (googleSyncError) {
            console.warn('Google Calendar update sync failed', googleSyncError);
+         }
+       }
+
+       if (appleEventId) {
+         try {
+           await updateAppleCalendarEvent(appleEventId, {
+             title: title.trim(),
+             startDateIso: datetime,
+             location: location.trim() || null,
+             notes: notes.trim() || null,
+           });
+         } catch {
+           // If the linked event was removed outside Blueberry, recreate it and relink.
+           try {
+             await deleteAppleCalendarEvent(appleEventId);
+           } catch {
+             // Best effort cleanup of stale linkage target.
+           }
+
+           const newAppleEventId = await createAppleCalendarEvent({
+             title: title.trim(),
+             startDateIso: datetime,
+             location: location.trim() || null,
+             notes: notes.trim() || null,
+           });
+
+           if (newAppleEventId) {
+             setAppleEventId(newAppleEventId);
+             await supabase
+               .from('appointments')
+               .update({ apple_event_id: newAppleEventId })
+               .eq('id', appointmentId)
+               .eq('household_id', household.id);
+           }
+         }
+       } else {
+         try {
+           const newAppleEventId = await createAppleCalendarEvent({
+             title: title.trim(),
+             startDateIso: datetime,
+             location: location.trim() || null,
+             notes: notes.trim() || null,
+           });
+
+           if (newAppleEventId) {
+             setAppleEventId(newAppleEventId);
+             await supabase
+               .from('appointments')
+               .update({ apple_event_id: newAppleEventId })
+               .eq('id', appointmentId)
+               .eq('household_id', household.id);
+           }
+         } catch (appleSyncError) {
+           console.warn('Apple Calendar update sync failed', appleSyncError);
          }
        }
 

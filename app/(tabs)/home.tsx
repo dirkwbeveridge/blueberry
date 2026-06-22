@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { QuickActions } from '../../components/home/QuickActions';
 import { TodoList } from '../../components/home/TodoList';
@@ -7,9 +7,11 @@ import { TrimesterProgress } from '../../components/home/TrimesterProgress';
 import { WeekHeroCard } from '../../components/home/WeekHeroCard';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
+import { getPostpartumWeekContent } from '../../constants/postpartumContent';
 import { colors, fonts, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { getPostpartumWeek } from '../../lib/postpartumWeeks';
 import { supabase } from '../../lib/supabase';
 import type { HealthLog, Todo } from '../../types';
 
@@ -19,7 +21,7 @@ const MOOD_EMOJI: Record<string, string> = {
 };
 
 export default function HomeScreen() {
-  const { household, currentUser, currentWeek, isMotherRole } = useHousehold();
+  const { household, currentUser, currentWeek, isMotherRole, isPostpartum } = useHousehold();
   const [todos,      setTodos]      = useState<Todo[]>([]);
   const [pendingTodoIds, setPendingTodoIds] = useState<string[]>([]);
   const [latestLog,  setLatestLog]  = useState<HealthLog | null>(null);
@@ -95,6 +97,8 @@ export default function HomeScreen() {
 
   const displayName = currentUser?.display_name ?? currentUser?.role ?? 'there';
   const greeting    = displayName ? `Hi, ${displayName}` : 'Hello';
+  const postpartumWeek = getPostpartumWeek(household?.baby_dob ?? null);
+  const postpartumContent = getPostpartumWeekContent(postpartumWeek);
 
   return (
     <ScrollView
@@ -106,12 +110,16 @@ export default function HomeScreen() {
       {/* Greeting */}
       <View style={styles.header}>
         <Text style={styles.greeting}>{greeting}</Text>
-        {household?.baby_name && (
-          <Text style={styles.subGreeting}>Tracking {household.baby_name}&apos;s journey</Text>
-        )}
+        {household?.baby_name ? (
+          <Text style={styles.subGreeting}>
+            {isPostpartum
+              ? `Caring for ${household.baby_name}`
+              : `Tracking ${household.baby_name}&apos;s journey`}
+          </Text>
+        ) : null}
       </View>
 
-      {currentWeek === 0 && (
+      {!isPostpartum && currentWeek === 0 && (
         <Card>
           <Text style={styles.sectionTitle}>Journey setup</Text>
           <Text style={styles.setupHint}>
@@ -121,19 +129,38 @@ export default function HomeScreen() {
       )}
 
       {/* Week hero */}
-      {currentWeek > 0 && <WeekHeroCard week={currentWeek} household={household} />}
+      {!isPostpartum && currentWeek > 0 && <WeekHeroCard week={currentWeek} household={household} />}
 
       {/* Trimester progress */}
-      {currentWeek > 0 && household?.due_date && (
+      {!isPostpartum && currentWeek > 0 && household?.due_date && (
         <Card>
           <TrimesterProgress week={currentWeek} dueDateIso={household.due_date} />
+        </Card>
+      )}
+
+      {/* Postpartum guidance */}
+      {isPostpartum && (
+        <Card>
+          <Text style={styles.sectionTitle}>Postpartum week {postpartumWeek}</Text>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Mom recovery</Text>
+            <Text style={styles.focusText}>{postpartumContent.momRecovery}</Text>
+          </View>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Partner support</Text>
+            <Text style={styles.focusText}>{postpartumContent.partnerFocus}</Text>
+          </View>
+          <View style={styles.focusBlock}>
+            <Text style={styles.focusLabel}>Baby focus</Text>
+            <Text style={styles.focusText}>{postpartumContent.babyFocus}</Text>
+          </View>
         </Card>
       )}
 
       {/* Latest symptom log */}
       {isMotherRole && latestLog && (
         <Card>
-          <Text style={styles.sectionTitle}>Latest log</Text>
+          <Text style={styles.sectionTitle}>{isPostpartum ? 'Latest recovery log' : 'Latest log'}</Text>
           <View style={styles.logRow}>
             {latestLog.mood && <Text style={styles.moodEmoji}>{MOOD_EMOJI[latestLog.mood] ?? '🙂'}</Text>}
             <View style={styles.logBody}>
@@ -183,6 +210,9 @@ const styles = StyleSheet.create({
   subGreeting:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
   sectionTitle: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text, marginBottom: spacing.md },
   setupHint:    { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, lineHeight: 19 },
+  focusBlock:   { gap: 2, marginBottom: spacing.sm },
+  focusLabel:   { fontFamily: fonts.body.semibold, fontSize: 11, color: colors.primary, letterSpacing: 0.4, textTransform: 'uppercase' },
+  focusText:    { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, lineHeight: 20 },
   sectionHeader:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
   sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
   seeAll:       { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },

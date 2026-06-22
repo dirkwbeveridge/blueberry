@@ -9,7 +9,9 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "push:readiness": "node scripts/push-readiness-check.mjs"
+    "push:readiness": "node scripts/push-readiness-check.mjs",
+    "gc:7a:readiness": "node scripts/google-calendar-7a-readiness.mjs",
+    "gc:7a:verify": "node scripts/verify-google-calendar-7a.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
@@ -22,6 +24,7 @@
     "dayjs": "^1.11.21",
     "expo": "^56.0.12",
     "expo-auth-session": "^56.0.14",
+    "expo-calendar": "^56.0.8",
     "expo-constants": "^56.0.18",
     "expo-dev-client": "~56.0.20",
     "expo-font": "~56.0.7",

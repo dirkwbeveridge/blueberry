@@ -1,7 +1,7 @@
 ---
 workstream: family-mode
 created: 2026-06-09
-updated: 2026-06-20
+updated: 2026-06-21
 ---
 
 # Project State
@@ -11,7 +11,7 @@ updated: 2026-06-20
 **Status:** In progress
 **Current Phase:** 01-family-mode
 **Last Activity:** 2026-06-20
-**Last Activity Description:** Baby-arrived trigger, postpartum tab visibility, and consolidated baby tracker logging implemented; postpartum variants for core shared tabs remain pending.
+**Last Activity Description:** Baby-arrived trigger, postpartum tab visibility, and consolidated baby tracker logging are implemented; postpartum variants for Home/Health/Together and shared support surfaces remain pending.
 
 ## Progress
 
@@ -50,10 +50,10 @@ Implementation currently uses a consolidated `baby_logs` table (`log_type` + JSO
 
 ## Current Gaps (Blocking Full Family Mode Usability)
 
-1. `home.tsx` postpartum hero/weekly guidance variant incomplete.
-2. `health.tsx` postpartum recovery check-in path incomplete.
-3. `together.tsx` postpartum support/night-shift surfaces incomplete.
-4. Dedicated postpartum sync abstractions (`usePostpartumSync`, stats components) not yet implemented.
+1. `home.tsx` postpartum hero/weekly guidance variant needs completion and verification.
+2. `health.tsx` postpartum recovery check-in path needs completion and verification.
+3. `together.tsx` postpartum support/night-shift surfaces need completion.
+4. Dedicated postpartum sync abstractions (`usePostpartumSync`, stats components) are still not implemented.
 
 ## Session Continuity
 
@@ -62,6 +62,6 @@ Implementation currently uses a consolidated `baby_logs` table (`log_type` + JSO
 
 ## Next Action
 
-1. Implement postpartum variants for `home.tsx`, `health.tsx`, and `together.tsx`.
+1. Complete and verify postpartum variants for `home.tsx`, `health.tsx`, and `together.tsx`.
 2. Add shared night-shift visibility surfaces (table/model finalization if needed).
-3. Reconcile plan docs with consolidated `baby_logs` architecture.
+3. Keep planning docs aligned to the consolidated `baby_logs` architecture until/unless a normalized schema migration is approved.

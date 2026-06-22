@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 import { Button } from '../../components/ui/Button';
 import { DateField } from '../../components/ui/DateField';
@@ -8,6 +8,7 @@ import { ModalSheet } from '../../components/ui/ModalSheet';
 import { TimeField } from '../../components/ui/TimeField';
 import { colors, fonts, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
+import { createAppleCalendarEvent } from '../../lib/appleCalendar';
 import { getValidAccessToken } from '../../lib/googleAuth';
 import { createCalendarEvent } from '../../lib/googleCalendarApi';
 import {
@@ -100,12 +101,25 @@ export default function AddAppointmentModal() {
       if (err) throw err;
       if (!savedAppointment) throw new Error('Appointment insert returned no row.');
 
+      let appleEventId: string | null = null;
+      try {
+        appleEventId = await createAppleCalendarEvent({
+          title: savedAppointment.title,
+          startDateIso: savedAppointment.appointment_date,
+          location: savedAppointment.location,
+          notes: notes.trim() || null,
+        });
+      } catch (appleSyncError) {
+        console.warn('Apple Calendar create sync failed', appleSyncError);
+      }
+
+      let googleEventId: string | null = null;
       if (currentUser?.id) {
         const accessToken = await getValidAccessToken(currentUser.id);
         if (accessToken) {
           try {
             const startIso = new Date(savedAppointment.appointment_date).toISOString();
-            const googleEventId = await createCalendarEvent(accessToken, {
+            googleEventId = await createCalendarEvent(accessToken, {
               summary: savedAppointment.title,
               start: {
                 dateTime: startIso,
@@ -117,15 +131,25 @@ export default function AddAppointmentModal() {
               },
               location: savedAppointment.location ?? undefined,
             });
-
-            await supabase
-              .from('appointments')
-              .update({ google_event_id: googleEventId })
-              .eq('id', savedAppointment.id);
           } catch (googleSyncError) {
             console.warn('Google Calendar create sync failed', googleSyncError);
           }
         }
+      }
+
+      if (appleEventId || googleEventId) {
+        const updatePayload: { apple_event_id?: string | null; google_event_id?: string | null } = {};
+        if (appleEventId) {
+          updatePayload.apple_event_id = appleEventId;
+        }
+        if (googleEventId) {
+          updatePayload.google_event_id = googleEventId;
+        }
+
+        await supabase
+          .from('appointments')
+          .update(updatePayload)
+          .eq('id', savedAppointment.id);
       }
 
       try {
