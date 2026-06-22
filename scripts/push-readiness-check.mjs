@@ -28,17 +28,23 @@ function loadDotEnvLocal() {
 
 loadDotEnvLocal();
 
-const requiredEnvVars = [
-  'APNS_AUTH_KEY',
+const requiredEnvVars = ['EXPO_PUBLIC_SUPABASE_URL'];
+
+const requiredSupabaseFunctionSecrets = [
+  'APNS_PRIVATE_KEY',
   'APNS_KEY_ID',
   'APNS_TEAM_ID',
   'APNS_BUNDLE_ID',
   'APNS_ENV',
-  'EXPO_PUBLIC_SUPABASE_URL',
+  'PUSH_FUNCTION_SECRET',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'SUPABASE_ANON_KEY',
+  'SUPABASE_URL',
 ];
 
 const requiredFiles = [
   'supabase/functions/send-apns-notification/index.ts',
+  'supabase/functions/dispatch-event-notification/index.ts',
   'supabase/migrations/20260620100000_create_device_push_tokens.sql',
   'SUPABASE-SETUP.md',
 ];
@@ -55,6 +61,18 @@ for (const key of requiredEnvVars) {
   const present = Boolean(process.env[key]);
   if (!present) envOk = false;
   console.log(`${present ? 'PASS' : 'FAIL'}  ${key}`);
+}
+
+console.log('\nSupabase function secrets (for remote function env)');
+for (const key of requiredSupabaseFunctionSecrets) {
+  const present = Boolean(process.env[key]);
+  if (!present) envOk = false;
+  console.log(`${present ? 'PASS' : 'FAIL'}  ${key}`);
+}
+
+const legacyAuthKeyPresent = Boolean(process.env.APNS_AUTH_KEY);
+if (legacyAuthKeyPresent) {
+  console.log('\nINFO  APNS_AUTH_KEY is set but not used by current functions (APNS_PRIVATE_KEY is authoritative).');
 }
 
 let filesOk = true;
