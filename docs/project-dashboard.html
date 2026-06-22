@@ -236,13 +236,13 @@
   <header>
     <h1>Blueberry Dashboard</h1>
     <p class="subtitle">Status by phase for v1 private household companion</p>
-    <p class="meta">Updated 2026-06-20 from .planning/STATE.md, .planning/ROADMAP.md, and workstream state files</p>
+    <p class="meta">Updated 2026-06-21 from .planning/STATE.md, .planning/ROADMAP.md, and workstream state files</p>
   </header>
 
   <section class="banner">
     <p><strong>Active workstream:</strong> Push Notifications (7c)</p>
     <p><strong>Current focus:</strong> backend deployment and physical-device APNs verification</p>
-    <p><strong>Largest risk:</strong> unresolved execution gates (calendar OAuth + two-way sync, and Family Mode trigger implementation)</p>
+    <p><strong>Largest risk:</strong> external execution gates (APNs secrets/deploy + real-device verification), plus 7b not started and postpartum surface completion</p>
   </section>
 
   <section class="kpis">
@@ -258,13 +258,13 @@
     </article>
     <article class="kpi">
       <div class="label">In progress</div>
-      <div class="value">3</div>
-      <div class="note">Foundation hardening + 7a foundation + 7c APNs-first</div>
+      <div class="value">4</div>
+      <div class="note">Foundation verification + 7a verification + 7c APNs-first + 8 postpartum completion</div>
     </article>
     <article class="kpi">
       <div class="label">Planned/Deferred</div>
-      <div class="value">8</div>
-      <div class="note">Calendar, Family Mode, AI deferred</div>
+      <div class="value">7</div>
+      <div class="note">Calendar 7b + deferred AI + remaining planned work</div>
     </article>
   </section>
 
@@ -331,12 +331,12 @@
       <div>
         <h3 class="title">Health Logging and Journal</h3>
         <p class="goal">Symptoms, mood, energy, notes, and shared journal entries.</p>
-        <p class="next"><strong>Next:</strong> complete journal activation in current tab flow and verify history sync.</p>
+        <p class="next"><strong>Next:</strong> verify journal and health flows end-to-end in live two-user sync.</p>
       </div>
       <div class="status">
         <span class="pill planned">Partial</span>
         <div class="bar"><span style="width:58%"></span></div>
-        <div class="pct">Health mostly ported, journal not fully active</div>
+        <div class="pct">Health + journal routes active; live-flow verification pending</div>
       </div>
     </article>
 
@@ -373,12 +373,12 @@
       <div>
         <h3 class="title">Google Calendar Sync</h3>
         <p class="goal">Two-way sync between appointments and Google Calendar.</p>
-        <p class="next"><strong>Next:</strong> implement OAuth exchange and two-way sync; connect UI foundation is already in place.</p>
+        <p class="next"><strong>Next:</strong> run real-device verification for connect, two-way sync, and conflict-policy outcomes.</p>
       </div>
       <div class="status">
-        <span class="pill inprogress">Foundation Started</span>
-        <div class="bar"><span style="width:35%"></span></div>
-        <div class="pct">UI/connect surfaces exist; sync engine not implemented</div>
+        <span class="pill inprogress">Code Complete</span>
+        <div class="bar"><span style="width:85%"></span></div>
+        <div class="pct">Implementation complete in code; physical-device verification pending</div>
       </div>
     </article>
 
@@ -387,12 +387,12 @@
       <div>
         <h3 class="title">Apple Calendar EventKit Sync</h3>
         <p class="goal">Two-way sync between appointments and iOS EventKit.</p>
-        <p class="next"><strong>Next:</strong> execute in same calendar-sync workstream.</p>
+        <p class="next"><strong>Next:</strong> begin EventKit implementation (schema + helpers + write/inbound sync).</p>
       </div>
       <div class="status">
         <span class="pill planned">Planned</span>
-        <div class="bar"><span style="width:20%"></span></div>
-        <div class="pct">Plan written, no execution yet</div>
+        <div class="bar"><span style="width:15%"></span></div>
+        <div class="pct">Plan written, not started in code</div>
       </div>
     </article>
 
@@ -406,7 +406,7 @@
       <div class="status">
         <span class="pill inprogress">In Progress</span>
         <div class="bar"><span style="width:75%"></span></div>
-        <div class="pct">APNs-first implementation complete locally, external deploy pending</div>
+        <div class="pct">APNs-first implementation complete locally; Apple credentials/secrets/deploy gates still open</div>
       </div>
     </article>
 
@@ -429,12 +429,12 @@
       <div>
         <h3 class="title">Family Mode Postpartum</h3>
         <p class="goal">Postpartum workflows: feeding, sleep, diapers, milestones, and night-shift coordination.</p>
-        <p class="next"><strong>Next:</strong> implement More -&gt; Begin Family Mode trigger, then start execution after current gates are stable.</p>
+        <p class="next"><strong>Next:</strong> complete postpartum variants on Home/Health/Together and add shared night-shift surfaces.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Planned</span>
-        <div class="bar"><span style="width:22%"></span></div>
-        <div class="pct">Trigger path defined, implementation not started</div>
+        <span class="pill inprogress">In Progress</span>
+        <div class="bar"><span style="width:45%"></span></div>
+        <div class="pct">Begin Family Mode trigger implemented; postpartum surface completion pending</div>
       </div>
     </article>
   </section>
@@ -446,8 +446,9 @@
       <li>Set APNs secrets and deploy send-apns-notification.</li>
       <li>Run physical-device validation for push registration and APNs delivery.</li>
       <li>Close Phase 1 golden-path verification against live Supabase.</li>
-      <li>Implement Google Calendar OAuth exchange + two-way sync (7a), then EventKit two-way sync (7b).</li>
-      <li>Implement More -&gt; Begin Family Mode trigger as Phase 8 execution gate.</li>
+      <li>Run 7a real-device verification (connect, inbound/outbound sync, conflict policy outcomes).</li>
+      <li>Start 7b EventKit implementation and schema prerequisites.</li>
+      <li>Finish postpartum variants for Home/Health/Together and shared support surfaces.</li>
     </ol>
   </section>
 </div>

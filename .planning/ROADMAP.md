@@ -148,7 +148,7 @@ This is the active delivery schedule used for current build execution.
 
 ## Phase 7a: Google Calendar Sync (promoted to Phase 1, 2026-05-23)
 
-**Re-baselined 2026-06-20:** Treat current implementation as UI foundation started (connect entry points present) while OAuth token exchange and two-way appointment sync remain the execution gate.
+**Re-baselined 2026-06-21:** Core implementation is complete in code (OAuth PKCE, token lifecycle, conflict-policy handling, and two-way sync paths). Remaining gate is real-device verification against live accounts and appointments.
 
 **Goal:** Two-way sync of `appointments` with the user's Google Calendar.
 
@@ -195,11 +195,11 @@ This is the active delivery schedule used for current build execution.
 
 ## Phase 8: Family Mode (Postpartum)
 
-**Re-baselined 2026-06-20:** Keep postpartum scope intact, with explicit trigger path defined as More -> Begin Family Mode. Trigger implementation is the entry gate before feature execution.
+**Re-baselined 2026-06-21:** Keep postpartum scope intact. The explicit trigger path (More -> Begin Family Mode) is implemented; remaining execution is postpartum variants and shared support surfaces.
 
 **Goal:** When `households.baby_dob` is set, the app transitions into Family Mode. Feeding, sleep, diaper logs; pediatric visits; baby milestones; postpartum check-in for Mom; honest night-shift swap for Partner.
 
-**Status:** Schema has reserved space (tables currently dropped, scheduled to return in `02-postpartum.sql`). Story exists in `docs/blueberry-story.html` Chapter 4. Implementation plan needed before code.
+**Status:** In progress. Trigger and consolidated baby tracker flow are implemented in app code; postpartum variants for Home/Health/Together plus dedicated shared night-shift surfaces remain open.
 
 **Trigger:** Test household's real due date is 2025-10-11; they are already postpartum. Family Mode planning should not lag behind Phase 1 verification by more than one phase.
 
