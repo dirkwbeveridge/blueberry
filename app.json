@@ -12,7 +12,8 @@
       "deploymentTarget": "16.4",
       "bundleIdentifier": "com.dbeveridge.blueberry",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCalendarsUsageDescription": "Blueberry uses your calendar to sync prenatal appointments you create in the app."
       }
     },
     "android": {
@@ -43,13 +44,15 @@
         }
       ],
       "expo-secure-store",
+      "expo-calendar",
       [
         "expo-notifications",
         {
           "enableBackgroundRemoteNotifications": false
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "./plugins/withXcode26BuildFix"
     ],
     "experiments": {
       "typedRoutes": true
