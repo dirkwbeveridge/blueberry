@@ -1,7 +1,7 @@
 ---
 workstream: push-notifications
 created: 2026-06-09
-updated: 2026-06-20 (local APNs implementation hardened in real repo)
+updated: 2026-06-26
 ---
 
 # Project State
@@ -9,8 +9,8 @@ updated: 2026-06-20 (local APNs implementation hardened in real repo)
 ## Current Position
 **Status:** In progress
 **Current Phase:** 01-push-notifications
-**Last Activity:** 2026-06-20
-**Last Activity Description:** Local APNs token sync, notification settings UI, local appointment reminder flow, and APNs Edge Function reviewed and hardened in the real repo
+**Last Activity:** 2026-06-26
+**Last Activity Description:** Reconciled against merged `main`: local APNs token sync, notification settings UI, local appointment reminder flow, `device_push_tokens` support, and APNs Edge Function scaffold are present in repo; remote deployment is still pending
 
 ## Progress
 **Phases Complete:** 0
@@ -46,7 +46,7 @@ updated: 2026-06-20 (local APNs implementation hardened in real repo)
 
 | Secret | Source |
 |--------|--------|
-| `APNS_AUTH_KEY` | p8 file from Apple Developer Portal → Keys |
+| `APNS_AUTH_KEY` | p8 file from Apple Developer Portal → Keys (blocked until Apple Developer approval is active) |
 | `APNS_KEY_ID` | 10-char Key ID from Apple Developer Portal |
 | `APNS_TEAM_ID` | 10-char Team ID from developer.apple.com |
 | `APNS_BUNDLE_ID` | App bundle identifier, e.g. `com.blueberry.app` |
@@ -56,13 +56,13 @@ updated: 2026-06-20 (local APNs implementation hardened in real repo)
 
 ## Open Items Before Completion
 
-1. **APNs Auth Key:** Create at developer.apple.com → Keys → Add → Apple Push Notifications service. Requires Apple Developer Program. Download p8 file once and store as `APNS_AUTH_KEY` Supabase secret.
+1. **APNs Auth Key:** Create at developer.apple.com → Keys → Add → Apple Push Notifications service. Requires Apple Developer Program approval. As of 2026-06-26 that approval is still pending, so this remains blocked. Download p8 file once and store as `APNS_AUTH_KEY` Supabase secret when available.
 2. ~~FCM Setup~~ — Android/FCM deferred. Not required for v1.
-3. **Supabase deployment:** Apply `supabase-schema.sql`, the push-token migration, function secrets, and deploy `send-apns-notification`.
+3. **Supabase deployment:** Apply the active schema/migrations expected by the merged app, set function secrets when Apple approval allows it, and deploy `send-apns-notification`.
 4. **DB webhook configuration:** `notify-partner-checkin` and `notify-todo-assigned` require manual webhook setup in Supabase Dashboard after deployment.
 5. **pg_cron jobs:** `notify-appointment-reminder` and `notify-kick-reminder` require pg_cron extension and cron job SQL.
 6. **Real device for testing:** APNs tokens cannot be obtained on iOS Simulator. At least one real device needed for full end-to-end test.
 
 ## Session Continuity
-**Stopped At:** Local implementation and build verification complete; remote delivery deployment and device verification still pending
+**Stopped At:** Local implementation is merged on `main`; APNs production completion is blocked by pending Apple Developer approval, and remote delivery deployment/device verification are still pending
 **Resume File:** `SUPABASE-SETUP.md`

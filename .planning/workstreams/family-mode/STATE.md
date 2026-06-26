@@ -1,7 +1,7 @@
 ---
 workstream: family-mode
 created: 2026-06-09
-updated: 2026-06-20
+updated: 2026-06-26
 ---
 
 # Project State
@@ -10,8 +10,8 @@ updated: 2026-06-20
 
 **Status:** In progress
 **Current Phase:** 01-family-mode
-**Last Activity:** 2026-06-20
-**Last Activity Description:** Baby-arrived trigger, postpartum tab visibility, and consolidated baby tracker logging implemented; postpartum variants for core shared tabs remain pending.
+**Last Activity:** 2026-06-26
+**Last Activity Description:** Reconciled against merged `main`: Begin Family Mode trigger, postpartum tab visibility, and consolidated baby tracker logging are merged; postpartum variants for core shared tabs remain pending.
 
 ## Progress
 
@@ -27,8 +27,8 @@ Phases 7a/7b/7c (calendar, push) and can be built in parallel with those workstr
 
 ## Stage Transition Mechanism
 
-Trigger: households.baby_dob is set (via the "Baby has arrived" modal at
-More → Baby has arrived, or via household setup in a future phase).
+Trigger: households.baby_dob is set (via the "Begin Family Mode" entry in More,
+which opens the `baby-arrived` modal, or via household setup in a future phase).
 
 Chain:
   store.setBabyDob(dob)        — sets stage: 'postpartum' synchronously in Zustand
@@ -57,7 +57,7 @@ Implementation currently uses a consolidated `baby_logs` table (`log_type` + JSO
 
 ## Session Continuity
 
-**Stopped At:** Core trigger + logging implemented; remaining work is postpartum screen variants and shared support surfaces.
+**Stopped At:** Core trigger + logging are merged on `main`; remaining work is postpartum screen variants and shared support surfaces.
 **Resume File:** .planning/workstreams/family-mode/phases/01-family-mode/PLAN.md
 
 ## Next Action

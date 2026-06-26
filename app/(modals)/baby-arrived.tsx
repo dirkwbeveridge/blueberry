@@ -5,20 +5,27 @@ import { Alert, StyleSheet, Text } from 'react-native';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { DateField } from '../../components/ui/DateField';
+import { Input } from '../../components/ui/Input';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { colors, fonts, spacing } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 import { useHouseholdStore } from '../../store/household';
+import type { BabyGender, Household } from '../../types';
 
 export default function BabyArrivedModal() {
   const { household, currentUser } = useHousehold();
   const setBabyDob = useHouseholdStore((s) => s.setBabyDob);
+  const setBabyName = useHouseholdStore((s) => s.setBabyName);
+  const setBabyGender = useHouseholdStore((s) => s.setBabyGender);
   const setHousehold = useHouseholdStore((s) => s.setHousehold);
 
   const [babyDob, setBabyDobDate] = useState<Date | null>(
     household?.baby_dob ? new Date(household.baby_dob) : null
   );
+  const [babyName, setBabyNameText] = useState(household?.baby_name ?? '');
+  const [babyGender, setBabyGenderValue] = useState<BabyGender>(household?.baby_gender ?? 'unknown');
   const [saving, setSaving] = useState(false);
 
   async function handleSave() {
@@ -39,12 +46,23 @@ export default function BabyArrivedModal() {
     }
 
     const dobIso = babyDob.toISOString().slice(0, 10);
+    const trimmedName = babyName.trim();
+    const previousHousehold: Household = household;
 
     setSaving(true);
     try {
+      setBabyDob(dobIso);
+      setBabyName(trimmedName);
+      setBabyGender(babyGender);
+
       const { data, error } = await supabase
         .from('households')
-        .update({ baby_dob: dobIso, stage: 'postpartum' })
+        .update({
+          baby_dob: dobIso,
+          baby_name: trimmedName || null,
+          baby_gender: babyGender,
+          stage: 'postpartum',
+        })
         .eq('id', household.id)
         .select('*')
         .single();
@@ -54,12 +72,12 @@ export default function BabyArrivedModal() {
       if (data) {
         setHousehold(data);
       }
-      setBabyDob(dobIso);
 
       Alert.alert('Family Mode enabled', 'Blueberry is now set to postpartum tracking.', [
         { text: 'Continue', onPress: () => router.back() },
       ]);
     } catch (error) {
+      setHousehold(previousHousehold);
       Alert.alert('Could not update household', error instanceof Error ? error.message : 'Try again.');
     } finally {
       setSaving(false);
@@ -74,6 +92,13 @@ export default function BabyArrivedModal() {
         </Text>
       </Card>
 
+      <Input
+        label="Baby name (optional)"
+        value={babyName}
+        onChangeText={setBabyNameText}
+        placeholder="What should Blueberry call your baby?"
+      />
+
       <DateField
         label="Baby's birthday"
         value={babyDob}
@@ -83,8 +108,19 @@ export default function BabyArrivedModal() {
         maximumDate={new Date()}
       />
 
+      <Text style={styles.label}>Baby gender</Text>
+      <SegmentedControl
+        value={babyGender}
+        onChange={(value) => setBabyGenderValue(value as BabyGender)}
+        options={[
+          { value: 'unknown', label: 'Keep private' },
+          { value: 'female', label: 'Girl' },
+          { value: 'male', label: 'Boy' },
+        ]}
+      />
+
       <Button
-        label={saving ? 'Saving...' : 'Begin Family Mode'}
+        label={household?.stage === 'postpartum' ? 'Update Family Mode' : 'Begin Family Mode'}
         loading={saving}
         onPress={handleSave}
         disabled={!babyDob}
@@ -102,5 +138,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body.regular,
     fontSize: 13,
     lineHeight: 18,
+  },
+  label: {
+    color: colors.text,
+    fontFamily: fonts.body.semibold,
+    fontSize: 14,
   },
 });

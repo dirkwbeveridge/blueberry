@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, fonts, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 
@@ -214,20 +214,20 @@ const styles = StyleSheet.create({
   },
   mainBtnActive: { backgroundColor: colors.primary },
   mainBtnEmoji:  { fontSize: 32 },
-  mainBtnLabel:        { fontFamily: fonts.heading.semibold, fontSize: 20, color: colors.primary },
+  mainBtnLabel:        { ...typography.subheading, fontSize: 20, lineHeight: 28, color: colors.primary },
   mainBtnLabelActive:  { color: colors.surface },
-  mainBtnElapsed:{ fontFamily: fonts.heading.bold, fontSize: 28, color: colors.surface },
+  mainBtnElapsed:{ ...typography.title, fontSize: 28, lineHeight: 34, color: colors.surface },
   statsRow:    { flexDirection: 'row', gap: spacing.lg, justifyContent: 'center' },
   stat:        { alignItems: 'center', gap: 2 },
-  statVal:     { fontFamily: fonts.heading.bold, fontSize: 24, color: colors.primary },
-  statLabel:   { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
-  hint:        { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20, maxWidth: 280 },
+  statVal:     { ...typography.heading, fontSize: 24, lineHeight: 30, color: colors.primary },
+  statLabel:   { ...typography.caption, color: colors.textMuted },
+  hint:        { ...typography.label, color: colors.textMuted, textAlign: 'center', maxWidth: 280 },
   history:     { width: '100%', gap: spacing.sm },
-  historyTitle:{ fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
+  historyTitle:{ ...typography.label, fontFamily: fonts.body.semibold, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
   historyRow:  { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 36, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.border },
-  historyNum:  { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, width: 28 },
-  historyDuration: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, flex: 1 },
-  historyGap:  { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, flex: 1 },
-  historyTime: { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
+  historyNum:  { ...typography.label, fontSize: 12, fontFamily: fonts.body.semibold, color: colors.textMuted, width: 28 },
+  historyDuration: { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.text, flex: 1 },
+  historyGap:  { ...typography.caption, fontSize: 12, color: colors.textMuted, flex: 1 },
+  historyTime: { ...typography.caption, color: colors.textMuted },
   actions:     { width: '100%', gap: spacing.sm },
 });

@@ -6,7 +6,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { colors, fonts, radii, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { supabase } from '../../lib/supabase';
@@ -122,11 +122,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
   },
-  addBtnText: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
-  loadingText: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
+  addBtnText: { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.surface },
+  loadingText: { ...typography.body, fontSize: 14, lineHeight: 22, color: colors.textMuted },
   list: { gap: spacing.md },
   entryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  entryDate: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  milestone: { fontFamily: fonts.heading.semibold, fontSize: 15, color: colors.primary, marginBottom: spacing.xs },
-  entryContent: { fontFamily: fonts.body.regular, fontSize: 14, color: colors.text, lineHeight: 22 },
+  entryDate: { ...typography.caption, fontSize: 12, color: colors.textMuted },
+  milestone: { ...typography.subheading, fontSize: 15, lineHeight: 22, color: colors.primary, marginBottom: spacing.xs },
+  entryContent: { ...typography.body, fontSize: 14, lineHeight: 22, color: colors.text },
 });

@@ -9,3 +9,12 @@ export function getPostpartumWeek(babyDob: string | Date | null, now: Date = new
   const elapsedWeeks = Math.floor((now.getTime() - dob.getTime()) / msPerWeek) + 1;
   return Math.max(1, Math.min(52, elapsedWeeks));
 }
+
+export function getPostpartumAgeLabel(babyDob: string | Date | null, now: Date = new Date()): string {
+  const week = getPostpartumWeek(babyDob, now);
+  if (week < 5) return `Week ${week}`;
+  if (week < 9) return `Month 2`;
+  if (week < 13) return `Month 3`;
+  const month = Math.max(3, Math.floor((week - 1) / 4) + 1);
+  return `Month ${month}`;
+}

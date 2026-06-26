@@ -11,6 +11,12 @@ This is the active delivery schedule used for current build execution.
 1. Non-AI Phase 1 completion target: Friday 2026-06-26.
 2. AI scope is fully deferred to Phase 2 start: Monday 2026-06-29.
 
+### Status Note As Of 2026-06-26
+
+- The dated schedule remains the planning frame, but Phase 1 is not actually closed today.
+- Non-AI code has advanced on `main`, yet live Supabase/device verification and APNs deployment gates remain open.
+- AI work has not started and should not be treated as started on 2026-06-29 unless the Phase 1 exit criteria below are genuinely met.
+
 ### Dated Milestones
 
 - Phase 0: 2026-06-22 to 2026-06-23 (scope lock and acceptance criteria)
@@ -65,7 +71,7 @@ This is the active delivery schedule used for current build execution.
 
 **Goal:** Create a running Expo TypeScript app with navigation skeleton, design tokens, shared UI primitives, Supabase schema/setup docs, typed domain model, and local household store.
 
-**Status:** In progress
+**Status:** In progress on `main`; static verification evidence exists, but live UAT remains open
 
 **Requirements:** INFRA-01 through INFRA-05
 
@@ -148,7 +154,7 @@ This is the active delivery schedule used for current build execution.
 
 ## Phase 7a: Google Calendar Sync (promoted to Phase 1, 2026-05-23)
 
-**Re-baselined 2026-06-20:** Treat current implementation as UI foundation started (connect entry points present) while OAuth token exchange and two-way appointment sync remain the execution gate.
+**Re-baselined 2026-06-26:** Google Calendar sync is code-complete on `main` (OAuth PKCE, token lifecycle, write-path sync, inbound sync, conflict policy). The remaining gate is real-device and live-backend verification, not missing implementation.
 
 **Goal:** Two-way sync of `appointments` with the user's Google Calendar.
 
@@ -159,6 +165,8 @@ This is the active delivery schedule used for current build execution.
 3. Updates and deletes propagate both directions.
 4. Both partners can see all appointments regardless of which one created them.
 5. `appointments.google_event_id` stores the bound event reference.
+
+**Status:** Code complete on `main`; unverified on a real device and unverified against the deployed backend.
 
 ## Phase 7b: Apple Calendar (EventKit) Sync (promoted to Phase 1, 2026-05-23)
 
@@ -185,7 +193,7 @@ This is the active delivery schedule used for current build execution.
 4. User can adjust which categories ping them from More, Notifications.
 5. Quiet hours (default 9 pm to 7 am) honored across all categories except labor-stage emergencies.
 
-**Status:** In progress. The real repo now has APNs token registration, a notifications preferences modal, local appointment reminder scheduling on-device, and a direct APNs Edge Function scaffold. Remaining work is backend deployment, orchestration, and physical-device verification.
+**Status:** In progress. The real repo now has APNs token registration, a notifications preferences modal, local appointment reminder scheduling on-device, a `device_push_tokens` path, and a direct APNs Edge Function scaffold. Remaining work is backend deployment, orchestration, and physical-device verification. Apple Developer approval is still pending as of 2026-06-26, so APNs production completion remains blocked.
 
 ## Phase 7d: AI Content (Phase 2 scope)
 
@@ -195,14 +203,14 @@ This is the active delivery schedule used for current build execution.
 
 ## Phase 8: Family Mode (Postpartum)
 
-**Re-baselined 2026-06-20:** Keep postpartum scope intact, with explicit trigger path defined as More -> Begin Family Mode. Trigger implementation is the entry gate before feature execution.
+**Re-baselined 2026-06-26:** Keep postpartum scope intact, with the explicit trigger path More -> Begin Family Mode now merged on `main`. The new execution gate is completion of the postpartum variants and shared support surfaces.
 
 **Goal:** When `households.baby_dob` is set, the app transitions into Family Mode. Feeding, sleep, diaper logs; pediatric visits; baby milestones; postpartum check-in for Mom; honest night-shift swap for Partner.
 
-**Status:** Schema has reserved space (tables currently dropped, scheduled to return in `02-postpartum.sql`). Story exists in `docs/blueberry-story.html` Chapter 4. Implementation plan needed before code.
+**Status:** Trigger, Baby tab gating, and consolidated `baby_logs` tracker flows are merged on `main`. Postpartum variants for Home/Health/Together and longer-term data-model reconciliation are still pending.
 
 **Trigger:** Test household's real due date is 2025-10-11; they are already postpartum. Family Mode planning should not lag behind Phase 1 verification by more than one phase.
 
 ## Immediate Next Step
 
-Execute the dated Phase 0 and Phase 1 plan to close non-AI readiness by 2026-06-26, then begin AI build in Phase 2 on 2026-06-29.
+Use the dated Phase 0 and Phase 1 plan as the schedule frame, but keep the status honest: Phase 1 still needs live verification closure, APNs production remains blocked by pending Apple Developer approval, and AI work does not begin until those non-AI exit criteria are actually met.

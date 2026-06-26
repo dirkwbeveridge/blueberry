@@ -12,7 +12,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { colors, fonts, radii, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { supabase } from '../../lib/supabase';
@@ -145,21 +145,20 @@ const styles = StyleSheet.create({
   screen:       { flex: 1, backgroundColor: colors.background },
   scroll:       { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
   addBtn:       { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 16, paddingVertical: 8, minHeight: 44, justifyContent: 'center' },
-  addBtnText:   { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.surface },
-  sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
-  muted:        { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted },
+  addBtnText:   { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.surface },
+  sectionLabel: { ...typography.label, fontSize: 12, fontFamily: fonts.body.semibold, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
+  muted:        { ...typography.body, fontSize: 14, lineHeight: 22, color: colors.textMuted },
 
   milestoneSection: { gap: spacing.sm },
   milestoneStrip:   { gap: spacing.sm, paddingVertical: spacing.xs },
   milestoneCard:    { backgroundColor: colors.primaryTint, borderRadius: radii.md, padding: spacing.md, minWidth: 140, borderWidth: 1, borderColor: colors.accent },
-  milestoneTag:     { fontFamily: fonts.heading.semibold, fontSize: 14, color: colors.primary },
-  milestoneWeek:    { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, marginTop: 2 },
+  milestoneTag:     { ...typography.subheading, fontSize: 14, lineHeight: 20, color: colors.primary },
+  milestoneWeek:    { ...typography.caption, color: colors.textMuted, marginTop: 2 },
 
   entriesList:   { gap: spacing.md },
   entryHeader:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  entryDate:     { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  entryMilestone:{ fontFamily: fonts.heading.semibold, fontSize: 15, color: colors.primary, marginBottom: spacing.xs },
-  entryContent:  { fontFamily: fonts.body.regular, fontSize: 14, color: colors.text, lineHeight: 22 },
+  entryDate:     { ...typography.caption, fontSize: 12, color: colors.textMuted },
+  entryMilestone:{ ...typography.subheading, fontSize: 15, lineHeight: 22, color: colors.primary, marginBottom: spacing.xs },
+  entryContent:  { ...typography.body, fontSize: 14, lineHeight: 22, color: colors.text },
 
 });
-

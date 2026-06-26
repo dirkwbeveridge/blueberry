@@ -6,7 +6,7 @@ import { DateField } from '../../components/ui/DateField';
 import { Input } from '../../components/ui/Input';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { TimeField } from '../../components/ui/TimeField';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { getValidAccessToken } from '../../lib/googleAuth';
 import { createCalendarEvent } from '../../lib/googleCalendarApi';
@@ -204,13 +204,13 @@ export default function AddAppointmentModal() {
 
 const styles = StyleSheet.create({
   helperText: {
-    fontFamily: fonts.body.regular,
+    ...typography.caption,
     fontSize: 12,
     color: colors.textMuted,
     marginTop: -spacing.sm,
   },
   errorText: {
-    fontFamily: fonts.body.medium,
+    ...typography.label,
     fontSize: 12,
     color: colors.error,
     marginTop: -spacing.sm,

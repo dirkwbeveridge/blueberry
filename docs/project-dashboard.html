@@ -236,13 +236,13 @@
   <header>
     <h1>Blueberry Dashboard</h1>
     <p class="subtitle">Status by phase for v1 private household companion</p>
-    <p class="meta">Updated 2026-06-20 from .planning/STATE.md, .planning/ROADMAP.md, and workstream state files</p>
+    <p class="meta">Updated 2026-06-26 from .planning/STATE.md, .planning/ROADMAP.md, and workstream state files</p>
   </header>
 
   <section class="banner">
     <p><strong>Active workstream:</strong> Push Notifications (7c)</p>
-    <p><strong>Current focus:</strong> backend deployment and physical-device APNs verification</p>
-    <p><strong>Largest risk:</strong> unresolved execution gates (calendar OAuth + two-way sync, and Family Mode trigger implementation)</p>
+    <p><strong>Current focus:</strong> live Phase 1 verification, plus APNs deployment readiness once Apple Developer approval lands</p>
+    <p><strong>Largest risk:</strong> unresolved verification and external approval gates (live backend/device verification, and APNs production approval)</p>
   </section>
 
   <section class="kpis">
@@ -258,13 +258,13 @@
     </article>
     <article class="kpi">
       <div class="label">In progress</div>
-      <div class="value">3</div>
-      <div class="note">Foundation hardening + 7a foundation + 7c APNs-first</div>
+      <div class="value">4</div>
+      <div class="note">Foundation/live verification + 7a + 7c + 8</div>
     </article>
     <article class="kpi">
       <div class="label">Planned/Deferred</div>
-      <div class="value">8</div>
-      <div class="note">Calendar, Family Mode, AI deferred</div>
+      <div class="value">7</div>
+      <div class="note">Verification gates, EventKit, and AI remain open</div>
     </article>
   </section>
 
@@ -289,7 +289,7 @@
       <div>
         <h3 class="title">Foundation</h3>
         <p class="goal">Running Expo app with schema, tokens, primitives, and persistent household state.</p>
-        <p class="next"><strong>Next:</strong> complete real-device golden-path verification against deployed Supabase.</p>
+        <p class="next"><strong>Next:</strong> complete live golden-path verification against deployed Supabase and physical devices.</p>
       </div>
       <div class="status">
         <span class="pill inprogress">In Progress</span>
@@ -306,9 +306,9 @@
         <p class="next"><strong>Next:</strong> verify end-to-end signup/create/join in live environment.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Ported</span>
+        <span class="pill planned">Merged</span>
         <div class="bar"><span style="width:70%"></span></div>
-        <div class="pct">Code ported, gate not closed</div>
+        <div class="pct">Mainline code merged, gate not closed</div>
       </div>
     </article>
 
@@ -320,9 +320,9 @@
         <p class="next"><strong>Next:</strong> verify realtime sync behavior across two users.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Ported</span>
+        <span class="pill planned">Merged</span>
         <div class="bar"><span style="width:68%"></span></div>
-        <div class="pct">Functional port, sync verification pending</div>
+        <div class="pct">Mainline code merged, sync verification pending</div>
       </div>
     </article>
 
@@ -331,12 +331,12 @@
       <div>
         <h3 class="title">Health Logging and Journal</h3>
         <p class="goal">Symptoms, mood, energy, notes, and shared journal entries.</p>
-        <p class="next"><strong>Next:</strong> complete journal activation in current tab flow and verify history sync.</p>
+        <p class="next"><strong>Next:</strong> verify Journal and health history behavior in the live shared flow.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Partial</span>
-        <div class="bar"><span style="width:58%"></span></div>
-        <div class="pct">Health mostly ported, journal not fully active</div>
+        <span class="pill planned">Merged</span>
+        <div class="bar"><span style="width:66%"></span></div>
+        <div class="pct">Journal tab is on main; live verification pending</div>
       </div>
     </article>
 
@@ -348,9 +348,9 @@
         <p class="next"><strong>Next:</strong> verify offline-to-online flow on device.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Ported</span>
+        <span class="pill planned">Merged</span>
         <div class="bar"><span style="width:65%"></span></div>
-        <div class="pct">UI shipped, workflow verification pending</div>
+        <div class="pct">Mainline code merged, workflow verification pending</div>
       </div>
     </article>
 
@@ -362,9 +362,9 @@
         <p class="next"><strong>Next:</strong> verify both users can create and view shared appointments in live backend.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Ported</span>
+        <span class="pill planned">Merged</span>
         <div class="bar"><span style="width:70%"></span></div>
-        <div class="pct">Ported, awaiting full partner-path test</div>
+        <div class="pct">Mainline code merged, awaiting full partner-path test</div>
       </div>
     </article>
 
@@ -373,12 +373,12 @@
       <div>
         <h3 class="title">Google Calendar Sync</h3>
         <p class="goal">Two-way sync between appointments and Google Calendar.</p>
-        <p class="next"><strong>Next:</strong> implement OAuth exchange and two-way sync; connect UI foundation is already in place.</p>
+        <p class="next"><strong>Next:</strong> verify the existing connect flow and two-way sync on a real device against the live backend.</p>
       </div>
       <div class="status">
-        <span class="pill inprogress">Foundation Started</span>
-        <div class="bar"><span style="width:35%"></span></div>
-        <div class="pct">UI/connect surfaces exist; sync engine not implemented</div>
+        <span class="pill inprogress">Code Complete</span>
+        <div class="bar"><span style="width:78%"></span></div>
+        <div class="pct">Implementation merged, verification still pending</div>
       </div>
     </article>
 
@@ -401,12 +401,12 @@
       <div>
         <h3 class="title">Push Notifications</h3>
         <p class="goal">APNs-first iOS notifications with preferences and privacy-safe payloads.</p>
-        <p class="next"><strong>Next:</strong> deploy schema/migration, set APNs secrets, deploy function, verify token + delivery on real iPhone.</p>
+        <p class="next"><strong>Next:</strong> deploy schema/migration, set APNs secrets when Apple approval lands, deploy function, then verify token and delivery on a real iPhone.</p>
       </div>
       <div class="status">
         <span class="pill inprogress">In Progress</span>
         <div class="bar"><span style="width:75%"></span></div>
-        <div class="pct">APNs-first implementation complete locally, external deploy pending</div>
+        <div class="pct">Mainline implementation merged; production completion blocked by Apple approval</div>
       </div>
     </article>
 
@@ -429,12 +429,12 @@
       <div>
         <h3 class="title">Family Mode Postpartum</h3>
         <p class="goal">Postpartum workflows: feeding, sleep, diapers, milestones, and night-shift coordination.</p>
-        <p class="next"><strong>Next:</strong> implement More -&gt; Begin Family Mode trigger, then start execution after current gates are stable.</p>
+        <p class="next"><strong>Next:</strong> complete postpartum variants for Home, Health, and Together on top of the merged trigger path.</p>
       </div>
       <div class="status">
-        <span class="pill planned">Planned</span>
-        <div class="bar"><span style="width:22%"></span></div>
-        <div class="pct">Trigger path defined, implementation not started</div>
+        <span class="pill inprogress">In Progress</span>
+        <div class="bar"><span style="width:42%"></span></div>
+        <div class="pct">Trigger and baby logging merged; postpartum surfaces still incomplete</div>
       </div>
     </article>
   </section>
@@ -442,12 +442,12 @@
   <section class="list-card">
     <h3>Immediate Next Steps</h3>
     <ol>
-      <li>Deploy or confirm schema and push-token migration in the active Supabase project.</li>
-      <li>Set APNs secrets and deploy send-apns-notification.</li>
+      <li>Close Phase 1 golden-path verification against live Supabase and physical devices.</li>
+      <li>Deploy or confirm the schema and migrations expected by the merged app, including push-token and baby-log support.</li>
+      <li>Set APNs secrets and deploy send-apns-notification after Apple Developer approval lands.</li>
       <li>Run physical-device validation for push registration and APNs delivery.</li>
-      <li>Close Phase 1 golden-path verification against live Supabase.</li>
-      <li>Implement Google Calendar OAuth exchange + two-way sync (7a), then EventKit two-way sync (7b).</li>
-      <li>Implement More -&gt; Begin Family Mode trigger as Phase 8 execution gate.</li>
+      <li>Real-device verify Google Calendar sync (7a), then implement EventKit two-way sync (7b).</li>
+      <li>Complete the postpartum variants behind the existing More -&gt; Begin Family Mode entry path.</li>
     </ol>
   </section>
 </div>

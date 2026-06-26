@@ -11,7 +11,7 @@ import { Card } from '../../components/ui/Card';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { babyDevelopment } from '../../constants/babyDevelopment';
 import { getFruitEmoji } from '../../constants/fruitEmojis';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { colors, fonts, radii, spacing, typography } from '../../constants/theme';
 import { weekContent } from '../../constants/weekContent';
 import { useHousehold } from '../../hooks/useHousehold';
 
@@ -38,9 +38,9 @@ function Section({ title, emoji, content }: { title: string; emoji: string; cont
 const sectionStyles = StyleSheet.create({
   container: { marginBottom: spacing.md },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  title: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text },
+  title: { ...typography.subheading, color: colors.text },
   chevron: { fontSize: 12, color: colors.textMuted },
-  body: { fontFamily: fonts.body.regular, fontSize: 15, color: colors.text, lineHeight: 24 },
+  body: { ...typography.body, color: colors.text },
 });
 
 export default function WeekDetailModal() {
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   selectorList: { paddingHorizontal: spacing.md, paddingRight: spacing.xl, paddingVertical: spacing.sm, gap: 6 },
   weekPill:     { width: 44, height: 44, borderRadius: radii.md, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   weekPillSelected: { backgroundColor: colors.primary },
-  weekPillNum:  { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.textMuted },
+  weekPillNum:  { ...typography.label, fontFamily: fonts.body.semibold, color: colors.textMuted },
   weekPillNumSelected: { color: colors.surface },
   currentDot:   { position: 'absolute', bottom: 3, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
 
@@ -157,19 +157,19 @@ const styles = StyleSheet.create({
 
   heroCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderRadius: radii.lg, padding: spacing.lg, borderWidth: 1.5 },
   heroLeft: { gap: 2 },
-  heroWeekLabel: { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 2 },
-  heroWeekNum:   { fontFamily: fonts.heading.bold, fontSize: 56, color: colors.primary, lineHeight: 60 },
+  heroWeekLabel: { ...typography.caption, fontFamily: fonts.body.semibold, fontSize: 10, lineHeight: 14, color: colors.textMuted, letterSpacing: 2 },
+  heroWeekNum:   { ...typography.display, color: colors.primary },
   currentBadge:  { backgroundColor: colors.primary, borderRadius: radii.full, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start', marginTop: 4 },
-  currentBadgeText: { fontFamily: fonts.body.semibold, fontSize: 10, color: colors.surface },
+  currentBadgeText: { ...typography.caption, fontFamily: fonts.body.semibold, fontSize: 10, lineHeight: 14, color: colors.surface },
   heroRight: { alignItems: 'flex-end', gap: 4 },
   heroEmoji: { fontSize: 44 },
-  heroFruit: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.text, textAlign: 'right', textTransform: 'capitalize' },
-  heroStats: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
+  heroFruit: { ...typography.label, color: colors.text, textAlign: 'right', textTransform: 'capitalize' },
+  heroStats: { ...typography.caption, fontSize: 12, color: colors.textMuted },
 
-  trimesterLabel: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: -4 },
+  trimesterLabel: { ...typography.label, fontSize: 12, color: colors.textMuted, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: -4 },
   card:          { marginBottom: 0 },
   partnerCard:   { backgroundColor: colors.primaryTint, shadowOpacity: 0.04 },
-  partnerLabel:  { fontFamily: fonts.body.semibold, fontSize: 13, color: colors.primary, marginBottom: spacing.sm },
-  partnerText:   { fontFamily: fonts.body.regular, fontSize: 15, color: colors.text, lineHeight: 24 },
-  devNote:       { fontFamily: fonts.body.regular, fontSize: 14, color: colors.textMuted, lineHeight: 22, fontStyle: 'italic' },
+  partnerLabel:  { ...typography.label, fontFamily: fonts.body.semibold, color: colors.primary, marginBottom: spacing.sm },
+  partnerText:   { ...typography.body, color: colors.text },
+  devNote:       { ...typography.body, fontSize: 14, lineHeight: 22, color: colors.textMuted, fontStyle: 'italic' },
 });

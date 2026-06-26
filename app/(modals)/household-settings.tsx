@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { DateField } from '../../components/ui/DateField';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 import { useHouseholdStore } from '../../store/household';
@@ -124,20 +124,20 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   metaLabel: {
+    ...typography.label,
     color: colors.textMuted,
-    fontFamily: fonts.body.medium,
     fontSize: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   metaValue: {
+    ...typography.subheading,
     color: colors.text,
-    fontFamily: fonts.heading.semibold,
     fontSize: 18,
   },
   helper: {
+    ...typography.caption,
     color: colors.textMuted,
-    fontFamily: fonts.body.regular,
     fontSize: 12,
     lineHeight: 17,
     marginTop: -spacing.xs,

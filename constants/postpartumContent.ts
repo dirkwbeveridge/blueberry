@@ -5,6 +5,54 @@ export interface PostpartumWeekContent {
   babyFocus: string;
 }
 
+const SUPPORT_ACTIONS_BY_PHASE: { maxWeek: number; items: string[] }[] = [
+  {
+    maxWeek: 2,
+    items: [
+      'Protect one uninterrupted recovery block every day.',
+      'Handle hydration, snacks, and medication without waiting to be asked.',
+      'Keep handoff notes concrete so the next shift starts informed.',
+      'Take over visitors, laundry, and incoming logistics.',
+    ],
+  },
+  {
+    maxWeek: 6,
+    items: [
+      'Reset the division of labor before default patterns become resentment.',
+      'Own one full overnight or early-morning stretch each week.',
+      'Ask what would make today feel 10 percent lighter, then do that task.',
+      'Watch for mood changes that need more than reassurance.',
+    ],
+  },
+  {
+    maxWeek: 12,
+    items: [
+      'Protect one solo recovery or exercise block each week.',
+      'Keep pediatric questions and milestone notes in one shared place.',
+      'Review night coverage before either parent hits a wall.',
+      'Make invisible labor visible by naming the next household load clearly.',
+    ],
+  },
+  {
+    maxWeek: 52,
+    items: [
+      'Rebalance chores and sleep plans whenever routines shift.',
+      'Keep recovery conversations active even when the acute phase has passed.',
+      'Review baby routines together before changing work schedules.',
+      'Trade mental load proactively instead of waiting for overload signals.',
+    ],
+  },
+];
+
+const POSTPARTUM_CONVERSATION_PROMPTS = [
+  'What is feeling heavier than it looked on paper this week?',
+  'Where do you need more backup from me tonight?',
+  'What part of the routine feels hardest right now?',
+  'What made you feel supported this week?',
+  'What should we stop doing because it is not helping?',
+  'What would make tomorrow feel calmer?',
+];
+
 export const POSTPARTUM_WEEK_CONTENT: PostpartumWeekContent[] = [
   {
     week: 1,
@@ -83,4 +131,14 @@ export const POSTPARTUM_WEEK_CONTENT: PostpartumWeekContent[] = [
 export function getPostpartumWeekContent(week: number): PostpartumWeekContent {
   const clampedWeek = Math.max(1, Math.min(12, Math.floor(week)));
   return POSTPARTUM_WEEK_CONTENT[clampedWeek - 1];
+}
+
+export function getPostpartumSupportActions(week: number): string[] {
+  const normalizedWeek = Math.max(1, Math.floor(week));
+  return SUPPORT_ACTIONS_BY_PHASE.find((phase) => normalizedWeek <= phase.maxWeek)?.items ?? SUPPORT_ACTIONS_BY_PHASE[SUPPORT_ACTIONS_BY_PHASE.length - 1].items;
+}
+
+export function getPostpartumConversationPrompt(week: number): string {
+  const normalizedWeek = Math.max(1, Math.floor(week));
+  return POSTPARTUM_CONVERSATION_PROMPTS[(normalizedWeek - 1) % POSTPARTUM_CONVERSATION_PROMPTS.length];
 }

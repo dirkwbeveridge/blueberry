@@ -12,7 +12,7 @@ import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
 import { Input } from '../../components/ui/Input';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { colors, fonts, radii, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 
@@ -148,13 +148,13 @@ export default function LogSymptomModal() {
 
 const styles = StyleSheet.create({
   scroll:    { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
-  sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
+  sectionLabel: { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.text, marginBottom: spacing.sm },
   moodGrid:  { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   energyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   energyBtn: { width: 44, height: 44, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   energyBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
-  energyNum: { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
+  energyNum: { ...typography.body, fontFamily: fonts.body.semibold, fontSize: 16, lineHeight: 20, color: colors.textMuted },
   energyNumSelected: { color: colors.surface },
-  energyHint:{ fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginLeft: 4 },
+  energyHint:{ ...typography.caption, fontSize: 12, color: colors.textMuted, marginLeft: 4 },
   symptomGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

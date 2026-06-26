@@ -27,6 +27,16 @@ interface GoogleCalendarListResponse {
   }>;
 }
 
+interface GoogleCalendarEventResponse {
+  id?: string;
+  summary?: string;
+  start?: { dateTime?: string; timeZone?: string };
+  end?: { dateTime?: string; timeZone?: string };
+  location?: string;
+  description?: string;
+  status?: string;
+}
+
 function buildApiError(status: number, message: string): GoogleApiError {
   const error = new Error(message) as GoogleApiError;
   error.code = 'GOOGLE_API_ERROR';
@@ -61,6 +71,24 @@ async function requestJson<T>(accessToken: string, url: string, init?: RequestIn
   return (await response.json()) as T;
 }
 
+function mapGoogleCalendarEvent(item: GoogleCalendarEventResponse): GoogleCalendarEvent {
+  return {
+    id: item.id,
+    summary: item.summary ?? '',
+    start: {
+      dateTime: item.start?.dateTime ?? '',
+      timeZone: item.start?.timeZone ?? 'UTC',
+    },
+    end: {
+      dateTime: item.end?.dateTime ?? item.start?.dateTime ?? '',
+      timeZone: item.end?.timeZone ?? item.start?.timeZone ?? 'UTC',
+    },
+    location: item.location,
+    description: item.description,
+    status: item.status,
+  };
+}
+
 export async function createCalendarEvent(
   accessToken: string,
   event: Omit<GoogleCalendarEvent, 'id'>,
@@ -86,6 +114,21 @@ export async function updateCalendarEvent(
     method: 'PATCH',
     body: JSON.stringify(event),
   });
+}
+
+export async function getCalendarEvent(accessToken: string, eventId: string): Promise<GoogleCalendarEvent | null> {
+  try {
+    const event = await requestJson<GoogleCalendarEventResponse>(
+      accessToken,
+      `${GOOGLE_CALENDAR_API_BASE}/${eventId}`,
+    );
+    return mapGoogleCalendarEvent(event);
+  } catch (error) {
+    if ((error as Partial<GoogleApiError>).code === 'GOOGLE_API_ERROR' && (error as Partial<GoogleApiError>).status === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function deleteCalendarEvent(accessToken: string, eventId: string): Promise<void> {
@@ -130,19 +173,5 @@ export async function listCalendarEvents(
       if (item.status === 'cancelled') return true;
       return Boolean(item.summary && item.start?.dateTime && item.end?.dateTime);
     })
-    .map((item) => ({
-      id: item.id,
-      summary: item.summary ?? '',
-      start: {
-        dateTime: item.start?.dateTime ?? '',
-        timeZone: item.start?.timeZone ?? 'UTC',
-      },
-      end: {
-        dateTime: item.end?.dateTime ?? item.start?.dateTime ?? '',
-        timeZone: item.end?.timeZone ?? item.start?.timeZone ?? 'UTC',
-      },
-      location: item.location,
-      description: item.description,
-      status: item.status,
-    }));
+    .map(mapGoogleCalendarEvent);
 }

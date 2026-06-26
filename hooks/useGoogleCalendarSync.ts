@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 
 import { getValidAccessToken } from '../lib/googleAuth';
-import { createCalendarEvent, listCalendarEvents, updateCalendarEvent } from '../lib/googleCalendarApi';
+import { createCalendarEvent, getCalendarEvent, listCalendarEvents, updateCalendarEvent } from '../lib/googleCalendarApi';
 import {
     loadGoogleCalendarSyncMetadata,
     setGoogleCalendarLastSyncedAt,
@@ -39,6 +39,11 @@ function normalizeIso(value: string): string {
   return new Date(value).toISOString();
 }
 
+function getValidTimestamp(value: string): number | null {
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 function getGoogleEventStartIso(event: { start: { dateTime?: string; date?: string } }): string | null {
   if (event.start.dateTime) {
     const parsed = new Date(event.start.dateTime);
@@ -69,6 +74,39 @@ function buildGoogleEventFromAppointment(appointment: Pick<Appointment, 'title' 
     },
     location: appointment.location ?? undefined,
   };
+}
+
+function buildGoogleSyncWindow(appointments: Appointment[]): { timeMin: string; timeMax: string } {
+  const linkedAppointmentTimestamps = appointments
+    .filter((appointment) => Boolean(appointment.google_event_id))
+    .map((appointment) => getValidTimestamp(appointment.appointment_date))
+    .filter((timestamp): timestamp is number => timestamp !== null);
+
+  const fallbackNow = Date.now();
+  const minLinkedTs = linkedAppointmentTimestamps.length > 0
+    ? Math.min(...linkedAppointmentTimestamps)
+    : fallbackNow - 30 * 24 * 60 * 60 * 1000;
+  const maxLinkedTs = linkedAppointmentTimestamps.length > 0
+    ? Math.max(...linkedAppointmentTimestamps)
+    : fallbackNow + 365 * 24 * 60 * 60 * 1000;
+
+  return {
+    timeMin: new Date(minLinkedTs - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    timeMax: new Date(maxLinkedTs + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+}
+
+async function findLinkedGoogleEvent(
+  accessToken: string,
+  googleEventId: string,
+  eventsById: Map<string, Awaited<ReturnType<typeof listCalendarEvents>>[number]>,
+) {
+  const listedEvent = eventsById.get(googleEventId);
+  if (listedEvent) {
+    return listedEvent;
+  }
+
+  return getCalendarEvent(accessToken, googleEventId);
 }
 
 export async function syncGoogleCalendarForUserHousehold(
@@ -102,22 +140,7 @@ export async function syncGoogleCalendarForUserHousehold(
   }
 
   const appointments = (rows ?? []) as unknown as Appointment[];
-  const linkedAppointmentTimestamps = appointments
-    .filter((appointment) => Boolean(appointment.google_event_id))
-    .map((appointment) => new Date(appointment.appointment_date).getTime())
-    .filter((timestamp) => Number.isFinite(timestamp));
-
-  const fallbackNow = Date.now();
-  const minLinkedTs = linkedAppointmentTimestamps.length > 0
-    ? Math.min(...linkedAppointmentTimestamps)
-    : fallbackNow - 30 * 24 * 60 * 60 * 1000;
-  const maxLinkedTs = linkedAppointmentTimestamps.length > 0
-    ? Math.max(...linkedAppointmentTimestamps)
-    : fallbackNow + 365 * 24 * 60 * 60 * 1000;
-
-  const timeMin = new Date(minLinkedTs - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const timeMax = new Date(maxLinkedTs + 30 * 24 * 60 * 60 * 1000).toISOString();
-
+  const { timeMin, timeMax } = buildGoogleSyncWindow(appointments);
   const events = await listCalendarEvents(accessToken, timeMin, timeMax);
   const eventsById = new Map(events.filter((event) => event.id).map((event) => [event.id as string, event]));
 
@@ -127,6 +150,11 @@ export async function syncGoogleCalendarForUserHousehold(
   let pushed = 0;
 
   for (const appointment of appointments) {
+    if (!getValidTimestamp(appointment.appointment_date)) {
+      console.warn('Google Calendar sync skipped appointment with invalid date', appointment.id);
+      continue;
+    }
+
     if (!appointment.google_event_id) {
       try {
         const eventId = await createCalendarEvent(accessToken, buildGoogleEventFromAppointment(appointment));
@@ -144,7 +172,7 @@ export async function syncGoogleCalendarForUserHousehold(
       continue;
     }
 
-    const linkedEvent = eventsById.get(appointment.google_event_id);
+    const linkedEvent = await findLinkedGoogleEvent(accessToken, appointment.google_event_id, eventsById);
     if (!linkedEvent || linkedEvent.status === 'cancelled') {
       if (conflictPolicy === 'blueberry_wins') {
         try {

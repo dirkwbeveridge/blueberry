@@ -11,7 +11,7 @@ import { Button } from '../../components/ui/Button';
 import { DateField } from '../../components/ui/DateField';
 import { Input } from '../../components/ui/Input';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
-import { colors, fonts, radii, spacing } from '../../constants/theme';
+import { colors, fonts, radii, spacing, typography } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useHouseholdStore } from '../../store/household';
 import type { BabyGender, Stage, UserRole } from '../../types';
@@ -328,30 +328,30 @@ const styles = StyleSheet.create({
   screen:      { flex: 1, backgroundColor: colors.background },
   scroll:      { flexGrow: 1, alignItems: 'center', padding: spacing.lg, gap: spacing.md },
   logo:        { fontSize: 56, marginTop: spacing.xl },
-  appName:     { fontFamily: fonts.heading.bold, fontSize: 32, color: colors.primary },
-  tagline:     { fontFamily: fonts.body.regular, fontSize: 15, color: colors.textMuted, marginBottom: spacing.md },
+  appName:     { ...typography.title, fontSize: 32, lineHeight: 38, color: colors.primary },
+  tagline:     { ...typography.body, color: colors.textMuted, marginBottom: spacing.md },
   form:        { width: '100%', gap: spacing.md },
-  stepTitle:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.text, marginBottom: spacing.xs },
+  stepTitle:   { ...typography.heading, fontSize: 22, color: colors.text, marginBottom: spacing.xs },
   switchAuthBtn: { minHeight: 44, justifyContent: 'center' },
-  switchAuth:  { fontFamily: fonts.body.medium, fontSize: 14, color: colors.primary, textAlign: 'center', marginTop: spacing.xs },
+  switchAuth:  { ...typography.label, fontSize: 14, color: colors.primary, textAlign: 'center', marginTop: spacing.xs },
   passwordToggleBtn: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-end' },
-  passwordToggleText: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },
-  sectionLabel:{ fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text },
+  passwordToggleText: { ...typography.label, color: colors.primary },
+  sectionLabel:{ ...typography.label, fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text },
   roleBtn:     { flexDirection: 'row', minHeight: 48, alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radii.lg, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
   roleBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
   roleEmoji:   { fontSize: 28 },
-  roleLabel:   { fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
+  roleLabel:   { ...typography.body, fontFamily: fonts.body.semibold, fontSize: 16, color: colors.textMuted },
   roleLabelSelected: { color: colors.primary },
-  roleDescription: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  roleDescription: { ...typography.caption, fontSize: 12, lineHeight: 18, color: colors.textMuted, marginTop: 2 },
   stageRow:    { flexDirection: 'row', gap: spacing.sm },
   stageBtn:    { flex: 1, minHeight: 48, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   stageBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
-  stageLabel:  { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
+  stageLabel:  { ...typography.label, fontSize: 12, color: colors.textMuted },
   stageLabelSelected: { color: colors.primary },
   genderRow:   { flexDirection: 'row', gap: spacing.sm },
   genderBtn:   { flex: 1, minHeight: 48, paddingVertical: spacing.md, borderRadius: radii.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   genderBtnSelected: { borderColor: colors.primary, backgroundColor: colors.primaryTint },
-  genderLabel: { fontFamily: fonts.body.medium, fontSize: 12, color: colors.textMuted },
+  genderLabel: { ...typography.label, fontSize: 12, color: colors.textMuted },
   genderLabelSelected: { color: colors.primary },
-  errorText:   { fontFamily: fonts.body.regular, fontSize: 12, color: colors.error },
+  errorText:   { ...typography.caption, fontSize: 12, color: colors.error },
 });

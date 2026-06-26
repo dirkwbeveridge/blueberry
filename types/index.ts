@@ -3,6 +3,11 @@ export type BabyGender = 'male' | 'female' | 'unknown';
 export type Priority = 'low' | 'medium' | 'high';
 export type UserRole = 'mother' | 'partner';
 export type BabyLogType = 'feeding' | 'sleep' | 'diaper' | 'handoff' | 'pumping' | 'solids';
+export type HouseholdEventType = 'night_shift_swap';
+export type PostpartumRecoveryStatus = 'steady' | 'tender' | 'drained' | 'overwhelmed';
+export type PostpartumBleedingLevel = 'lighter' | 'same' | 'heavier';
+export type PostpartumSleepQuality = 'broken' | 'patchy' | 'okay';
+export type NightShiftStatus = 'starting' | 'ending' | 'need-help';
 
 export interface Household {
   id: string;
@@ -80,6 +85,37 @@ export interface BabyLog {
   details: Record<string, unknown> | null;
   notes: string | null;
   created_at: string;
+}
+
+export interface HouseholdEvent {
+  id: string;
+  household_id: string;
+  actor_id: string;
+  event_type: HouseholdEventType;
+  payload: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface PostpartumCheckIn {
+  recoveryStatus: PostpartumRecoveryStatus;
+  bleeding: PostpartumBleedingLevel;
+  sleepQuality: PostpartumSleepQuality;
+  energyLevel: number | null;
+  notes: string;
+}
+
+export interface PostpartumCheckInEntry extends PostpartumCheckIn {
+  id: string;
+  logged_at: string;
+}
+
+export interface PostpartumStats {
+  feedingsToday: number;
+  diapersToday: number;
+  sleepMinutesToday: number;
+  pumpingSessionsToday: number;
+  latestFeedingAt: string | null;
+  latestSleepAt: string | null;
 }
 
 export interface KickSession {

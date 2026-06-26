@@ -13,7 +13,7 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, fonts, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 
@@ -172,16 +172,16 @@ const styles = StyleSheet.create({
   },
   kickBtnActive: { backgroundColor: colors.primary },
   kickEmoji:    { fontSize: 32 },
-  kickCount:    { fontFamily: fonts.heading.bold, fontSize: 48, color: colors.primary },
+  kickCount:    { ...typography.display, fontSize: 48, lineHeight: 52, color: colors.primary },
   kickCountActive: { color: colors.surface },
-  kickLabel:    { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
+  kickLabel:    { ...typography.caption, fontSize: 12, color: colors.textMuted },
   kickLabelActive: { color: 'rgba(255,255,255,0.85)' },
   statsRow:  { flexDirection: 'row', gap: spacing.xl, justifyContent: 'center' },
   stat:      { alignItems: 'center', gap: 2 },
-  statVal:   { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.primary },
-  statLabel: { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted },
+  statVal:   { ...typography.heading, fontSize: 22, lineHeight: 28, color: colors.primary },
+  statLabel: { ...typography.caption, color: colors.textMuted },
   goal:      { backgroundColor: colors.successTint, borderColor: colors.success, borderWidth: 1, alignSelf: 'stretch' },
-  goalText:  { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.success, textAlign: 'center' },
-  hint:      { fontFamily: fonts.body.regular, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20, maxWidth: 280 },
+  goalText:  { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.success, textAlign: 'center' },
+  hint:      { ...typography.label, color: colors.textMuted, textAlign: 'center', maxWidth: 280 },
   actions:   { width: '100%', gap: spacing.sm },
 });

@@ -1,7 +1,7 @@
 ---
 workstream: calendar-sync
 created: 2026-06-09
-updated: 2026-06-20
+updated: 2026-06-26
 ---
 
 # Project State
@@ -9,8 +9,8 @@ updated: 2026-06-20
 ## Current Position
 **Status:** In progress
 **Current Phase:** 01-calendar-sync
-**Last Activity:** 2026-06-20
-**Last Activity Description:** 7a Google Calendar implementation completed in code (OAuth PKCE, token lifecycle, write-path sync, foreground sync, conflict-policy handling). 7b remains not started.
+**Last Activity:** 2026-06-26
+**Last Activity Description:** Reconciled against merged `main`: 7a remains code-complete in app and pending real-device/live-backend verification; 7b remains not started.
 
 ## Progress
 **Phases Complete:** 0
@@ -25,13 +25,13 @@ updated: 2026-06-20
 
 ## Dependency
 
-This workstream requires the **core-app workstream Phase 6 (Partner and Appointments)** to be live and end-to-end verified before calendar sync can be tested. Specifically:
+This workstream requires the **core-app workstream Phase 6 (Partner and Appointments)** to be live and end-to-end verified before calendar sync can be fully closed. Specifically:
 
 - `appointments` table must be deployed in Supabase with RLS active.
 - The Add Appointment modal (`app/(modals)/add-appointment.tsx`) must be confirmed saving records to Supabase.
 - Both partners must be able to view shared appointments.
 
-Tasks 7 and 10 are now implemented in code. Remaining execution for this workstream is 7a real-device verification and 7b implementation.
+Tasks 7 and 10 are now implemented in code on `main`. Remaining execution for this workstream is 7a real-device/live-backend verification and 7b implementation.
 
 ## Blocking Open Questions
 
@@ -57,7 +57,7 @@ Before execution can begin, the following require a human decision:
 - Task 11 (inbound Apple sync): not done
 
 ## Session Continuity
-**Stopped At:** 7a code-complete state with verification pending; 7b not started.
+**Stopped At:** 7a code-complete state on `main` with verification pending; 7b not started.
 **Resume File:** .planning/workstreams/calendar-sync/phases/01-calendar-sync/PLAN.md
 
 ## Next Action

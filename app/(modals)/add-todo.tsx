@@ -11,7 +11,7 @@ import { Chip } from '../../components/ui/Chip';
 import { DateField } from '../../components/ui/DateField';
 import { Input } from '../../components/ui/Input';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, fonts, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { supabase } from '../../lib/supabase';
 import type { Priority } from '../../types';
@@ -96,7 +96,7 @@ export default function AddTodoModal() {
 }
 
 const styles = StyleSheet.create({
-  sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 14, color: colors.text, marginBottom: spacing.sm },
+  sectionLabel: { ...typography.label, fontSize: 14, fontFamily: fonts.body.semibold, color: colors.text, marginBottom: spacing.sm },
   priorityRow:  { flexDirection: 'row', gap: spacing.sm },
   priorityChip: { flex: 1, justifyContent: 'center', minHeight: 44 },
 });

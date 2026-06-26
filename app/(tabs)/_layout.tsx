@@ -13,11 +13,9 @@ import { useHousehold } from '../../hooks/useHousehold';
 // Postpartum:
 // - Baby tab is added for both roles when stage = postpartum.
 //
-// Health and Together both live in this stack. We hide whichever does not
-// belong in the active role's tab bar via `href: null` — the route is still
-// reachable for Mom to peek at Together via More (privacy-safe, no logs), but
-// Health stays out of Partner's bar AND a guard inside health.tsx blocks the
-// route to defend Mom's logs even if Partner deep-links there.
+// Health and Together both live in this stack. Health remains mother-only.
+// Together becomes shared during postpartum because handoffs and baby rhythm
+// are household coordination surfaces, not private notes.
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
   return <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.55 }}>{emoji}</Text>;
 }
@@ -67,7 +65,7 @@ export default function TabsLayout() {
         options={{
           title:        'Together',
           tabBarIcon:   ({ focused }) => <TabIcon emoji="💙" focused={focused} />,
-          href:         !roleResolved ? null : isPartnerRole ? undefined : null,
+          href:         !roleResolved ? null : isPostpartum ? undefined : isPartnerRole ? undefined : null,
         }}
       />
       <Tabs.Screen

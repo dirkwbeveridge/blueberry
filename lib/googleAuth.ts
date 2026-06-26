@@ -22,6 +22,17 @@ interface GoogleTokenResponse {
   scope?: string;
 }
 
+interface GoogleTokenErrorResponse {
+  error?: string;
+  error_description?: string;
+}
+
+export interface GoogleTokenRequestError extends Error {
+  code: 'GOOGLE_TOKEN_ERROR';
+  status: number;
+  errorCode?: string;
+}
+
 interface ExchangeCodeParams {
   code: string;
   codeVerifier: string;
@@ -34,6 +45,14 @@ function getGoogleClientId(): string {
 
 function storageKey(userId: string): string {
   return `google_tokens_${userId}`;
+}
+
+function buildTokenError(status: number, message: string, errorCode?: string): GoogleTokenRequestError {
+  const error = new Error(message) as GoogleTokenRequestError;
+  error.code = 'GOOGLE_TOKEN_ERROR';
+  error.status = status;
+  error.errorCode = errorCode;
+  return error;
 }
 
 export async function saveGoogleTokens(userId: string, tokens: GoogleCalendarTokens): Promise<void> {
@@ -90,11 +109,12 @@ async function postTokenForm(body: Record<string, string>): Promise<GoogleTokenR
   }
 
   if (!response.ok) {
+    const errorPayload = parsed as GoogleTokenErrorResponse | null;
     const message =
-      typeof parsed === 'object' && parsed !== null && 'error_description' in parsed && typeof (parsed as { error_description?: unknown }).error_description === 'string'
-        ? (parsed as { error_description: string }).error_description
+      typeof errorPayload?.error_description === 'string'
+        ? errorPayload.error_description
         : `Google token request failed (${response.status})`;
-    throw new Error(message);
+    throw buildTokenError(response.status, message, errorPayload?.error);
   }
 
   if (!parsed || typeof parsed !== 'object' || !('access_token' in parsed) || !('expires_in' in parsed)) {
@@ -145,6 +165,17 @@ export async function refreshGoogleTokens(userId: string): Promise<GoogleCalenda
   return refreshed;
 }
 
+function shouldClearTokensAfterRefreshError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'GOOGLE_TOKEN_ERROR' &&
+    'errorCode' in error &&
+    error.errorCode === 'invalid_grant'
+  );
+}
+
 export async function getValidAccessToken(userId: string): Promise<string | null> {
   const tokens = await loadGoogleTokens(userId);
   if (!tokens) return null;
@@ -161,8 +192,11 @@ export async function getValidAccessToken(userId: string): Promise<string | null
   try {
     const refreshed = await refreshGoogleTokens(userId);
     return refreshed?.access_token ?? null;
-  } catch {
-    await clearGoogleTokens(userId);
-    return null;
+  } catch (error) {
+    if (shouldClearTokensAfterRefreshError(error)) {
+      await clearGoogleTokens(userId);
+      return null;
+    }
+    throw error;
   }
 }

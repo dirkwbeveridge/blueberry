@@ -10,7 +10,7 @@ import {
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, fonts, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { loadGoogleTokens } from '../../lib/googleAuth';
 import { supabase } from '../../lib/supabase';
@@ -189,24 +189,24 @@ const styles = StyleSheet.create({
   profileCard: { marginBottom: spacing.xs },
   profileRow:  { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
   avatar:      { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  avatarText:  { fontFamily: fonts.heading.bold, fontSize: 22, color: colors.surface },
+  avatarText:  { ...typography.heading, fontSize: 22, color: colors.surface },
   profileBody: { flex: 1, gap: 2 },
-  profileName: { fontFamily: fonts.heading.semibold, fontSize: 17, color: colors.text },
-  profileRole: { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },
-  profilePartner: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted, marginTop: 2 },
-  profilePartnerMissing: { fontFamily: fonts.body.regular, fontSize: 12, color: colors.warning, marginTop: 2 },
+  profileName: { ...typography.subheading, color: colors.text },
+  profileRole: { ...typography.label, color: colors.primary },
+  profilePartner: { ...typography.caption, fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  profilePartnerMissing: { ...typography.caption, fontSize: 12, color: colors.warning, marginTop: 2 },
 
   section:      { gap: spacing.sm },
-  sectionLabel: { fontFamily: fonts.body.semibold, fontSize: 12, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
+  sectionLabel: { ...typography.label, fontSize: 12, fontFamily: fonts.body.semibold, color: colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
   row:          { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, minHeight: 44 },
   rowBorder:    { borderBottomWidth: 1, borderBottomColor: colors.border },
   rowEmoji:     { fontSize: 22, width: 28, textAlign: 'center' },
   rowBody:      { flex: 1, gap: 2 },
-  rowLabel:     { fontFamily: fonts.body.semibold, fontSize: 15, color: colors.text },
+  rowLabel:     { ...typography.body, fontFamily: fonts.body.semibold, color: colors.text },
   rowLabelMuted:{ color: colors.textMuted },
-  rowSub:       { fontFamily: fonts.body.regular, fontSize: 12, color: colors.textMuted },
-  rowRight:     { fontFamily: fonts.body.medium, fontSize: 13, color: colors.primary },
+  rowSub:       { ...typography.caption, fontSize: 12, color: colors.textMuted },
+  rowRight:     { ...typography.label, color: colors.primary },
   chev:         { fontSize: 22, color: colors.textMuted, lineHeight: 22 },
 
-  footer:       { fontFamily: fonts.body.regular, fontSize: 11, color: colors.textMuted, textAlign: 'center', marginTop: spacing.lg, opacity: 0.6 },
+  footer:       { ...typography.caption, color: colors.textMuted, textAlign: 'center', marginTop: spacing.lg, opacity: 0.6 },
 });
