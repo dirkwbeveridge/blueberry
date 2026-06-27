@@ -43,7 +43,7 @@ const withPodfileXcode26Fix = (config) =>
   Dir.glob(File.join(installer.sandbox.root, "Target Support Files", "**", "*-resources.sh")).each do |script|
     content = File.read(script)
     modified = content
-      .gsub(/\\$\\{PODS_ROOT\\}\\/resources-to-copy-/, '${TMPDIR}/resources-to-copy-')
+      .gsub(/\\$\\{PODS_ROOT\\}\\/resources-to-copy-/, '\\${TMPDIR}/resources-to-copy-')
       .gsub('$(realpath -mq "\${0}")', '$(cd "$(dirname "$0")"; pwd)/$(basename "$0")')
       .gsub('rsync -avr --copy-links --no-relative --exclude', 'rsync -avr --copy-links --no-relative --inplace --exclude')
     File.write(script, modified) if modified != content
