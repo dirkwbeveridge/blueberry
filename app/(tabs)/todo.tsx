@@ -18,6 +18,7 @@ import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { colors, fonts, priorityColors, radii, spacing, typography } from '../../constants/theme';
 import { useHousehold } from '../../hooks/useHousehold';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { deleteAppleCalendarEvent } from '../../lib/appleCalendar';
 import { getValidAccessToken } from '../../lib/googleAuth';
 import { deleteCalendarEvent } from '../../lib/googleCalendarApi';
 import { cancelAppointmentReminderByAppointmentId } from '../../lib/notifications';
@@ -169,6 +170,14 @@ export default function PlanScreen() {
               }
             } catch (googleDeleteError) {
               console.warn('Google Calendar delete sync failed', googleDeleteError);
+            }
+          }
+
+          if (appointment.apple_event_id) {
+            try {
+              await deleteAppleCalendarEvent(appointment.apple_event_id);
+            } catch (appleDeleteError) {
+              console.warn('Apple Calendar delete sync failed', appleDeleteError);
             }
           }
         } catch {

@@ -62,6 +62,7 @@ export interface Appointment {
   location: string | null;
   notes: string | null;
   google_event_id: string | null;
+  apple_event_id: string | null;
   created_at: string;
 }
 

@@ -37,6 +37,18 @@ const optionalEnvVars = [
   'EXPO_PUBLIC_GOOGLE_CLIENT_ID',
 ];
 
+const remoteFunctionSecrets = [
+  'APNS_PRIVATE_KEY',
+  'APNS_KEY_ID',
+  'APNS_TEAM_ID',
+  'APNS_BUNDLE_ID',
+  'APNS_ENV',
+  'PUSH_FUNCTION_SECRET',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'SUPABASE_ANON_KEY',
+  'SUPABASE_URL',
+];
+
 const requiredFiles = [
   'supabase-schema.sql',
   'lib/supabase.ts',
@@ -48,6 +60,7 @@ const requiredFiles = [
 
 const requiredPushFiles = [
   'supabase/functions/send-apns-notification/index.ts',
+  'supabase/functions/dispatch-event-notification/index.ts',
   'supabase/migrations/20260620100000_create_device_push_tokens.sql',
 ];
 
@@ -79,6 +92,17 @@ console.log('\nOptional environment variables');
 for (const key of optionalEnvVars) {
   const present = Boolean(process.env[key]);
   console.log(`${present ? 'PASS' : 'WARN'}  ${key}${present ? '' : ' (only needed for Google Calendar flows)'}`);
+}
+
+console.log('\nSupabase function secrets (remote deployment only)');
+for (const key of remoteFunctionSecrets) {
+  const present = Boolean(process.env[key]);
+  console.log(`${present ? 'PASS' : 'WARN'}  ${key}${present ? '' : ' (needed when deploying Edge Functions or validating APNs end-to-end)'}`);
+}
+
+const legacyAuthKeyPresent = Boolean(process.env.APNS_AUTH_KEY);
+if (legacyAuthKeyPresent) {
+  console.log('\nINFO  APNS_AUTH_KEY is set but not used by current functions (APNS_PRIVATE_KEY is authoritative).');
 }
 
 let filesOk = true;

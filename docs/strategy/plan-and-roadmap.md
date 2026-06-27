@@ -3,6 +3,8 @@
 Date: 2026-06-21
 Status: Updated sequencing for accelerated non-AI Phase 1 completion
 
+Note: This document is directional strategy sequencing. For implementation-status truth (7a/7b/7c and Family Mode execution state), use `.planning/STATE.md` and workstream `STATE.md` files.
+
 ## Milestone Dates
 
 - Phase 0 (Rebaseline and scope lock): 2026-06-22 to 2026-06-23

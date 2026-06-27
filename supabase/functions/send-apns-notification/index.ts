@@ -9,6 +9,24 @@ type ApnsRequest = {
   environment?: 'sandbox' | 'production';
 };
 
+function getRequiredPushSecret() {
+  const secret = Deno.env.get('PUSH_FUNCTION_SECRET');
+  if (!secret || secret.trim().length === 0) {
+    throw new Error('Missing PUSH_FUNCTION_SECRET');
+  }
+
+  return secret;
+}
+
+function assertAuthorized(request: Request) {
+  const configuredSecret = getRequiredPushSecret();
+  const providedSecret = request.headers.get('x-push-function-secret');
+
+  if (!providedSecret || providedSecret !== configuredSecret) {
+    throw new Error('Unauthorized');
+  }
+}
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -72,14 +90,28 @@ async function createApnsJwt() {
     .sign(key);
 }
 
+function resolveApnsEnvironment(value: string | undefined) {
+  if (!value) {
+    return 'sandbox' as const;
+  }
+
+  if (value !== 'sandbox' && value !== 'production') {
+    throw new Error("APNS_ENV must be 'sandbox' or 'production'");
+  }
+
+  return value;
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
   }
 
   try {
+    assertAuthorized(request);
+
     const defaultBundleId = Deno.env.get('APNS_BUNDLE_ID');
-    const defaultEnvironment = Deno.env.get('APNS_ENV') ?? 'sandbox';
+    const defaultEnvironment = resolveApnsEnvironment(Deno.env.get('APNS_ENV'));
     const body = parseApnsRequest(await request.json());
     const bundleId = body.bundleId ?? defaultBundleId;
     const apnsEnvironment = body.environment ?? defaultEnvironment;
@@ -123,9 +155,20 @@ Deno.serve(async (request: Request) => {
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Invalid APNs request';
+    if (message === 'Unauthorized') {
+      return Response.json({ error: message }, { status: 401 });
+    }
+
     return Response.json(
       { error: message },
-      { status: message === 'Missing APNs credentials' ? 500 : 400 }
+      {
+        status:
+          message === 'Missing APNs credentials' ||
+          message === 'Missing APNS_BUNDLE_ID' ||
+          message === 'Missing PUSH_FUNCTION_SECRET'
+            ? 500
+            : 400,
+      }
     );
   }
 

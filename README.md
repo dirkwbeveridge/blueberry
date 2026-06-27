@@ -44,6 +44,35 @@ Auth and data flows expect the Supabase schema to be deployed before golden-path
 - Browser web rendering currently fails with `Cannot use 'import.meta' outside a module`; web is not a Phase 1 target for this mobile app.
 - iOS simulator launch was not verified because `xcrun simctl help` exits with code 72 in this environment.
 
+## Google Calendar 7a Verification
+
+- Readiness gate: `npm run gc:7a:readiness`
+- Deterministic verifier: `npm run gc:7a:verify`
+- Full runbook: `docs/google-calendar-7a-verification.md`
+
+## Push Backend Readiness
+
+Blueberry push delivery is APNs-first and split into two Supabase Edge Functions:
+
+- `send-apns-notification`: sends one APNs alert to a specific native iOS token
+- `dispatch-event-notification`: event dispatcher scaffold that resolves recipients from
+	`users` + `device_push_tokens` + `notification_preferences`
+
+Quick checks:
+
+```bash
+npm run push:readiness
+```
+
+Deploy (after setting Supabase function secrets):
+
+```bash
+supabase functions deploy send-apns-notification
+supabase functions deploy dispatch-event-notification
+```
+
+Note: APNs delivery validation remains blocked on Apple Developer credentials and a real iPhone token.
+
 ## Planning
 
 GSD planning lives in `.planning/`. Legacy Claude/Firebase registry artifacts are intentionally excluded.

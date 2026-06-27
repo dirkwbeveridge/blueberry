@@ -119,6 +119,7 @@ create table appointments (
   location          text,
   notes             text,
   google_event_id   text,
+  apple_event_id    text,
   created_by        uuid references users(id) on delete set null,
   created_at        timestamptz not null default now()
 );
